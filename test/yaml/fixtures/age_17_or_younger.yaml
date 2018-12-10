@@ -1,0 +1,53 @@
+---
+name: Aged 17 years or younger
+
+data:
+-
+  resourceType: Patient
+  name: Joe Smith
+  gender: male
+  birthDate: 2003-02-16
+-
+  resourceType: MedicationOrder
+  code: RXNORM#197591 Diazepam 5 MG Oral Tablet
+  dateWritten: 2018-12-05
+
+results:
+  Summary:
+    Patient:
+      Name: Joe Smith
+      Gender: male
+      Age: 15
+      MeetsInclusionCriteria: false
+    PertinentMedicalHistory:
+      ConditionsAssociatedWithChronicPain: []
+      RiskFactorsForOpioidRelatedHarms: []
+    PainAssessments:
+      NumericPainIntensityAssessments: []
+      PainEnjoymentGeneralActivityAssessments: []
+      STarTBackAssessments: []
+    HistoricalTreatments:
+      OpioidMedications: []
+      NonOpioidMedications:
+      -
+        Type: Order
+        Name: Diazepam 5 MG Oral Tablet
+        Start: '2018-12-05T00:00:00.000+00:00'
+        End: null
+        Status: active
+      NonPharmacologicTreatments: []
+      StoolSoftenersAndLaxatives: []
+    RiskConsiderations:
+      RiskScreeningsRelevantToPainManagement: []
+      BenzodiazepineMedications:
+      -
+        Type: Order
+        Name: Diazepam 5 MG Oral Tablet
+        Start: '2018-12-05T00:00:00.000+00:00'
+        End: null
+        Status: active
+      NaloxoneMedications: []
+      UrineDrugScreens: []
+      MostRecentMME: null
+    
+      

@@ -1,0 +1,4 @@
+**/vscache/
+/.vscode
+/node_modules
+yarn-error.log
