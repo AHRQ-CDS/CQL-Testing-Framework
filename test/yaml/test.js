@@ -1,8 +1,6 @@
 const path = require('path');
-const yaml = require('../../src').yaml;
+const cqlt = require('../../src');
 
-describe('YAML Test Cases', () => {
-  const elmPath = path.resolve(__dirname, './cql/Factors_to_Consider_in_Managing_Chronic_Pain.json');
-  const yamlPath = path.resolve(__dirname, './fixtures');
-  yaml(elmPath, yamlPath, '2018-12-10T00:00:00.0Z');
-});
+const library = cqlt.loadLibrary('Factors_to_Consider_in_Managing_Chronic_Pain', [path.resolve(__dirname, './cql')]);
+const yamlPath = path.resolve(__dirname, './fixtures');
+cqlt.yaml.testSuite(library, yamlPath, '2018-12-10T00:00:00.0Z');

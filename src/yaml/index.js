@@ -10,8 +10,7 @@ const yamlToTestCase = require('./yamlToTestCase');
 const DUMP_PATIENTS = false;
 const DUMP_RESULTS = false;
 
-module.exports = function(pathToElmJson, pathToYamlFolder, executionDateTimeString) {
-  const library = loadLibrary(pathToElmJson);
+function testSuite(library, pathToYamlFolder, executionDateTimeString) {
   const identifier = library.source.library.identifier;
   const libraryHandle = `${identifier.id}_v${identifier.version}`;
   let executionDateTime;
@@ -84,22 +83,22 @@ function simplifyResult(result) {
   return result;
 }
 
-function loadLibrary(pathToLibrary) {
-  const elmFile = require(pathToLibrary);
-  const libraries = {};
-  // Look in the CQL file's folder for other libraries to include
-  for (const fileName of fs.readdirSync(path.dirname(pathToLibrary))) {
-    const file = path.join(path.dirname(pathToLibrary), fileName);
-    if (!file.endsWith('.json') || file == pathToLibrary) {
-      continue;
-    }
-    const json = require(file);
-    if (json && json.library && json.library.identifier && json.library.identifier.id) {
-      libraries[json.library.identifier.id] = json;
-    }
-  }
-  return new cql.Library(elmFile, new cql.Repository(libraries));
-}
+// function loadLibrary(pathToLibrary) {
+//   const elmFile = require(pathToLibrary);
+//   const libraries = {};
+//   // Look in the CQL file's folder for other libraries to include
+//   for (const fileName of fs.readdirSync(path.dirname(pathToLibrary))) {
+//     const file = path.join(path.dirname(pathToLibrary), fileName);
+//     if (!file.endsWith('.json') || file == pathToLibrary) {
+//       continue;
+//     }
+//     const json = require(file);
+//     if (json && json.library && json.library.identifier && json.library.identifier.id) {
+//       libraries[json.library.identifier.id] = json;
+//     }
+//   }
+//   return new cql.Library(elmFile, new cql.Repository(libraries));
+// }
 
 function loadCodeService() {
   const codeservice = new cs.CodeService(path.join(__dirname, 'vscache'));
@@ -121,3 +120,5 @@ function ensureValueSets(codeService, library, done) {
     done();
   }
 }
+
+module.exports = { testSuite };
