@@ -1,6 +1,25 @@
+const path = require('path');
 const yaml = require('js-yaml');
 const fs   = require('fs');
 const uuidv4 = require('uuid/v4');
+const TestCase = require('./testCase');
+
+function loadYamlTestCases(yamlPath) {
+  return recursiveLoadYamlTestCases(yamlPath, []);
+}
+
+function recursiveLoadYamlTestCases(yamlPath, testCases = []) {
+  const stat = fs.statSync(yamlPath);
+  if (stat.isDirectory()) {
+    for (const fileName of fs.readdirSync(yamlPath)) {
+      const file = path.join(yamlPath, fileName);
+      recursiveLoadYamlTestCases(file, testCases);
+    }
+  } else if (stat.isFile() && (yamlPath.endsWith('.yaml') || yamlPath.endsWith('.yml'))) {
+    testCases.push(yamlToTestCase(yamlPath));
+  }
+  return testCases;
+}
 
 function yamlToTestCase(yamlFilePath) {
   // Get document, or throw exception on error
@@ -10,10 +29,7 @@ function yamlToTestCase(yamlFilePath) {
   }
   const testName = doc.name;
   if (doc.skip) {
-    return {
-      name: testName,
-      skip: true
-    };
+    return new TestCase(testName, null, null, true);
   }
 
   // Handle the data
@@ -61,13 +77,7 @@ function yamlToTestCase(yamlFilePath) {
     doc.results = {};
   }
 
-  return {
-    name: testName,
-    skip: false,
-    only: doc.only != null ? doc.only : false,
-    bundle,
-    results: doc.results
-  };
+  return new TestCase(testName, bundle, doc.results, false, doc.only);
 }
 
 function handlePatient(d) {
@@ -322,4 +332,4 @@ function getObservationComponents(components) {
   }
 }
 
-module.exports = yamlToTestCase;
+module.exports = loadYamlTestCases;

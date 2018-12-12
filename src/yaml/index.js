@@ -4,13 +4,12 @@ const cs = require('cql-exec-vsac');
 const cql = require('cql-execution');
 const fhir = require('cql-exec-fhir');
 const {expect} = require('chai');
-const yamlToTestCase = require('./yamlToTestCase');
 
 // Set these to true to dump out files for easier debugging
 const DUMP_PATIENTS = false;
 const DUMP_RESULTS = false;
 
-function testSuite(library, pathToYamlFolder, executionDateTimeString) {
+function testSuite(library, testCases, executionDateTimeString) {
   const identifier = library.source.library.identifier;
   const libraryHandle = `${identifier.id}_v${identifier.version}`;
   let executionDateTime;
@@ -33,12 +32,7 @@ function testSuite(library, pathToYamlFolder, executionDateTimeString) {
 
     afterEach('Reset the patient source', () => patientSource.reset());
 
-    const files = fs.readdirSync(pathToYamlFolder);
-    for (const file of files) {
-      if (!file.endsWith('.yaml') && !file.endsWith('yml')) {
-        continue;
-      }
-      const testCase = yamlToTestCase(path.join(pathToYamlFolder, file));
+    for (const testCase of testCases) {
       const testFunc = testCase.skip ? it.skip : testCase.only ? it.only : it;
       testFunc(testCase.name, () => {
         if (DUMP_PATIENTS) {
@@ -53,13 +47,13 @@ function testSuite(library, pathToYamlFolder, executionDateTimeString) {
         }
         const patientId = testCase.bundle.entry[0].resource.id;
         expect(results.patientResults[patientId]).to.exist;
-        for (const expr of Object.keys(testCase.results)) {
-          checkResult(expr, results.patientResults[patientId][expr], testCase.results[expr]);
+        for (const expr of Object.keys(testCase.expected)) {
+          checkResult(expr, results.patientResults[patientId][expr], testCase.expected[expr]);
         }
       });
     }
   });
-};
+}
 
 function checkResult(expr, actual, expected) {
   const simpleResult = simplifyResult(actual);
