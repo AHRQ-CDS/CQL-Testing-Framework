@@ -77,4 +77,4 @@ function simplifyResult(result) {
   return result;
 }
 
-module.exports = { testSuite };
+module.exports = testSuite;

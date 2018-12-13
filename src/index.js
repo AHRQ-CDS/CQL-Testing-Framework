@@ -1,10 +1,10 @@
 const loadLibrary = require('./loadLibrary');
 const loadYamlTestCases = require('./loadYamlTestCases');
 const loadCodeService = require('./loadCodeService');
-const yaml = require('./yaml');
+const testSuite = require('./testSuite');
 module.exports = {
   loadCodeService,
   loadLibrary,
   loadYamlTestCases,
-  yaml
+  testSuite
 };
