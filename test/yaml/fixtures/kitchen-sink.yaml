@@ -22,7 +22,7 @@ data:
   period: 2015-02-01
 -
   resourceType: MedicationOrder
-  code: RXNORM#1049557 12 HR Oxycodone Hydrochloride 160 MG Extended Release Oral Tablet
+  code: RXNORM#1049599 12 HR Oxycodone Hydrochloride 80 MG Extended Release Oral Tablet
   dateWritten: 2018-10-10
 -
   resourceType: MedicationOrder
@@ -184,7 +184,7 @@ results:
         Status: active
       -
         Type: Order
-        Name: 12 HR Oxycodone Hydrochloride 160 MG Extended Release Oral Tablet
+        Name: 12 HR Oxycodone Hydrochloride 80 MG Extended Release Oral Tablet
         Start: '2018-10-10T00:00:00.000+00:00'
         End: null
         Status: active
