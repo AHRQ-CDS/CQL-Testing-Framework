@@ -1,6 +1,5 @@
 const fs = require('fs-extra');
 const path = require('path');
-const cs = require('cql-exec-vsac');
 const cql = require('cql-execution');
 const fhir = require('cql-exec-fhir');
 const {expect} = require('chai');
@@ -9,7 +8,7 @@ const {expect} = require('chai');
 const DUMP_PATIENTS = false;
 const DUMP_RESULTS = false;
 
-function testSuite(library, testCases, executionDateTimeString) {
+function testSuite(testCases, library, codeService, executionDateTimeString) {
   const identifier = library.source.library.identifier;
   const libraryHandle = `${identifier.id}_v${identifier.version}`;
   let executionDateTime;
@@ -21,13 +20,15 @@ function testSuite(library, testCases, executionDateTimeString) {
     dumpPath = path.join('test_dump', libraryHandle);
     fs.mkdirpSync(dumpPath);
   }
-  const codeService = loadCodeService();
   const patientSource = fhir.PatientSource.FHIRv102();
   const executor = new cql.Executor(library, codeService);
   describe(libraryHandle, () => {
     before('Download value set definitions from VSAC if necessary', function(done) {
       this.timeout(30000);
-      ensureValueSets(codeService, library, done);
+      const vs = Object.keys(library.valuesets).map(key => library.valuesets[key]);
+      codeService.ensureValueSets(vs)
+        .then(() => done())
+        .catch((err) => err instanceof Error ? done(err) : done(new Error(err)));
     });
 
     afterEach('Reset the patient source', () => patientSource.reset());
@@ -58,7 +59,6 @@ function testSuite(library, testCases, executionDateTimeString) {
 function checkResult(expr, actual, expected) {
   const simpleResult = simplifyResult(actual);
   const message = `${expr}=<${simpleResult}>`;
-  // If it fell through to here, just do a normal equals assertion
   expect(simpleResult, message).to.eql(expected);
 }
 
@@ -75,44 +75,6 @@ function simplifyResult(result) {
     }
   }
   return result;
-}
-
-// function loadLibrary(pathToLibrary) {
-//   const elmFile = require(pathToLibrary);
-//   const libraries = {};
-//   // Look in the CQL file's folder for other libraries to include
-//   for (const fileName of fs.readdirSync(path.dirname(pathToLibrary))) {
-//     const file = path.join(path.dirname(pathToLibrary), fileName);
-//     if (!file.endsWith('.json') || file == pathToLibrary) {
-//       continue;
-//     }
-//     const json = require(file);
-//     if (json && json.library && json.library.identifier && json.library.identifier.id) {
-//       libraries[json.library.identifier.id] = json;
-//     }
-//   }
-//   return new cql.Library(elmFile, new cql.Repository(libraries));
-// }
-
-function loadCodeService() {
-  const codeservice = new cs.CodeService(path.join(__dirname, 'vscache'));
-  codeservice.loadValueSetsFromFile(path.join(__dirname, 'vscache', 'valueset-db.json'));
-  return codeservice;
-}
-
-function ensureValueSets(codeService, library, done) {
-  // If the library has valuesets, crosscheck them with the local codeservice. Any valuesets not found in the local
-  // cache will be downloaded from VSAC.
-  let valuesetArray = Object.keys(library.valuesets).map(function(idx) {return library.valuesets[idx];});
-  if (valuesetArray !== null) { // We have some valuesets... get them.
-    codeService.ensureValueSets(valuesetArray)
-      .then( () => done() )
-      .catch( (err) => {
-        done(err);
-      });
-  } else { // No valuesets. Go to next handler.
-    done();
-  }
 }
 
 module.exports = { testSuite };
