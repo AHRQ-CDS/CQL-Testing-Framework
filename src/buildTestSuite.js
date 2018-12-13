@@ -4,20 +4,16 @@ const cql = require('cql-execution');
 const fhir = require('cql-exec-fhir');
 const {expect} = require('chai');
 
-// Set these to true to dump out files for easier debugging
-const DUMP_PATIENTS = false;
-const DUMP_RESULTS = false;
-
-function testSuite(testCases, library, codeService, executionDateTimeString) {
+function buildTestSuite(testCases, library, codeService, options) {
   const identifier = library.source.library.identifier;
   const libraryHandle = `${identifier.id}_v${identifier.version}`;
   let executionDateTime;
-  if (executionDateTimeString != null && executionDateTimeString.length > 0) {
-    executionDateTime = cql.DateTime.parse(executionDateTimeString);
+  if (options && options.date != null && options.date.length > 0) {
+    executionDateTime = cql.DateTime.parse(options.date);
   }
   let dumpPath;
-  if (DUMP_PATIENTS || DUMP_RESULTS) {
-    dumpPath = path.join('test_dump', libraryHandle);
+  if (options.dumpFiles && options.dumpFiles.enabled) {
+    dumpPath = path.join(options.dumpFiles.path, libraryHandle);
     fs.mkdirpSync(dumpPath);
   }
   const patientSource = fhir.PatientSource.FHIRv102();
@@ -36,13 +32,13 @@ function testSuite(testCases, library, codeService, executionDateTimeString) {
     for (const testCase of testCases) {
       const testFunc = testCase.skip ? it.skip : testCase.only ? it.only : it;
       testFunc(testCase.name, () => {
-        if (DUMP_PATIENTS) {
+        if (dumpPath) {
           const fileName = path.join(dumpPath, `${testCase.name.replace(/[\s/\\]/g, '_')}.json`);
           fs.writeFileSync(fileName, JSON.stringify(testCase.bundle, null, 2), 'utf8');
         }
         patientSource.loadBundles([testCase.bundle]);
         const results = executor.exec(patientSource, executionDateTime);
-        if (DUMP_RESULTS) {
+        if (dumpPath) {
           const fileName = path.join(dumpPath, `${testCase.name.replace(/[\s/\\]/g, '_')}_RESULTS.json`);
           fs.writeFileSync(fileName, JSON.stringify(results, null, 2), 'utf8');
         }
@@ -77,4 +73,4 @@ function simplifyResult(result) {
   return result;
 }
 
-module.exports = testSuite;
+module.exports = buildTestSuite;

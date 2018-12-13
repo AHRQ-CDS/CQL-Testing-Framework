@@ -1,4 +1,5 @@
 **/vscache/
+**/dump_files/
 /.vscode
 /node_modules
 yarn-error.log
