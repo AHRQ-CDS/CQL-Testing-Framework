@@ -9,7 +9,7 @@ function test(configPath) {
   const config = loadConfig(configPath);
   const library = loadLibrary(config.get('library.name'), config.get('library.paths'));
   const testCases = loadYamlTestCases(config.get('tests.path'));
-  const codeService = loadCodeService(config.get('options.valueSetCache.path'));
+  const codeService = loadCodeService(config.get('options.vsac.cache'));
   buildTestSuite(testCases, library, codeService, config.get('options'));
 }
 

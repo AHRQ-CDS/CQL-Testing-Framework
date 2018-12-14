@@ -1,4 +1,5 @@
 **/vscache/
+**/.vscache/
 **/dump_files/
 /.vscode
 /node_modules

@@ -58,13 +58,28 @@ function newConfig(dir) {
         env: 'CQLT_DATE',
         arg: 'date'
       },
-      valueSetCache: {
-        path: {
+      vsac: {
+        user: {
+          doc: 'The UMLS user name to use when connecting to the VSAC',
+          format: 'String',
+          default: '',
+          env: 'UMLS_USER_NAME', // NOTE: Inconsistent name to match existing ENV name used by cql-exec-vsac
+          arg: 'vsac-user'
+        },
+        password: {
+          doc: 'The UMLS password to use when connecting to the VSAC',
+          format: 'String',
+          default: '',
+          sensitive: true,
+          env: 'UMLS_PASSWORD', // NOTE: Inconsistent name to match existing ENV name used by cql-exec-vsac
+          arg: 'vsac-password'
+        },
+        cache: {
           doc: 'The file path for the value set cache',
           format: 'String',
-          default: path.join(dir, 'vscache'),
+          default: path.join(dir, '.vscache'),
           env: 'CQLT_VS_CACHE_PATH',
-          arg: 'vs-cache-path'
+          arg: 'vsac-cache'
         }
       },
       dumpFiles: {

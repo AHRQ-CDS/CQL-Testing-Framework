@@ -22,9 +22,27 @@ function buildTestSuite(testCases, library, codeService, options) {
     before('Download value set definitions from VSAC if necessary', function(done) {
       this.timeout(30000);
       const vs = Object.keys(library.valuesets).map(key => library.valuesets[key]);
-      codeService.ensureValueSets(vs)
+      let user, pass;
+      if (options.vsac && options.vsac.user && options.vsac.user !== '') {
+        user = options.vsac.user;
+        pass = options.vsac.password;
+      }
+      codeService.ensureValueSets(vs, user, pass)
         .then(() => done())
-        .catch((err) => err instanceof Error ? done(err) : done(new Error(err)));
+        .catch((err) => {
+          if (err instanceof Error) {
+            done(err);
+          } else if (err && err.indexOf('UMLS_USER_NAME') != null) {
+            const message = 'Failed to download value sets. Please ensure VSAC user and password '
+              + 'is specified via one of the appropriate mechanisms, either:\n'
+              + '- configuration: options.vsac.user & options.vsac.password\n'
+              + '- environment variables: UMLS_USER_NAME & UMLS_PASSWORD\n'
+              + '- arguments (commandline only): --vsac-user & --vsac-password';
+            done(new Error(message));
+          } else {
+            done(new Error(err));
+          }
+        });
     });
 
     afterEach('Reset the patient source', () => patientSource.reset());
