@@ -31,7 +31,7 @@ function newConfig(dir) {
       paths: {
         doc: 'The path(s) at which the library and its dependencies can be found (files or folders)',
         format: 'Array',
-        default: path.join(dir, 'fixtures', 'cql'),
+        default: path.join(dir, 'cql'),
         env: 'CQLT_LIBRARY_PATHS',
         arg: 'library-paths',
         coerce: (val) => val.split(',')
@@ -41,7 +41,7 @@ function newConfig(dir) {
       path: {
         doc: 'The file path containing the test case files',
         format: 'String',
-        default: path.join(dir, 'fixtures', 'tests'),
+        default: path.join(dir, 'tests'),
         env: 'CQLT_TESTS_PATH',
         arg: 'tests-path'
       }
