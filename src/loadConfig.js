@@ -11,7 +11,7 @@ convict.addParser([
 ]);
 
 // Define the schema
-function newConfig(dir) {
+function newConfig() {
   return convict({
     library: {
       name: {
@@ -31,17 +31,16 @@ function newConfig(dir) {
       paths: {
         doc: 'The path(s) at which the library and its dependencies can be found (files or folders)',
         format: 'Array',
-        default: path.join(dir, 'cql'),
+        default: 'cql',
         env: 'CQLT_LIBRARY_PATHS',
-        arg: 'library-paths',
-        coerce: (val) => val.split(',')
+        arg: 'library-paths'
       },
     },
     tests: {
       path: {
         doc: 'The file path containing the test case files',
         format: 'String',
-        default: path.join(dir, 'tests'),
+        default: 'tests',
         env: 'CQLT_TESTS_PATH',
         arg: 'tests-path'
       }
@@ -77,7 +76,7 @@ function newConfig(dir) {
         cache: {
           doc: 'The file path for the value set cache',
           format: 'String',
-          default: path.join(dir, '.vscache'),
+          default: '.vscache',
           env: 'CQLT_VS_CACHE_PATH',
           arg: 'vsac-cache'
         }
@@ -93,7 +92,7 @@ function newConfig(dir) {
         path: {
           doc: 'The file path to dump files to (if enabled)',
           format: 'String',
-          default: path.join(dir, 'dump_files'),
+          default: 'dump_files',
           env: 'CQLT_DUMP_PATH',
           arg: 'dump-path'
         }
@@ -114,7 +113,21 @@ function loadConfig(configPath) {
     config = newConfig(process.cwd());
   }
   config.validate({ allowed: 'strict' });
+  resolvePathsToConfigFile(configPath, config);
   return config;
+}
+
+function resolvePathsToConfigFile(configPath, config) {
+  const resolvePath = (thePath) => {
+    if (path.isAbsolute(thePath)) {
+      return thePath;
+    }
+    return path.resolve(path.dirname(configPath), thePath);
+  };
+  ['tests.path', 'options.vsac.cache', 'options.dumpFiles.path'].forEach((key) => {
+    config.set(key, resolvePath(config.get(key)));
+  });
+  config.set('library.paths', config.get('library.paths').map(resolvePath));
 }
 
 module.exports = loadConfig;
