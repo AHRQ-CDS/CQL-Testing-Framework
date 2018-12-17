@@ -24,6 +24,9 @@ function detectConfigs(configPath, configFiles=[]) {
   const stat = fs.statSync(configPath);
   if (stat.isDirectory()) {
     for (const fileName of fs.readdirSync(configPath)) {
+      if (fileName === 'node_modules') {
+        continue;
+      }
       const file = path.join(configPath, fileName);
       detectConfigs(file, configFiles);
     }
