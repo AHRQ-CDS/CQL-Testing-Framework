@@ -23,7 +23,7 @@ You must [install Node.js](https://nodejs.org/en/download/) to use the CQL Testi
 
 # Integrating the CQL Testing Framework
 
-The CQL Testing Framework is a Node.js module.  For the alpha release, it is distributed as a compressed file: `cql-testing-1.0.0-alpha.1.tgz`. If you've downloaded the cql-testing source code, you'll find a copy of this file in the `dist/` folder.
+The CQL Testing Framework is a Node.js module.  For the alpha release, it is distributed as a compressed file: `cql-testing-v1.0.0-alpha.1.tgz`. If you've downloaded the cql-testing source code, you'll find a copy of this file in the `dist/` folder.
 
 ## Typical Project Structure
 
@@ -158,7 +158,7 @@ Each YAML file in the `tests` folder is a separate test case.  Each file has the
 * **data**: A sequence (i.e., array) of the resource instances making up the test case (with the `Patient` resource as the first one)
 * **results**: A hash (i.e. object) for which each key corresponds to a CQL expression name and the value is the _expected_ result for that CQL expression
 
-The following is a very simple example of a test case for a fictional artifact with inclusion criteria that the patient must be male, over 18, and have an Opiod prescription on record.  It sets up test data for a 40 year-old male with an Oxycodone prescription and specifies that the `MeetsInclusionCriteria` CQL expression should evaluate to `true`.
+The following is a very simple example of a test case for a fictional CQL library with inclusion criteria that the patient must be male, over 18, and have an Opiod prescription on record.  It sets up test data for a 40 year-old male with an Oxycodone prescription and specifies that the `MeetsInclusionCriteria` CQL expression should evaluate to `true`.
 
 ```yaml
 ---
@@ -327,7 +327,7 @@ Examples:
 
 ### Attribute Type: quantity
 
-A quantity of measurement with or without units specified.  If units are specified, then they should be valid UCUM units.
+A quantity of measurement with or without units specified.  If units are specified, then they should be valid [UCUM](http://unitsofmeasure.org) units.
 
 Examples:
 

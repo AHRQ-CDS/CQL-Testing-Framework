@@ -11,7 +11,7 @@
     "lint": "./node_modules/.bin/eslint .",
     "lint:fix": "./node_modules/.bin/eslint . --fix"
   },
-  "devDependencies": {
+  "dependencies": {
     "chai": "^4.2.0",
     "convict": "^4.4.0",
     "cql-exec-fhir": "^1.1.0",
