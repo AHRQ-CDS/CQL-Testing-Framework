@@ -1,1 +1,6 @@
 /jsconfig.json
+/yarn-error.log
+/dist
+/test
+**/.vscache/
+**/dump_files/
