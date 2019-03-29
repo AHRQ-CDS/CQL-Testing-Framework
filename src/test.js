@@ -14,9 +14,10 @@ function test(configPath) {
     console.info('CQLT Config:', configFile);
     const config = loadConfig(configFile);
     const library = loadLibrary(config.get('library.name'), config.get('library.paths'));
-    const testCases = loadYamlTestCases(config.get('tests.path'));
+    const fhirVersion = getFHIRVersion(library);
+    const testCases = loadYamlTestCases(config.get('tests.path'), fhirVersion);
     const codeService = loadCodeService(config.get('options.vsac.cache'));
-    buildTestSuite(testCases, library, codeService, config.get('options'));
+    buildTestSuite(testCases, library, codeService, fhirVersion, config.get('options'));
   }
 }
 
@@ -34,6 +35,11 @@ function detectConfigs(configPath, configFiles=[]) {
     configFiles.push(configPath);
   }
   return configFiles;
+}
+
+function getFHIRVersion(library) {
+  const fhirUsing = library.source.library.usings.def.find(d => d.uri === 'http://hl7.org/fhir');
+  return fhirUsing ? fhirUsing.version : undefined;
 }
 
 module.exports = test;

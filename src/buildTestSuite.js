@@ -4,7 +4,7 @@ const cql = require('cql-execution');
 const fhir = require('cql-exec-fhir');
 const {expect} = require('chai');
 
-function buildTestSuite(testCases, library, codeService, options) {
+function buildTestSuite(testCases, library, codeService, fhirVersion, options) {
   const identifier = library.source.library.identifier;
   const libraryHandle = `${identifier.id}_v${identifier.version}`;
   let executionDateTime;
@@ -16,9 +16,20 @@ function buildTestSuite(testCases, library, codeService, options) {
     dumpPath = path.join(options.dumpFiles.path, libraryHandle);
     fs.mkdirpSync(dumpPath);
   }
-  const patientSource = fhir.PatientSource.FHIRv102();
   const executor = new cql.Executor(library, codeService);
   describe(libraryHandle, () => {
+    let patientSource;
+    before('Initialize FHIR patient source', () => {
+      switch (fhirVersion) {
+      case '1.0.2': patientSource = fhir.PatientSource.FHIRv102(); break;
+      case '3.0.0': patientSource = fhir.PatientSource.FHIRv300(); break;
+      // no default
+      }
+      if (patientSource == null) {
+        expect.fail('Failed to initialize FHIR patient source.  Only FHIR 1.0.2 or 3.0.0 are supported.');
+      }
+    });
+
     before('Download value set definitions from VSAC if necessary', function(done) {
       this.timeout(30000);
       const vs = Object.keys(library.valuesets).map(key => library.valuesets[key]);

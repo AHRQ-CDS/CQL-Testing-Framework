@@ -4,24 +4,24 @@ const fs   = require('fs');
 const uuidv4 = require('uuid/v4');
 const TestCase = require('./testCase');
 
-function loadYamlTestCases(yamlPath) {
-  return recursiveLoadYamlTestCases(yamlPath, []);
+function loadYamlTestCases(yamlPath, fhirVersion) {
+  return recursiveLoadYamlTestCases(yamlPath, fhirVersion, []);
 }
 
-function recursiveLoadYamlTestCases(yamlPath, testCases = []) {
+function recursiveLoadYamlTestCases(yamlPath, fhirVersion, testCases = []) {
   const stat = fs.statSync(yamlPath);
   if (stat.isDirectory()) {
     for (const fileName of fs.readdirSync(yamlPath)) {
       const file = path.join(yamlPath, fileName);
-      recursiveLoadYamlTestCases(file, testCases);
+      recursiveLoadYamlTestCases(file, fhirVersion, testCases);
     }
   } else if (stat.isFile() && (yamlPath.endsWith('.yaml') || yamlPath.endsWith('.yml'))) {
-    testCases.push(yamlToTestCase(yamlPath));
+    testCases.push(yamlToTestCase(yamlPath, fhirVersion));
   }
   return testCases;
 }
 
-function yamlToTestCase(yamlFilePath) {
+function yamlToTestCase(yamlFilePath, fhirVersion) {
   // Get document, or throw exception on error
   const doc = yaml.safeLoad(fs.readFileSync(yamlFilePath, 'utf8'));
   if (!doc.name) {
@@ -52,7 +52,7 @@ function yamlToTestCase(yamlFilePath) {
     console.warn(`${testName}: First element was not a patient.  Inserting a patient element.`);
     doc.data = doc.data.unshift({ resourceType: 'Patient' });
   }
-  const p = handlePatient(doc.data[0]);
+  const p = handlePatient(doc.data[0], fhirVersion);
   addResource(p);
 
   for (let i = 1; i < doc.data.length; i++) {
@@ -61,12 +61,13 @@ function yamlToTestCase(yamlFilePath) {
       throw new Error(`${testName}: Every data element must specify its 'resourceType'`);
     }
     switch (d.resourceType) {
-    case 'Condition': addResource(handleCondition(d, p)); break;
-    case 'Encounter': addResource(handleEncounter(d, p)); break;
-    case 'MedicationOrder': addResource(handleMedicationOrder(d, p)); break;
-    case 'MedicationStatement': addResource(handleMedicationStatement(d, p)); break;
-    case 'Observation': addResource(handleObservation(d, p)); break;
-    case 'Procedure': addResource(handleProcedure(d, p)); break;
+    case 'Condition': addResource(handleCondition(d, p, fhirVersion)); break;
+    case 'Encounter': addResource(handleEncounter(d, p, fhirVersion)); break;
+    case 'MedicationOrder': addResource(handleMedicationOrder(d, p, fhirVersion)); break;
+    case 'MedicationRequest': addResource(handleMedicationRequest(d, p, fhirVersion)); break;
+    case 'MedicationStatement': addResource(handleMedicationStatement(d, p, fhirVersion)); break;
+    case 'Observation': addResource(handleObservation(d, p, fhirVersion)); break;
+    case 'Procedure': addResource(handleProcedure(d, p, fhirVersion)); break;
     default:
       throw new Error(`${testName}: Unsupported resourceType '${d.resourceType}'`);
     }
@@ -80,44 +81,65 @@ function yamlToTestCase(yamlFilePath) {
   return new TestCase(testName, bundle, doc.results, false, doc.only);
 }
 
-function handlePatient(d) {
+function handlePatient(d, fhirVersion) {
   return {
     resourceType: 'Patient',
     id: getId(d.id),
-    name: getName(d.name),
+    name: getName(d.name, fhirVersion),
     gender: d.gender,
     birthDate: getDate(d.birthDate)
   };
 }
 
-function handleCondition(d, p) {
+function handleCondition(d, p, fhirVersion) {
+  let patientKey, dateRecordedKey, dateRecordedValue;
+  if (fhirVersion === '1.0.2') {
+    patientKey = 'patient';
+    dateRecordedKey = 'dateRecorded';
+    dateRecordedValue = getDate(d.dateRecorded);
+  } else {
+    patientKey = 'subject';
+    dateRecordedKey = 'assertedDate';
+    dateRecordedValue = getDateTime(d.assertedDate);
+  }
   return {
     resourceType: 'Condition',
     id: getId(d.id),
-    patient: getPatientReference(p.id),
+    [patientKey]: getPatientReference(p.id),
     code: getCodeableConcept(d.code),
     clinicalStatus: getString(d.clinicalStatus, d.abatementDateTime ? 'resolved': 'active'),
     verificationStatus: getString(d.verificationStatus, 'confirmed'),
     onsetDateTime: getDateTime(d.onsetDateTime),
-    dateRecorded: getDate(d.dateRecorded),
+    [dateRecordedKey]: dateRecordedValue,
     abatementDateTime: getDateTime(d.abatementDateTime)
   };
 }
 
-function handleEncounter(d, p) {
+function handleEncounter(d, p, fhirVersion) {
+  let patientKey, classValue;
+  if (fhirVersion === '1.0.2') {
+    patientKey = 'patient';
+    classValue = getString(d.class);
+  } else {
+    patientKey = 'subject';
+    classValue = getCoding(d.class);
+  }
   return {
     resourceType: 'Encounter',
     id: getId(d.id),
     status: getString(d.status, 'finished'),
-    class: getString(d.class),
-    type: getCodeableConcept(d.type),
-    patient: getPatientReference(p.id),
+    class: classValue,
+    type: getCodeableConceptArray(d.type),
+    [patientKey]: getPatientReference(p.id),
     reason: getCodeableConceptArray(d.reason),
     period: getPeriod(d.period)
   };
 }
 
-function handleMedicationOrder(d, p) {
+function handleMedicationOrder(d, p, fhirVersion) {
+  if (fhirVersion !== '1.0.2') {
+    throw new Error('MedicationOrder is not a valid 3.0.0 resource.  Use MedicationRequest instead.');
+  }
   return {
     resourceType: 'MedicationOrder',
     id: getId(d.id),
@@ -129,26 +151,59 @@ function handleMedicationOrder(d, p) {
   };
 }
 
-function handleMedicationStatement(d, p) {
+function handleMedicationRequest(d, p, fhirVersion) {
+  if (fhirVersion === '1.0.2') {
+    throw new Error('MedicationRequest is not a valid 1.0.2 resource.  Use MedicationOrder instead.');
+  }
+  return {
+    resourceType: 'MedicationRequest',
+    id: getId(d.id),
+    authoredOn: getDateTime(d.authoredOn),
+    status: getString(d.status, 'active'),
+    subject: getPatientReference(p.id),
+    medicationCodeableConcept: getCodeableConcept(d.code)
+  };
+}
+
+function handleMedicationStatement(d, p, fhirVersion) {
+  let patientKey, wasNotTakenKey, wasNotTakenValue;
+  if (fhirVersion === '1.0.2') {
+    patientKey = 'patient';
+    wasNotTakenKey = 'wasNotTaken';
+    wasNotTakenValue = getBoolean(d.wasNotTaken, false);
+  } else {
+    patientKey = 'subject';
+    wasNotTakenKey = 'taken';
+    if (typeof d.taken === 'boolean') {
+      d.taken = d.taken ? 'y' : 'n';
+    }
+    wasNotTakenValue = getString(d.taken, 'y');
+  }
   return {
     resourceType: 'MedicationStatement',
     id: getId(d.id),
-    patient: getPatientReference(p.id),
+    [patientKey]: getPatientReference(p.id),
     dateAsserted: getDateTime(d.dateAsserted),
     status: getString(d.status, 'active'),
-    wasNotTaken: getBoolean(d.wasNotTaken, false),
+    [wasNotTakenKey]: wasNotTakenValue,
     effectiveDateTime: d.effectiveDateTime ? getDateTime(d.effectiveDateTime) : undefined,
     effectivePeriod: d.effectivePeriod ? getPeriod(d.effectivePeriod) : undefined,
     medicationCodeableConcept: getCodeableConcept(d.code)
   };
 }
 
-function handleObservation(d, p) {
+function handleObservation(d, p, fhirVersion) {
+  let categoryValue;
+  if (fhirVersion === '1.0.2') {
+    categoryValue = getCodeableConcept(d.category);
+  } else {
+    categoryValue = getCodeableConceptArray(d.category);
+  }
   return {
     resourceType: 'Observation',
     id: getId(d.id),
     status: getString(d.status, 'final'),
-    category: getCodeableConcept(d.category),
+    category: categoryValue,
     code: getCodeableConcept(d.code),
     subject: getPatientReference(p.id),
     effectiveDateTime: getDateTime(d.effectiveDateTime),
@@ -163,7 +218,15 @@ function handleObservation(d, p) {
   };
 }
 
-function handleProcedure(d, p) {
+function handleProcedure(d, p, fhirVersion) {
+  let notPerformedKey, notPerformedValue;
+  if (fhirVersion === '1.0.2') {
+    notPerformedKey = 'notPerformed';
+    notPerformedValue = getBoolean(d.notPerformed, false);
+  } else {
+    notPerformedKey = 'notDone';
+    notPerformedValue = getBoolean(d.notDone, false);
+  }
   return {
     resourceType: 'Procedure',
     id: getId(d.id),
@@ -171,7 +234,7 @@ function handleProcedure(d, p) {
     status: getString(d.status, 'completed'),
     category: getCodeableConcept(d.category),
     code: getCodeableConcept(d.code),
-    notPerformed: getBoolean(d.notPerformed, false),
+    [notPerformedKey]: notPerformedValue,
     performedDateTime: d.performedDateTime ? getDateTime(d.performedDateTime) : undefined,
     performedPeriod: d.performedPeriod ? getPeriod(d.performedPeriod) : undefined,
     outcome: getCodeableConcept(d.outcome)
@@ -182,7 +245,7 @@ function getId(id) {
   return id ? id : uuidv4();
 }
 
-function getName(name) {
+function getName(name, fhirVersion) {
   if (name) {
     const humanName = {};
     const parts = name.split(/\s+/);
@@ -190,7 +253,11 @@ function getName(name) {
       humanName.given = parts.slice(0, -1);
     }
     if (parts.length > 1) {
-      humanName.family = parts.slice(parts.length - 1);
+      if (fhirVersion === '1.0.2') {
+        humanName.family = parts.slice(parts.length - 1);
+      } else {
+        humanName.family = parts[parts.length - 1];
+      }
     }
     return [humanName];
   }
