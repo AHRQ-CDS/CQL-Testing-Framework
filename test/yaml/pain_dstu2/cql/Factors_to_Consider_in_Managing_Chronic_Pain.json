@@ -2175,41 +2175,41 @@
                      "operand" : [ {
                         "type" : "Union",
                         "operand" : [ {
-                           "type" : "Union",
-                           "operand" : [ {
-                              "type" : "Union",
-                              "operand" : [ {
-                                 "type" : "Union",
-                                 "operand" : [ {
-                                    "name" : "DepressionConditions",
-                                    "type" : "ExpressionRef"
-                                 }, {
-                                    "name" : "AnxietyConditions",
-                                    "type" : "ExpressionRef"
-                                 } ]
-                              }, {
-                                 "name" : "SubstanceUseDisorderConditions",
-                                 "type" : "ExpressionRef"
-                              } ]
-                           }, {
-                              "name" : "SuicideAttemptConditions",
-                              "type" : "ExpressionRef"
-                           } ]
+                           "name" : "DepressionConditions",
+                           "type" : "ExpressionRef"
                         }, {
-                           "name" : "SleepDisorderedBreathingConditions",
+                           "name" : "AnxietyConditions",
                            "type" : "ExpressionRef"
                         } ]
+                     }, {
+                        "type" : "Union",
+                        "operand" : [ {
+                           "name" : "SubstanceUseDisorderConditions",
+                           "type" : "ExpressionRef"
+                        }, {
+                           "name" : "SuicideAttemptConditions",
+                           "type" : "ExpressionRef"
+                        } ]
+                     } ]
+                  }, {
+                     "type" : "Union",
+                     "operand" : [ {
+                        "name" : "SleepDisorderedBreathingConditions",
+                        "type" : "ExpressionRef"
                      }, {
                         "name" : "RenalDysfunctionConditions",
                         "type" : "ExpressionRef"
                      } ]
-                  }, {
-                     "name" : "HepaticDysfunctionConditions",
-                     "type" : "ExpressionRef"
                   } ]
                }, {
-                  "name" : "PregnancyConditions",
-                  "type" : "ExpressionRef"
+                  "type" : "Union",
+                  "operand" : [ {
+                     "name" : "HepaticDysfunctionConditions",
+                     "type" : "ExpressionRef"
+                  }, {
+                     "name" : "PregnancyConditions",
+                     "type" : "ExpressionRef"
+                  } ]
                } ]
             }
          }, {
@@ -2475,13 +2475,13 @@
                               "type" : "TupleTypeSpecifier",
                               "element" : [ {
                                  "name" : "Start",
-                                 "type" : {
+                                 "elementType" : {
                                     "name" : "{urn:hl7-org:elm-types:r1}String",
                                     "type" : "NamedTypeSpecifier"
                                  }
                               }, {
                                  "name" : "End",
-                                 "type" : {
+                                 "elementType" : {
                                     "name" : "{urn:hl7-org:elm-types:r1}String",
                                     "type" : "NamedTypeSpecifier"
                                  }
@@ -2968,13 +2968,13 @@
                            "type" : "TupleTypeSpecifier",
                            "element" : [ {
                               "name" : "Start",
-                              "type" : {
+                              "elementType" : {
                                  "name" : "{urn:hl7-org:elm-types:r1}String",
                                  "type" : "NamedTypeSpecifier"
                               }
                            }, {
                               "name" : "End",
-                              "type" : {
+                              "elementType" : {
                                  "name" : "{urn:hl7-org:elm-types:r1}String",
                                  "type" : "NamedTypeSpecifier"
                               }
@@ -3123,13 +3123,13 @@
                            "type" : "TupleTypeSpecifier",
                            "element" : [ {
                               "name" : "Start",
-                              "type" : {
+                              "elementType" : {
                                  "name" : "{urn:hl7-org:elm-types:r1}String",
                                  "type" : "NamedTypeSpecifier"
                               }
                            }, {
                               "name" : "End",
-                              "type" : {
+                              "elementType" : {
                                  "name" : "{urn:hl7-org:elm-types:r1}String",
                                  "type" : "NamedTypeSpecifier"
                               }
@@ -3249,27 +3249,27 @@
                         "operand" : [ {
                            "type" : "Union",
                            "operand" : [ {
-                              "type" : "Union",
-                              "operand" : [ {
-                                 "name" : "ReportConditionRiskFactorsForOpioidRelatedHarms",
-                                 "type" : "ExpressionRef"
-                              }, {
-                                 "name" : "ReportEncounterRiskFactorsForOpioidRelatedHarms",
-                                 "type" : "ExpressionRef"
-                              } ]
+                              "name" : "ReportConditionRiskFactorsForOpioidRelatedHarms",
+                              "type" : "ExpressionRef"
                            }, {
+                              "name" : "ReportEncounterRiskFactorsForOpioidRelatedHarms",
+                              "type" : "ExpressionRef"
+                           } ]
+                        }, {
+                           "type" : "Union",
+                           "operand" : [ {
                               "type" : "ToList",
                               "operand" : {
                                  "name" : "ReportOlderThan65",
                                  "type" : "ExpressionRef"
                               }
+                           }, {
+                              "type" : "ToList",
+                              "operand" : {
+                                 "name" : "ReportMostRecentPositivePregnancyObservation",
+                                 "type" : "ExpressionRef"
+                              }
                            } ]
-                        }, {
-                           "type" : "ToList",
-                           "operand" : {
-                              "name" : "ReportMostRecentPositivePregnancyObservation",
-                              "type" : "ExpressionRef"
-                           }
                         } ]
                      }
                   } ],

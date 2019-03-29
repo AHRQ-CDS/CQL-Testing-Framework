@@ -2,7 +2,7 @@
    "library" : {
       "identifier" : {
          "id" : "FHIRHelpers",
-         "version" : "3.0.0"
+         "version" : "1.0.2"
       },
       "schemaIdentifier" : {
          "id" : "urn:hl7-org:elm",
@@ -15,7 +15,7 @@
          }, {
             "localIdentifier" : "FHIR",
             "uri" : "http://hl7.org/fhir",
-            "version" : "3.0.0"
+            "version" : "1.0.2"
          } ]
       },
       "statements" : {
@@ -25,30 +25,57 @@
             "accessLevel" : "Public",
             "type" : "FunctionDef",
             "expression" : {
-               "lowClosed" : true,
-               "highClosed" : true,
-               "type" : "Interval",
-               "low" : {
-                  "path" : "value",
-                  "type" : "Property",
-                  "source" : {
-                     "path" : "start",
-                     "type" : "Property",
-                     "source" : {
+               "type" : "If",
+               "condition" : {
+                  "asType" : "{urn:hl7-org:elm-types:r1}Boolean",
+                  "type" : "As",
+                  "operand" : {
+                     "type" : "IsNull",
+                     "operand" : {
                         "name" : "period",
                         "type" : "OperandRef"
                      }
                   }
                },
-               "high" : {
-                  "path" : "value",
-                  "type" : "Property",
-                  "source" : {
-                     "path" : "end",
+               "then" : {
+                  "type" : "As",
+                  "operand" : {
+                     "type" : "Null"
+                  },
+                  "asTypeSpecifier" : {
+                     "type" : "IntervalTypeSpecifier",
+                     "pointType" : {
+                        "name" : "{urn:hl7-org:elm-types:r1}DateTime",
+                        "type" : "NamedTypeSpecifier"
+                     }
+                  }
+               },
+               "else" : {
+                  "lowClosed" : true,
+                  "highClosed" : true,
+                  "type" : "Interval",
+                  "low" : {
+                     "path" : "value",
                      "type" : "Property",
                      "source" : {
-                        "name" : "period",
-                        "type" : "OperandRef"
+                        "path" : "start",
+                        "type" : "Property",
+                        "source" : {
+                           "name" : "period",
+                           "type" : "OperandRef"
+                        }
+                     }
+                  },
+                  "high" : {
+                     "path" : "value",
+                     "type" : "Property",
+                     "source" : {
+                        "path" : "end",
+                        "type" : "Property",
+                        "source" : {
+                           "name" : "period",
+                           "type" : "OperandRef"
+                        }
                      }
                   }
                }
@@ -66,37 +93,58 @@
             "accessLevel" : "Public",
             "type" : "FunctionDef",
             "expression" : {
-               "classType" : "{urn:hl7-org:elm-types:r1}Quantity",
-               "type" : "Instance",
-               "element" : [ {
-                  "name" : "value",
-                  "value" : {
-                     "path" : "value",
-                     "type" : "Property",
-                     "source" : {
+               "type" : "If",
+               "condition" : {
+                  "asType" : "{urn:hl7-org:elm-types:r1}Boolean",
+                  "type" : "As",
+                  "operand" : {
+                     "type" : "IsNull",
+                     "operand" : {
+                        "name" : "quantity",
+                        "type" : "OperandRef"
+                     }
+                  }
+               },
+               "then" : {
+                  "asType" : "{urn:hl7-org:elm-types:r1}Quantity",
+                  "type" : "As",
+                  "operand" : {
+                     "type" : "Null"
+                  }
+               },
+               "else" : {
+                  "classType" : "{urn:hl7-org:elm-types:r1}Quantity",
+                  "type" : "Instance",
+                  "element" : [ {
+                     "name" : "value",
+                     "value" : {
                         "path" : "value",
                         "type" : "Property",
                         "source" : {
-                           "name" : "quantity",
-                           "type" : "OperandRef"
+                           "path" : "value",
+                           "type" : "Property",
+                           "source" : {
+                              "name" : "quantity",
+                              "type" : "OperandRef"
+                           }
                         }
                      }
-                  }
-               }, {
-                  "name" : "unit",
-                  "value" : {
-                     "path" : "value",
-                     "type" : "Property",
-                     "source" : {
-                        "path" : "unit",
+                  }, {
+                     "name" : "unit",
+                     "value" : {
+                        "path" : "value",
                         "type" : "Property",
                         "source" : {
-                           "name" : "quantity",
-                           "type" : "OperandRef"
+                           "path" : "unit",
+                           "type" : "Property",
+                           "source" : {
+                              "name" : "quantity",
+                              "type" : "OperandRef"
+                           }
                         }
                      }
-                  }
-               } ]
+                  } ]
+               }
             },
             "operand" : [ {
                "name" : "quantity",
@@ -111,32 +159,59 @@
             "accessLevel" : "Public",
             "type" : "FunctionDef",
             "expression" : {
-               "lowClosed" : true,
-               "highClosed" : true,
-               "type" : "Interval",
-               "low" : {
-                  "name" : "ToQuantity",
-                  "type" : "FunctionRef",
-                  "operand" : [ {
-                     "path" : "low",
-                     "type" : "Property",
-                     "source" : {
+               "type" : "If",
+               "condition" : {
+                  "asType" : "{urn:hl7-org:elm-types:r1}Boolean",
+                  "type" : "As",
+                  "operand" : {
+                     "type" : "IsNull",
+                     "operand" : {
                         "name" : "range",
                         "type" : "OperandRef"
                      }
-                  } ]
+                  }
                },
-               "high" : {
-                  "name" : "ToQuantity",
-                  "type" : "FunctionRef",
-                  "operand" : [ {
-                     "path" : "high",
-                     "type" : "Property",
-                     "source" : {
-                        "name" : "range",
-                        "type" : "OperandRef"
+               "then" : {
+                  "type" : "As",
+                  "operand" : {
+                     "type" : "Null"
+                  },
+                  "asTypeSpecifier" : {
+                     "type" : "IntervalTypeSpecifier",
+                     "pointType" : {
+                        "name" : "{urn:hl7-org:elm-types:r1}Quantity",
+                        "type" : "NamedTypeSpecifier"
                      }
-                  } ]
+                  }
+               },
+               "else" : {
+                  "lowClosed" : true,
+                  "highClosed" : true,
+                  "type" : "Interval",
+                  "low" : {
+                     "name" : "ToQuantity",
+                     "type" : "FunctionRef",
+                     "operand" : [ {
+                        "path" : "low",
+                        "type" : "Property",
+                        "source" : {
+                           "name" : "range",
+                           "type" : "OperandRef"
+                        }
+                     } ]
+                  },
+                  "high" : {
+                     "name" : "ToQuantity",
+                     "type" : "FunctionRef",
+                     "operand" : [ {
+                        "path" : "high",
+                        "type" : "Property",
+                        "source" : {
+                           "name" : "range",
+                           "type" : "OperandRef"
+                        }
+                     } ]
+                  }
                }
             },
             "operand" : [ {
@@ -152,65 +227,86 @@
             "accessLevel" : "Public",
             "type" : "FunctionDef",
             "expression" : {
-               "classType" : "{urn:hl7-org:elm-types:r1}Code",
-               "type" : "Instance",
-               "element" : [ {
-                  "name" : "code",
-                  "value" : {
-                     "path" : "value",
-                     "type" : "Property",
-                     "source" : {
-                        "path" : "code",
-                        "type" : "Property",
-                        "source" : {
-                           "name" : "coding",
-                           "type" : "OperandRef"
-                        }
+               "type" : "If",
+               "condition" : {
+                  "asType" : "{urn:hl7-org:elm-types:r1}Boolean",
+                  "type" : "As",
+                  "operand" : {
+                     "type" : "IsNull",
+                     "operand" : {
+                        "name" : "coding",
+                        "type" : "OperandRef"
                      }
                   }
-               }, {
-                  "name" : "system",
-                  "value" : {
-                     "path" : "value",
-                     "type" : "Property",
-                     "source" : {
-                        "path" : "system",
+               },
+               "then" : {
+                  "asType" : "{urn:hl7-org:elm-types:r1}Code",
+                  "type" : "As",
+                  "operand" : {
+                     "type" : "Null"
+                  }
+               },
+               "else" : {
+                  "classType" : "{urn:hl7-org:elm-types:r1}Code",
+                  "type" : "Instance",
+                  "element" : [ {
+                     "name" : "code",
+                     "value" : {
+                        "path" : "value",
                         "type" : "Property",
                         "source" : {
-                           "name" : "coding",
-                           "type" : "OperandRef"
+                           "path" : "code",
+                           "type" : "Property",
+                           "source" : {
+                              "name" : "coding",
+                              "type" : "OperandRef"
+                           }
                         }
                      }
-                  }
-               }, {
-                  "name" : "version",
-                  "value" : {
-                     "path" : "value",
-                     "type" : "Property",
-                     "source" : {
-                        "path" : "version",
+                  }, {
+                     "name" : "system",
+                     "value" : {
+                        "path" : "value",
                         "type" : "Property",
                         "source" : {
-                           "name" : "coding",
-                           "type" : "OperandRef"
+                           "path" : "system",
+                           "type" : "Property",
+                           "source" : {
+                              "name" : "coding",
+                              "type" : "OperandRef"
+                           }
                         }
                      }
-                  }
-               }, {
-                  "name" : "display",
-                  "value" : {
-                     "path" : "value",
-                     "type" : "Property",
-                     "source" : {
-                        "path" : "display",
+                  }, {
+                     "name" : "version",
+                     "value" : {
+                        "path" : "value",
                         "type" : "Property",
                         "source" : {
-                           "name" : "coding",
-                           "type" : "OperandRef"
+                           "path" : "version",
+                           "type" : "Property",
+                           "source" : {
+                              "name" : "coding",
+                              "type" : "OperandRef"
+                           }
                         }
                      }
-                  }
-               } ]
+                  }, {
+                     "name" : "display",
+                     "value" : {
+                        "path" : "value",
+                        "type" : "Property",
+                        "source" : {
+                           "path" : "display",
+                           "type" : "Property",
+                           "source" : {
+                              "name" : "coding",
+                              "type" : "OperandRef"
+                           }
+                        }
+                     }
+                  } ]
+               }
             },
             "operand" : [ {
                "name" : "coding",
@@ -225,50 +321,71 @@
             "accessLevel" : "Public",
             "type" : "FunctionDef",
             "expression" : {
-               "classType" : "{urn:hl7-org:elm-types:r1}Concept",
-               "type" : "Instance",
-               "element" : [ {
-                  "name" : "codes",
-                  "value" : {
-                     "type" : "Query",
-                     "source" : [ {
-                        "alias" : "C",
-                        "expression" : {
-                           "path" : "coding",
+               "type" : "If",
+               "condition" : {
+                  "asType" : "{urn:hl7-org:elm-types:r1}Boolean",
+                  "type" : "As",
+                  "operand" : {
+                     "type" : "IsNull",
+                     "operand" : {
+                        "name" : "concept",
+                        "type" : "OperandRef"
+                     }
+                  }
+               },
+               "then" : {
+                  "asType" : "{urn:hl7-org:elm-types:r1}Concept",
+                  "type" : "As",
+                  "operand" : {
+                     "type" : "Null"
+                  }
+               },
+               "else" : {
+                  "classType" : "{urn:hl7-org:elm-types:r1}Concept",
+                  "type" : "Instance",
+                  "element" : [ {
+                     "name" : "codes",
+                     "value" : {
+                        "type" : "Query",
+                        "source" : [ {
+                           "alias" : "C",
+                           "expression" : {
+                              "path" : "coding",
+                              "type" : "Property",
+                              "source" : {
+                                 "name" : "concept",
+                                 "type" : "OperandRef"
+                              }
+                           }
+                        } ],
+                        "relationship" : [ ],
+                        "return" : {
+                           "expression" : {
+                              "name" : "ToCode",
+                              "type" : "FunctionRef",
+                              "operand" : [ {
+                                 "name" : "C",
+                                 "type" : "AliasRef"
+                              } ]
+                           }
+                        }
+                     }
+                  }, {
+                     "name" : "display",
+                     "value" : {
+                        "path" : "value",
+                        "type" : "Property",
+                        "source" : {
+                           "path" : "text",
                            "type" : "Property",
                            "source" : {
                               "name" : "concept",
                               "type" : "OperandRef"
                            }
                         }
-                     } ],
-                     "relationship" : [ ],
-                     "return" : {
-                        "expression" : {
-                           "name" : "ToCode",
-                           "type" : "FunctionRef",
-                           "operand" : [ {
-                              "name" : "C",
-                              "type" : "AliasRef"
-                           } ]
-                        }
                      }
-                  }
-               }, {
-                  "name" : "display",
-                  "value" : {
-                     "path" : "value",
-                     "type" : "Property",
-                     "source" : {
-                        "path" : "text",
-                        "type" : "Property",
-                        "source" : {
-                           "name" : "concept",
-                           "type" : "OperandRef"
-                        }
-                     }
-                  }
-               } ]
+                  } ]
+               }
             },
             "operand" : [ {
                "name" : "concept",
@@ -294,26 +411,6 @@
                "name" : "value",
                "operandTypeSpecifier" : {
                   "name" : "{http://hl7.org/fhir}uuid",
-                  "type" : "NamedTypeSpecifier"
-               }
-            } ]
-         }, {
-            "name" : "ToString",
-            "context" : "Patient",
-            "accessLevel" : "Public",
-            "type" : "FunctionDef",
-            "expression" : {
-               "path" : "value",
-               "type" : "Property",
-               "source" : {
-                  "name" : "value",
-                  "type" : "OperandRef"
-               }
-            },
-            "operand" : [ {
-               "name" : "value",
-               "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}TestScriptRequestMethodCode",
                   "type" : "NamedTypeSpecifier"
                }
             } ]
@@ -433,26 +530,6 @@
             "operand" : [ {
                "name" : "value",
                "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}RestfulCapabilityMode",
-                  "type" : "NamedTypeSpecifier"
-               }
-            } ]
-         }, {
-            "name" : "ToString",
-            "context" : "Patient",
-            "accessLevel" : "Public",
-            "type" : "FunctionDef",
-            "expression" : {
-               "path" : "value",
-               "type" : "Property",
-               "source" : {
-                  "name" : "value",
-                  "type" : "OperandRef"
-               }
-            },
-            "operand" : [ {
-               "name" : "value",
-               "operandTypeSpecifier" : {
                   "name" : "{http://hl7.org/fhir}DetectedIssueSeverity",
                   "type" : "NamedTypeSpecifier"
                }
@@ -474,26 +551,6 @@
                "name" : "value",
                "operandTypeSpecifier" : {
                   "name" : "{http://hl7.org/fhir}IssueSeverity",
-                  "type" : "NamedTypeSpecifier"
-               }
-            } ]
-         }, {
-            "name" : "ToString",
-            "context" : "Patient",
-            "accessLevel" : "Public",
-            "type" : "FunctionDef",
-            "expression" : {
-               "path" : "value",
-               "type" : "Property",
-               "source" : {
-                  "name" : "value",
-                  "type" : "OperandRef"
-               }
-            },
-            "operand" : [ {
-               "name" : "value",
-               "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}CareTeamStatus",
                   "type" : "NamedTypeSpecifier"
                }
             } ]
@@ -553,26 +610,6 @@
             "operand" : [ {
                "name" : "value",
                "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}EncounterStatus",
-                  "type" : "NamedTypeSpecifier"
-               }
-            } ]
-         }, {
-            "name" : "ToString",
-            "context" : "Patient",
-            "accessLevel" : "Public",
-            "type" : "FunctionDef",
-            "expression" : {
-               "path" : "value",
-               "type" : "Property",
-               "source" : {
-                  "name" : "value",
-                  "type" : "OperandRef"
-               }
-            },
-            "operand" : [ {
-               "name" : "value",
-               "operandTypeSpecifier" : {
                   "name" : "{http://hl7.org/fhir}StructureDefinitionKind",
                   "type" : "NamedTypeSpecifier"
                }
@@ -593,147 +630,7 @@
             "operand" : [ {
                "name" : "value",
                "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}PublicationStatus",
-                  "type" : "NamedTypeSpecifier"
-               }
-            } ]
-         }, {
-            "name" : "ToString",
-            "context" : "Patient",
-            "accessLevel" : "Public",
-            "type" : "FunctionDef",
-            "expression" : {
-               "path" : "value",
-               "type" : "Property",
-               "source" : {
-                  "name" : "value",
-                  "type" : "OperandRef"
-               }
-            },
-            "operand" : [ {
-               "name" : "value",
-               "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}ConsentDataMeaning",
-                  "type" : "NamedTypeSpecifier"
-               }
-            } ]
-         }, {
-            "name" : "ToString",
-            "context" : "Patient",
-            "accessLevel" : "Public",
-            "type" : "FunctionDef",
-            "expression" : {
-               "path" : "value",
-               "type" : "Property",
-               "source" : {
-                  "name" : "value",
-                  "type" : "OperandRef"
-               }
-            },
-            "operand" : [ {
-               "name" : "value",
-               "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}StructureMapSourceListMode",
-                  "type" : "NamedTypeSpecifier"
-               }
-            } ]
-         }, {
-            "name" : "ToString",
-            "context" : "Patient",
-            "accessLevel" : "Public",
-            "type" : "FunctionDef",
-            "expression" : {
-               "path" : "value",
-               "type" : "Property",
-               "source" : {
-                  "name" : "value",
-                  "type" : "OperandRef"
-               }
-            },
-            "operand" : [ {
-               "name" : "value",
-               "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}RequestStatus",
-                  "type" : "NamedTypeSpecifier"
-               }
-            } ]
-         }, {
-            "name" : "ToString",
-            "context" : "Patient",
-            "accessLevel" : "Public",
-            "type" : "FunctionDef",
-            "expression" : {
-               "path" : "value",
-               "type" : "Property",
-               "source" : {
-                  "name" : "value",
-                  "type" : "OperandRef"
-               }
-            },
-            "operand" : [ {
-               "name" : "value",
-               "operandTypeSpecifier" : {
                   "name" : "{http://hl7.org/fhir}QuestionnaireResponseStatus",
-                  "type" : "NamedTypeSpecifier"
-               }
-            } ]
-         }, {
-            "name" : "ToString",
-            "context" : "Patient",
-            "accessLevel" : "Public",
-            "type" : "FunctionDef",
-            "expression" : {
-               "path" : "value",
-               "type" : "Property",
-               "source" : {
-                  "name" : "value",
-                  "type" : "OperandRef"
-               }
-            },
-            "operand" : [ {
-               "name" : "value",
-               "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}SearchComparator",
-                  "type" : "NamedTypeSpecifier"
-               }
-            } ]
-         }, {
-            "name" : "ToString",
-            "context" : "Patient",
-            "accessLevel" : "Public",
-            "type" : "FunctionDef",
-            "expression" : {
-               "path" : "value",
-               "type" : "Property",
-               "source" : {
-                  "name" : "value",
-                  "type" : "OperandRef"
-               }
-            },
-            "operand" : [ {
-               "name" : "value",
-               "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}ChargeItemStatus",
-                  "type" : "NamedTypeSpecifier"
-               }
-            } ]
-         }, {
-            "name" : "ToString",
-            "context" : "Patient",
-            "accessLevel" : "Public",
-            "type" : "FunctionDef",
-            "expression" : {
-               "path" : "value",
-               "type" : "Property",
-               "source" : {
-                  "name" : "value",
-                  "type" : "OperandRef"
-               }
-            },
-            "operand" : [ {
-               "name" : "value",
-               "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}ActionParticipantType",
                   "type" : "NamedTypeSpecifier"
                }
             } ]
@@ -793,7 +690,7 @@
             "operand" : [ {
                "name" : "value",
                "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}AllergyIntoleranceClinicalStatus",
+                  "name" : "{http://hl7.org/fhir}ConformanceResourceStatus",
                   "type" : "NamedTypeSpecifier"
                }
             } ]
@@ -854,46 +751,6 @@
                "name" : "value",
                "operandTypeSpecifier" : {
                   "name" : "{http://hl7.org/fhir}ParticipationStatus",
-                  "type" : "NamedTypeSpecifier"
-               }
-            } ]
-         }, {
-            "name" : "ToString",
-            "context" : "Patient",
-            "accessLevel" : "Public",
-            "type" : "FunctionDef",
-            "expression" : {
-               "path" : "value",
-               "type" : "Property",
-               "source" : {
-                  "name" : "value",
-                  "type" : "OperandRef"
-               }
-            },
-            "operand" : [ {
-               "name" : "value",
-               "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}TestReportResult",
-                  "type" : "NamedTypeSpecifier"
-               }
-            } ]
-         }, {
-            "name" : "ToString",
-            "context" : "Patient",
-            "accessLevel" : "Public",
-            "type" : "FunctionDef",
-            "expression" : {
-               "path" : "value",
-               "type" : "Property",
-               "source" : {
-                  "name" : "value",
-                  "type" : "OperandRef"
-               }
-            },
-            "operand" : [ {
-               "name" : "value",
-               "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}ConceptMapGroupUnmappedMode",
                   "type" : "NamedTypeSpecifier"
                }
             } ]
@@ -1033,6 +890,26 @@
             "operand" : [ {
                "name" : "value",
                "operandTypeSpecifier" : {
+                  "name" : "{http://hl7.org/fhir}ConformanceEventMode",
+                  "type" : "NamedTypeSpecifier"
+               }
+            } ]
+         }, {
+            "name" : "ToString",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "type" : "FunctionDef",
+            "expression" : {
+               "path" : "value",
+               "type" : "Property",
+               "source" : {
+                  "name" : "value",
+                  "type" : "OperandRef"
+               }
+            },
+            "operand" : [ {
+               "name" : "value",
+               "operandTypeSpecifier" : {
                   "name" : "{http://hl7.org/fhir}IssueType",
                   "type" : "NamedTypeSpecifier"
                }
@@ -1053,7 +930,7 @@
             "operand" : [ {
                "name" : "value",
                "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}ContentType",
+                  "name" : "{http://hl7.org/fhir}TransactionMode",
                   "type" : "NamedTypeSpecifier"
                }
             } ]
@@ -1073,7 +950,7 @@
             "operand" : [ {
                "name" : "value",
                "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}StructureMapContextType",
+                  "name" : "{http://hl7.org/fhir}ContentType",
                   "type" : "NamedTypeSpecifier"
                }
             } ]
@@ -1133,6 +1010,46 @@
             "operand" : [ {
                "name" : "value",
                "operandTypeSpecifier" : {
+                  "name" : "{http://hl7.org/fhir}AuditEventParticipantNetworkType",
+                  "type" : "NamedTypeSpecifier"
+               }
+            } ]
+         }, {
+            "name" : "ToString",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "type" : "FunctionDef",
+            "expression" : {
+               "path" : "value",
+               "type" : "Property",
+               "source" : {
+                  "name" : "value",
+                  "type" : "OperandRef"
+               }
+            },
+            "operand" : [ {
+               "name" : "value",
+               "operandTypeSpecifier" : {
+                  "name" : "{http://hl7.org/fhir}CommunicationStatus",
+                  "type" : "NamedTypeSpecifier"
+               }
+            } ]
+         }, {
+            "name" : "ToString",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "type" : "FunctionDef",
+            "expression" : {
+               "path" : "value",
+               "type" : "Property",
+               "source" : {
+                  "name" : "value",
+                  "type" : "OperandRef"
+               }
+            },
+            "operand" : [ {
+               "name" : "value",
+               "operandTypeSpecifier" : {
                   "name" : "{http://hl7.org/fhir}ClinicalImpressionStatus",
                   "type" : "NamedTypeSpecifier"
                }
@@ -1173,7 +1090,27 @@
             "operand" : [ {
                "name" : "value",
                "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}RequestIntent",
+                  "name" : "{http://hl7.org/fhir}DeviceUseRequestPriority",
+                  "type" : "NamedTypeSpecifier"
+               }
+            } ]
+         }, {
+            "name" : "ToString",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "type" : "FunctionDef",
+            "expression" : {
+               "path" : "value",
+               "type" : "Property",
+               "source" : {
+                  "name" : "value",
+                  "type" : "OperandRef"
+               }
+            },
+            "operand" : [ {
+               "name" : "value",
+               "operandTypeSpecifier" : {
+                  "name" : "{http://hl7.org/fhir}OrderStatus",
                   "type" : "NamedTypeSpecifier"
                }
             } ]
@@ -1213,87 +1150,7 @@
             "operand" : [ {
                "name" : "value",
                "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}MeasmntPrinciple",
-                  "type" : "NamedTypeSpecifier"
-               }
-            } ]
-         }, {
-            "name" : "ToString",
-            "context" : "Patient",
-            "accessLevel" : "Public",
-            "type" : "FunctionDef",
-            "expression" : {
-               "path" : "value",
-               "type" : "Property",
-               "source" : {
-                  "name" : "value",
-                  "type" : "OperandRef"
-               }
-            },
-            "operand" : [ {
-               "name" : "value",
-               "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}ConsentExceptType",
-                  "type" : "NamedTypeSpecifier"
-               }
-            } ]
-         }, {
-            "name" : "ToString",
-            "context" : "Patient",
-            "accessLevel" : "Public",
-            "type" : "FunctionDef",
-            "expression" : {
-               "path" : "value",
-               "type" : "Property",
-               "source" : {
-                  "name" : "value",
-                  "type" : "OperandRef"
-               }
-            },
-            "operand" : [ {
-               "name" : "value",
-               "operandTypeSpecifier" : {
                   "name" : "{http://hl7.org/fhir}string",
-                  "type" : "NamedTypeSpecifier"
-               }
-            } ]
-         }, {
-            "name" : "ToString",
-            "context" : "Patient",
-            "accessLevel" : "Public",
-            "type" : "FunctionDef",
-            "expression" : {
-               "path" : "value",
-               "type" : "Property",
-               "source" : {
-                  "name" : "value",
-                  "type" : "OperandRef"
-               }
-            },
-            "operand" : [ {
-               "name" : "value",
-               "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}ActionRequiredBehavior",
-                  "type" : "NamedTypeSpecifier"
-               }
-            } ]
-         }, {
-            "name" : "ToString",
-            "context" : "Patient",
-            "accessLevel" : "Public",
-            "type" : "FunctionDef",
-            "expression" : {
-               "path" : "value",
-               "type" : "Property",
-               "source" : {
-                  "name" : "value",
-                  "type" : "OperandRef"
-               }
-            },
-            "operand" : [ {
-               "name" : "value",
-               "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}EndpointStatus",
                   "type" : "NamedTypeSpecifier"
                }
             } ]
@@ -1373,26 +1230,6 @@
             "operand" : [ {
                "name" : "value",
                "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}MedicationRequestStatus",
-                  "type" : "NamedTypeSpecifier"
-               }
-            } ]
-         }, {
-            "name" : "ToString",
-            "context" : "Patient",
-            "accessLevel" : "Public",
-            "type" : "FunctionDef",
-            "expression" : {
-               "path" : "value",
-               "type" : "Property",
-               "source" : {
-                  "name" : "value",
-                  "type" : "OperandRef"
-               }
-            },
-            "operand" : [ {
-               "name" : "value",
-               "operandTypeSpecifier" : {
                   "name" : "{http://hl7.org/fhir}MedicationAdministrationStatus",
                   "type" : "NamedTypeSpecifier"
                }
@@ -1413,27 +1250,7 @@
             "operand" : [ {
                "name" : "value",
                "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}ActionCardinalityBehavior",
-                  "type" : "NamedTypeSpecifier"
-               }
-            } ]
-         }, {
-            "name" : "ToString",
-            "context" : "Patient",
-            "accessLevel" : "Public",
-            "type" : "FunctionDef",
-            "expression" : {
-               "path" : "value",
-               "type" : "Property",
-               "source" : {
-                  "name" : "value",
-                  "type" : "OperandRef"
-               }
-            },
-            "operand" : [ {
-               "name" : "value",
-               "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}MedicationRequestIntent",
+                  "name" : "{http://hl7.org/fhir}RestfulConformanceMode",
                   "type" : "NamedTypeSpecifier"
                }
             } ]
@@ -1473,26 +1290,6 @@
             "operand" : [ {
                "name" : "value",
                "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}ImmunizationStatusCodes",
-                  "type" : "NamedTypeSpecifier"
-               }
-            } ]
-         }, {
-            "name" : "ToString",
-            "context" : "Patient",
-            "accessLevel" : "Public",
-            "type" : "FunctionDef",
-            "expression" : {
-               "path" : "value",
-               "type" : "Property",
-               "source" : {
-                  "name" : "value",
-                  "type" : "OperandRef"
-               }
-            },
-            "operand" : [ {
-               "name" : "value",
-               "operandTypeSpecifier" : {
                   "name" : "{http://hl7.org/fhir}AccountStatus",
                   "type" : "NamedTypeSpecifier"
                }
@@ -1513,7 +1310,7 @@
             "operand" : [ {
                "name" : "value",
                "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}MedicationDispenseStatus",
+                  "name" : "{http://hl7.org/fhir}ProcedureRequestPriority",
                   "type" : "NamedTypeSpecifier"
                }
             } ]
@@ -1533,7 +1330,7 @@
             "operand" : [ {
                "name" : "value",
                "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}ConfidentialityClassification",
+                  "name" : "{http://hl7.org/fhir}MedicationDispenseStatus",
                   "type" : "NamedTypeSpecifier"
                }
             } ]
@@ -1593,67 +1390,7 @@
             "operand" : [ {
                "name" : "value",
                "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}StructureMapTargetListMode",
-                  "type" : "NamedTypeSpecifier"
-               }
-            } ]
-         }, {
-            "name" : "ToString",
-            "context" : "Patient",
-            "accessLevel" : "Public",
-            "type" : "FunctionDef",
-            "expression" : {
-               "path" : "value",
-               "type" : "Property",
-               "source" : {
-                  "name" : "value",
-                  "type" : "OperandRef"
-               }
-            },
-            "operand" : [ {
-               "name" : "value",
-               "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}TestReportParticipantType",
-                  "type" : "NamedTypeSpecifier"
-               }
-            } ]
-         }, {
-            "name" : "ToString",
-            "context" : "Patient",
-            "accessLevel" : "Public",
-            "type" : "FunctionDef",
-            "expression" : {
-               "path" : "value",
-               "type" : "Property",
-               "source" : {
-                  "name" : "value",
-                  "type" : "OperandRef"
-               }
-            },
-            "operand" : [ {
-               "name" : "value",
-               "operandTypeSpecifier" : {
                   "name" : "{http://hl7.org/fhir}BindingStrength",
-                  "type" : "NamedTypeSpecifier"
-               }
-            } ]
-         }, {
-            "name" : "ToString",
-            "context" : "Patient",
-            "accessLevel" : "Public",
-            "type" : "FunctionDef",
-            "expression" : {
-               "path" : "value",
-               "type" : "Property",
-               "source" : {
-                  "name" : "value",
-                  "type" : "OperandRef"
-               }
-            },
-            "operand" : [ {
-               "name" : "value",
-               "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}RequestPriority",
                   "type" : "NamedTypeSpecifier"
                }
             } ]
@@ -1693,47 +1430,7 @@
             "operand" : [ {
                "name" : "value",
                "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}DiscriminatorType",
-                  "type" : "NamedTypeSpecifier"
-               }
-            } ]
-         }, {
-            "name" : "ToString",
-            "context" : "Patient",
-            "accessLevel" : "Public",
-            "type" : "FunctionDef",
-            "expression" : {
-               "path" : "value",
-               "type" : "Property",
-               "source" : {
-                  "name" : "value",
-                  "type" : "OperandRef"
-               }
-            },
-            "operand" : [ {
-               "name" : "value",
-               "operandTypeSpecifier" : {
                   "name" : "{http://hl7.org/fhir}XPathUsageType",
-                  "type" : "NamedTypeSpecifier"
-               }
-            } ]
-         }, {
-            "name" : "ToString",
-            "context" : "Patient",
-            "accessLevel" : "Public",
-            "type" : "FunctionDef",
-            "expression" : {
-               "path" : "value",
-               "type" : "Property",
-               "source" : {
-                  "name" : "value",
-                  "type" : "OperandRef"
-               }
-            },
-            "operand" : [ {
-               "name" : "value",
-               "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}StructureMapInputMode",
                   "type" : "NamedTypeSpecifier"
                }
             } ]
@@ -1793,66 +1490,6 @@
             "operand" : [ {
                "name" : "value",
                "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}LinkageType",
-                  "type" : "NamedTypeSpecifier"
-               }
-            } ]
-         }, {
-            "name" : "ToString",
-            "context" : "Patient",
-            "accessLevel" : "Public",
-            "type" : "FunctionDef",
-            "expression" : {
-               "path" : "value",
-               "type" : "Property",
-               "source" : {
-                  "name" : "value",
-                  "type" : "OperandRef"
-               }
-            },
-            "operand" : [ {
-               "name" : "value",
-               "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}ReferenceHandlingPolicy",
-                  "type" : "NamedTypeSpecifier"
-               }
-            } ]
-         }, {
-            "name" : "ToString",
-            "context" : "Patient",
-            "accessLevel" : "Public",
-            "type" : "FunctionDef",
-            "expression" : {
-               "path" : "value",
-               "type" : "Property",
-               "source" : {
-                  "name" : "value",
-                  "type" : "OperandRef"
-               }
-            },
-            "operand" : [ {
-               "name" : "value",
-               "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}MedicationStatus",
-                  "type" : "NamedTypeSpecifier"
-               }
-            } ]
-         }, {
-            "name" : "ToString",
-            "context" : "Patient",
-            "accessLevel" : "Public",
-            "type" : "FunctionDef",
-            "expression" : {
-               "path" : "value",
-               "type" : "Property",
-               "source" : {
-                  "name" : "value",
-                  "type" : "OperandRef"
-               }
-            },
-            "operand" : [ {
-               "name" : "value",
-               "operandTypeSpecifier" : {
                   "name" : "{http://hl7.org/fhir}FilterOperator",
                   "type" : "NamedTypeSpecifier"
                }
@@ -1893,26 +1530,6 @@
             "operand" : [ {
                "name" : "value",
                "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}ResearchStudyStatus",
-                  "type" : "NamedTypeSpecifier"
-               }
-            } ]
-         }, {
-            "name" : "ToString",
-            "context" : "Patient",
-            "accessLevel" : "Public",
-            "type" : "FunctionDef",
-            "expression" : {
-               "path" : "value",
-               "type" : "Property",
-               "source" : {
-                  "name" : "value",
-                  "type" : "OperandRef"
-               }
-            },
-            "operand" : [ {
-               "name" : "value",
-               "operandTypeSpecifier" : {
                   "name" : "{http://hl7.org/fhir}ExtensionContext",
                   "type" : "NamedTypeSpecifier"
                }
@@ -1933,7 +1550,7 @@
             "operand" : [ {
                "name" : "value",
                "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}FHIRDefinedType",
+                  "name" : "{http://hl7.org/fhir}ClaimType",
                   "type" : "NamedTypeSpecifier"
                }
             } ]
@@ -1973,26 +1590,6 @@
             "operand" : [ {
                "name" : "value",
                "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}ActionRelationshipType",
-                  "type" : "NamedTypeSpecifier"
-               }
-            } ]
-         }, {
-            "name" : "ToString",
-            "context" : "Patient",
-            "accessLevel" : "Public",
-            "type" : "FunctionDef",
-            "expression" : {
-               "path" : "value",
-               "type" : "Property",
-               "source" : {
-                  "name" : "value",
-                  "type" : "OperandRef"
-               }
-            },
-            "operand" : [ {
-               "name" : "value",
-               "operandTypeSpecifier" : {
                   "name" : "{http://hl7.org/fhir}ConstraintSeverity",
                   "type" : "NamedTypeSpecifier"
                }
@@ -2013,7 +1610,7 @@
             "operand" : [ {
                "name" : "value",
                "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}EventCapabilityMode",
+                  "name" : "{http://hl7.org/fhir}GuideResourcePurpose",
                   "type" : "NamedTypeSpecifier"
                }
             } ]
@@ -2033,47 +1630,7 @@
             "operand" : [ {
                "name" : "value",
                "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}ContractResourceStatusCodes",
-                  "type" : "NamedTypeSpecifier"
-               }
-            } ]
-         }, {
-            "name" : "ToString",
-            "context" : "Patient",
-            "accessLevel" : "Public",
-            "type" : "FunctionDef",
-            "expression" : {
-               "path" : "value",
-               "type" : "Property",
-               "source" : {
-                  "name" : "value",
-                  "type" : "OperandRef"
-               }
-            },
-            "operand" : [ {
-               "name" : "value",
-               "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}ResearchSubjectStatus",
-                  "type" : "NamedTypeSpecifier"
-               }
-            } ]
-         }, {
-            "name" : "ToString",
-            "context" : "Patient",
-            "accessLevel" : "Public",
-            "type" : "FunctionDef",
-            "expression" : {
-               "path" : "value",
-               "type" : "Property",
-               "source" : {
-                  "name" : "value",
-                  "type" : "OperandRef"
-               }
-            },
-            "operand" : [ {
-               "name" : "value",
-               "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}UDIEntryType",
+                  "name" : "{http://hl7.org/fhir}ProcedureStatus",
                   "type" : "NamedTypeSpecifier"
                }
             } ]
@@ -2113,27 +1670,7 @@
             "operand" : [ {
                "name" : "value",
                "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}TestReportActionResult",
-                  "type" : "NamedTypeSpecifier"
-               }
-            } ]
-         }, {
-            "name" : "ToString",
-            "context" : "Patient",
-            "accessLevel" : "Public",
-            "type" : "FunctionDef",
-            "expression" : {
-               "path" : "value",
-               "type" : "Property",
-               "source" : {
-                  "name" : "value",
-                  "type" : "OperandRef"
-               }
-            },
-            "operand" : [ {
-               "name" : "value",
-               "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}StructureMapTransform",
+                  "name" : "{http://hl7.org/fhir}QuestionnaireStatus",
                   "type" : "NamedTypeSpecifier"
                }
             } ]
@@ -2194,46 +1731,6 @@
                "name" : "value",
                "operandTypeSpecifier" : {
                   "name" : "{http://hl7.org/fhir}AggregationMode",
-                  "type" : "NamedTypeSpecifier"
-               }
-            } ]
-         }, {
-            "name" : "ToString",
-            "context" : "Patient",
-            "accessLevel" : "Public",
-            "type" : "FunctionDef",
-            "expression" : {
-               "path" : "value",
-               "type" : "Property",
-               "source" : {
-                  "name" : "value",
-                  "type" : "OperandRef"
-               }
-            },
-            "operand" : [ {
-               "name" : "value",
-               "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}CapabilityStatementKind",
-                  "type" : "NamedTypeSpecifier"
-               }
-            } ]
-         }, {
-            "name" : "ToString",
-            "context" : "Patient",
-            "accessLevel" : "Public",
-            "type" : "FunctionDef",
-            "expression" : {
-               "path" : "value",
-               "type" : "Property",
-               "source" : {
-                  "name" : "value",
-                  "type" : "OperandRef"
-               }
-            },
-            "operand" : [ {
-               "name" : "value",
-               "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}AllergyIntoleranceVerificationStatus",
                   "type" : "NamedTypeSpecifier"
                }
             } ]
@@ -2333,86 +1830,6 @@
             "operand" : [ {
                "name" : "value",
                "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}ActionGroupingBehavior",
-                  "type" : "NamedTypeSpecifier"
-               }
-            } ]
-         }, {
-            "name" : "ToString",
-            "context" : "Patient",
-            "accessLevel" : "Public",
-            "type" : "FunctionDef",
-            "expression" : {
-               "path" : "value",
-               "type" : "Property",
-               "source" : {
-                  "name" : "value",
-                  "type" : "OperandRef"
-               }
-            },
-            "operand" : [ {
-               "name" : "value",
-               "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}StructureMapModelMode",
-                  "type" : "NamedTypeSpecifier"
-               }
-            } ]
-         }, {
-            "name" : "ToString",
-            "context" : "Patient",
-            "accessLevel" : "Public",
-            "type" : "FunctionDef",
-            "expression" : {
-               "path" : "value",
-               "type" : "Property",
-               "source" : {
-                  "name" : "value",
-                  "type" : "OperandRef"
-               }
-            },
-            "operand" : [ {
-               "name" : "value",
-               "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}TaskStatus",
-                  "type" : "NamedTypeSpecifier"
-               }
-            } ]
-         }, {
-            "name" : "ToString",
-            "context" : "Patient",
-            "accessLevel" : "Public",
-            "type" : "FunctionDef",
-            "expression" : {
-               "path" : "value",
-               "type" : "Property",
-               "source" : {
-                  "name" : "value",
-                  "type" : "OperandRef"
-               }
-            },
-            "operand" : [ {
-               "name" : "value",
-               "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}AdverseEventCausality",
-                  "type" : "NamedTypeSpecifier"
-               }
-            } ]
-         }, {
-            "name" : "ToString",
-            "context" : "Patient",
-            "accessLevel" : "Public",
-            "type" : "FunctionDef",
-            "expression" : {
-               "path" : "value",
-               "type" : "Property",
-               "source" : {
-                  "name" : "value",
-                  "type" : "OperandRef"
-               }
-            },
-            "operand" : [ {
-               "name" : "value",
-               "operandTypeSpecifier" : {
                   "name" : "{http://hl7.org/fhir}SubscriptionChannelType",
                   "type" : "NamedTypeSpecifier"
                }
@@ -2433,7 +1850,27 @@
             "operand" : [ {
                "name" : "value",
                "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}GraphCompartmentRule",
+                  "name" : "{http://hl7.org/fhir}ProcedureRequestStatus",
+                  "type" : "NamedTypeSpecifier"
+               }
+            } ]
+         }, {
+            "name" : "ToString",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "type" : "FunctionDef",
+            "expression" : {
+               "path" : "value",
+               "type" : "Property",
+               "source" : {
+                  "name" : "value",
+                  "type" : "OperandRef"
+               }
+            },
+            "operand" : [ {
+               "name" : "value",
+               "operandTypeSpecifier" : {
+                  "name" : "{http://hl7.org/fhir}ReferralStatus",
                   "type" : "NamedTypeSpecifier"
                }
             } ]
@@ -2473,87 +1910,7 @@
             "operand" : [ {
                "name" : "value",
                "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}CarePlanIntent",
-                  "type" : "NamedTypeSpecifier"
-               }
-            } ]
-         }, {
-            "name" : "ToString",
-            "context" : "Patient",
-            "accessLevel" : "Public",
-            "type" : "FunctionDef",
-            "expression" : {
-               "path" : "value",
-               "type" : "Property",
-               "source" : {
-                  "name" : "value",
-                  "type" : "OperandRef"
-               }
-            },
-            "operand" : [ {
-               "name" : "value",
-               "operandTypeSpecifier" : {
                   "name" : "{http://hl7.org/fhir}SlicingRules",
-                  "type" : "NamedTypeSpecifier"
-               }
-            } ]
-         }, {
-            "name" : "ToString",
-            "context" : "Patient",
-            "accessLevel" : "Public",
-            "type" : "FunctionDef",
-            "expression" : {
-               "path" : "value",
-               "type" : "Property",
-               "source" : {
-                  "name" : "value",
-                  "type" : "OperandRef"
-               }
-            },
-            "operand" : [ {
-               "name" : "value",
-               "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}ExplanationOfBenefitStatus",
-                  "type" : "NamedTypeSpecifier"
-               }
-            } ]
-         }, {
-            "name" : "ToString",
-            "context" : "Patient",
-            "accessLevel" : "Public",
-            "type" : "FunctionDef",
-            "expression" : {
-               "path" : "value",
-               "type" : "Property",
-               "source" : {
-                  "name" : "value",
-                  "type" : "OperandRef"
-               }
-            },
-            "operand" : [ {
-               "name" : "value",
-               "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}ConsentState",
-                  "type" : "NamedTypeSpecifier"
-               }
-            } ]
-         }, {
-            "name" : "ToString",
-            "context" : "Patient",
-            "accessLevel" : "Public",
-            "type" : "FunctionDef",
-            "expression" : {
-               "path" : "value",
-               "type" : "Property",
-               "source" : {
-                  "name" : "value",
-                  "type" : "OperandRef"
-               }
-            },
-            "operand" : [ {
-               "name" : "value",
-               "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}AdverseEventCategory",
                   "type" : "NamedTypeSpecifier"
                }
             } ]
@@ -2613,47 +1970,7 @@
             "operand" : [ {
                "name" : "value",
                "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}MedicationRequestPriority",
-                  "type" : "NamedTypeSpecifier"
-               }
-            } ]
-         }, {
-            "name" : "ToString",
-            "context" : "Patient",
-            "accessLevel" : "Public",
-            "type" : "FunctionDef",
-            "expression" : {
-               "path" : "value",
-               "type" : "Property",
-               "source" : {
-                  "name" : "value",
-                  "type" : "OperandRef"
-               }
-            },
-            "operand" : [ {
-               "name" : "value",
-               "operandTypeSpecifier" : {
                   "name" : "{http://hl7.org/fhir}ConceptMapEquivalence",
-                  "type" : "NamedTypeSpecifier"
-               }
-            } ]
-         }, {
-            "name" : "ToString",
-            "context" : "Patient",
-            "accessLevel" : "Public",
-            "type" : "FunctionDef",
-            "expression" : {
-               "path" : "value",
-               "type" : "Property",
-               "source" : {
-                  "name" : "value",
-                  "type" : "OperandRef"
-               }
-            },
-            "operand" : [ {
-               "name" : "value",
-               "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}FHIRAllTypes",
                   "type" : "NamedTypeSpecifier"
                }
             } ]
@@ -2713,7 +2030,7 @@
             "operand" : [ {
                "name" : "value",
                "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}TriggerType",
+                  "name" : "{http://hl7.org/fhir}SearchModifierCode",
                   "type" : "NamedTypeSpecifier"
                }
             } ]
@@ -2733,7 +2050,7 @@
             "operand" : [ {
                "name" : "value",
                "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}SearchModifierCode",
+                  "name" : "{http://hl7.org/fhir}DeviceUseRequestStatus",
                   "type" : "NamedTypeSpecifier"
                }
             } ]
@@ -2813,26 +2130,6 @@
             "operand" : [ {
                "name" : "value",
                "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}EventStatus",
-                  "type" : "NamedTypeSpecifier"
-               }
-            } ]
-         }, {
-            "name" : "ToString",
-            "context" : "Patient",
-            "accessLevel" : "Public",
-            "type" : "FunctionDef",
-            "expression" : {
-               "path" : "value",
-               "type" : "Property",
-               "source" : {
-                  "name" : "value",
-                  "type" : "OperandRef"
-               }
-            },
-            "operand" : [ {
-               "name" : "value",
-               "operandTypeSpecifier" : {
                   "name" : "{http://hl7.org/fhir}OperationParameterUse",
                   "type" : "NamedTypeSpecifier"
                }
@@ -2873,26 +2170,6 @@
             "operand" : [ {
                "name" : "value",
                "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}ActionConditionKind",
-                  "type" : "NamedTypeSpecifier"
-               }
-            } ]
-         }, {
-            "name" : "ToString",
-            "context" : "Patient",
-            "accessLevel" : "Public",
-            "type" : "FunctionDef",
-            "expression" : {
-               "path" : "value",
-               "type" : "Property",
-               "source" : {
-                  "name" : "value",
-                  "type" : "OperandRef"
-               }
-            },
-            "operand" : [ {
-               "name" : "value",
-               "operandTypeSpecifier" : {
                   "name" : "{http://hl7.org/fhir}ObservationStatus",
                   "type" : "NamedTypeSpecifier"
                }
@@ -2913,7 +2190,7 @@
             "operand" : [ {
                "name" : "value",
                "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}qualityType",
+                  "name" : "{http://hl7.org/fhir}ParticipantStatus",
                   "type" : "NamedTypeSpecifier"
                }
             } ]
@@ -2953,7 +2230,7 @@
             "operand" : [ {
                "name" : "value",
                "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}ResourceType",
+                  "name" : "{http://hl7.org/fhir}ConformanceStatementKind",
                   "type" : "NamedTypeSpecifier"
                }
             } ]
@@ -2973,7 +2250,7 @@
             "operand" : [ {
                "name" : "value",
                "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}QuestionnaireItemType",
+                  "name" : "{http://hl7.org/fhir}DiagnosticOrderStatus",
                   "type" : "NamedTypeSpecifier"
                }
             } ]
@@ -2994,26 +2271,6 @@
                "name" : "value",
                "operandTypeSpecifier" : {
                   "name" : "{http://hl7.org/fhir}boolean",
-                  "type" : "NamedTypeSpecifier"
-               }
-            } ]
-         }, {
-            "name" : "ToString",
-            "context" : "Patient",
-            "accessLevel" : "Public",
-            "type" : "FunctionDef",
-            "expression" : {
-               "path" : "value",
-               "type" : "Property",
-               "source" : {
-                  "name" : "value",
-                  "type" : "OperandRef"
-               }
-            },
-            "operand" : [ {
-               "name" : "value",
-               "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}StructureMapGroupTypeMode",
                   "type" : "NamedTypeSpecifier"
                }
             } ]
@@ -3074,26 +2331,6 @@
                "name" : "value",
                "operandTypeSpecifier" : {
                   "name" : "{http://hl7.org/fhir}SupplyRequestStatus",
-                  "type" : "NamedTypeSpecifier"
-               }
-            } ]
-         }, {
-            "name" : "ToString",
-            "context" : "Patient",
-            "accessLevel" : "Public",
-            "type" : "FunctionDef",
-            "expression" : {
-               "path" : "value",
-               "type" : "Property",
-               "source" : {
-                  "name" : "value",
-                  "type" : "OperandRef"
-               }
-            },
-            "operand" : [ {
-               "name" : "value",
-               "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}ActionSelectionBehavior",
                   "type" : "NamedTypeSpecifier"
                }
             } ]
@@ -3193,7 +2430,7 @@
             "operand" : [ {
                "name" : "value",
                "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}CarePlanStatus",
+                  "name" : "{http://hl7.org/fhir}AllergyIntoleranceCertainty",
                   "type" : "NamedTypeSpecifier"
                }
             } ]
@@ -3213,7 +2450,7 @@
             "operand" : [ {
                "name" : "value",
                "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}ConditionClinicalStatusCodes",
+                  "name" : "{http://hl7.org/fhir}CarePlanStatus",
                   "type" : "NamedTypeSpecifier"
                }
             } ]
@@ -3238,7 +2475,7 @@
                }
             } ]
          }, {
-            "name" : "Tobase64Binary",
+            "name" : "ToString",
             "context" : "Patient",
             "accessLevel" : "Public",
             "type" : "FunctionDef",
@@ -3254,46 +2491,6 @@
                "name" : "value",
                "operandTypeSpecifier" : {
                   "name" : "{http://hl7.org/fhir}base64Binary",
-                  "type" : "NamedTypeSpecifier"
-               }
-            } ]
-         }, {
-            "name" : "ToString",
-            "context" : "Patient",
-            "accessLevel" : "Public",
-            "type" : "FunctionDef",
-            "expression" : {
-               "path" : "value",
-               "type" : "Property",
-               "source" : {
-                  "name" : "value",
-                  "type" : "OperandRef"
-               }
-            },
-            "operand" : [ {
-               "name" : "value",
-               "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}DeviceUseStatementStatus",
-                  "type" : "NamedTypeSpecifier"
-               }
-            } ]
-         }, {
-            "name" : "ToString",
-            "context" : "Patient",
-            "accessLevel" : "Public",
-            "type" : "FunctionDef",
-            "expression" : {
-               "path" : "value",
-               "type" : "Property",
-               "source" : {
-                  "name" : "value",
-                  "type" : "OperandRef"
-               }
-            },
-            "operand" : [ {
-               "name" : "value",
-               "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}AuditEventAgentNetworkType",
                   "type" : "NamedTypeSpecifier"
                }
             } ]
@@ -3413,47 +2610,27 @@
             "operand" : [ {
                "name" : "value",
                "operandTypeSpecifier" : {
+                  "name" : "{http://hl7.org/fhir}DiagnosticOrderPriority",
+                  "type" : "NamedTypeSpecifier"
+               }
+            } ]
+         }, {
+            "name" : "ToString",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "type" : "FunctionDef",
+            "expression" : {
+               "path" : "value",
+               "type" : "Property",
+               "source" : {
+                  "name" : "value",
+                  "type" : "OperandRef"
+               }
+            },
+            "operand" : [ {
+               "name" : "value",
+               "operandTypeSpecifier" : {
                   "name" : "{http://hl7.org/fhir}uri",
-                  "type" : "NamedTypeSpecifier"
-               }
-            } ]
-         }, {
-            "name" : "ToString",
-            "context" : "Patient",
-            "accessLevel" : "Public",
-            "type" : "FunctionDef",
-            "expression" : {
-               "path" : "value",
-               "type" : "Property",
-               "source" : {
-                  "name" : "value",
-                  "type" : "OperandRef"
-               }
-            },
-            "operand" : [ {
-               "name" : "value",
-               "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}ContributorType",
-                  "type" : "NamedTypeSpecifier"
-               }
-            } ]
-         }, {
-            "name" : "ToString",
-            "context" : "Patient",
-            "accessLevel" : "Public",
-            "type" : "FunctionDef",
-            "expression" : {
-               "path" : "value",
-               "type" : "Property",
-               "source" : {
-                  "name" : "value",
-                  "type" : "OperandRef"
-               }
-            },
-            "operand" : [ {
-               "name" : "value",
-               "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}ReferenceVersionRules",
                   "type" : "NamedTypeSpecifier"
                }
             } ]
@@ -3494,26 +2671,6 @@
                "name" : "value",
                "operandTypeSpecifier" : {
                   "name" : "{http://hl7.org/fhir}IdentityAssuranceLevel",
-                  "type" : "NamedTypeSpecifier"
-               }
-            } ]
-         }, {
-            "name" : "ToString",
-            "context" : "Patient",
-            "accessLevel" : "Public",
-            "type" : "FunctionDef",
-            "expression" : {
-               "path" : "value",
-               "type" : "Property",
-               "source" : {
-                  "name" : "value",
-                  "type" : "OperandRef"
-               }
-            },
-            "operand" : [ {
-               "name" : "value",
-               "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}MeasureReportStatus",
                   "type" : "NamedTypeSpecifier"
                }
             } ]
@@ -3593,26 +2750,6 @@
             "operand" : [ {
                "name" : "value",
                "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}ConditionalReadStatus",
-                  "type" : "NamedTypeSpecifier"
-               }
-            } ]
-         }, {
-            "name" : "ToString",
-            "context" : "Patient",
-            "accessLevel" : "Public",
-            "type" : "FunctionDef",
-            "expression" : {
-               "path" : "value",
-               "type" : "Property",
-               "source" : {
-                  "name" : "value",
-                  "type" : "OperandRef"
-               }
-            },
-            "operand" : [ {
-               "name" : "value",
-               "operandTypeSpecifier" : {
                   "name" : "{http://hl7.org/fhir}ConditionVerificationStatus",
                   "type" : "NamedTypeSpecifier"
                }
@@ -3634,26 +2771,6 @@
                "name" : "value",
                "operandTypeSpecifier" : {
                   "name" : "{http://hl7.org/fhir}AllergyIntoleranceSeverity",
-                  "type" : "NamedTypeSpecifier"
-               }
-            } ]
-         }, {
-            "name" : "ToString",
-            "context" : "Patient",
-            "accessLevel" : "Public",
-            "type" : "FunctionDef",
-            "expression" : {
-               "path" : "value",
-               "type" : "Property",
-               "source" : {
-                  "name" : "value",
-                  "type" : "OperandRef"
-               }
-            },
-            "operand" : [ {
-               "name" : "value",
-               "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}FinancialResourceStatusCodes",
                   "type" : "NamedTypeSpecifier"
                }
             } ]
@@ -3773,6 +2890,26 @@
             "operand" : [ {
                "name" : "value",
                "operandTypeSpecifier" : {
+                  "name" : "{http://hl7.org/fhir}CommunicationRequestStatus",
+                  "type" : "NamedTypeSpecifier"
+               }
+            } ]
+         }, {
+            "name" : "ToString",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "type" : "FunctionDef",
+            "expression" : {
+               "path" : "value",
+               "type" : "Property",
+               "source" : {
+                  "name" : "value",
+                  "type" : "OperandRef"
+               }
+            },
+            "operand" : [ {
+               "name" : "value",
+               "operandTypeSpecifier" : {
                   "name" : "{http://hl7.org/fhir}DocumentReferenceStatus",
                   "type" : "NamedTypeSpecifier"
                }
@@ -3833,7 +2970,7 @@
             "operand" : [ {
                "name" : "value",
                "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}repositoryType",
+                  "name" : "{http://hl7.org/fhir}CarePlanRelationship",
                   "type" : "NamedTypeSpecifier"
                }
             } ]
@@ -3854,26 +2991,6 @@
                "name" : "value",
                "operandTypeSpecifier" : {
                   "name" : "{http://hl7.org/fhir}LocationStatus",
-                  "type" : "NamedTypeSpecifier"
-               }
-            } ]
-         }, {
-            "name" : "ToString",
-            "context" : "Patient",
-            "accessLevel" : "Public",
-            "type" : "FunctionDef",
-            "expression" : {
-               "path" : "value",
-               "type" : "Property",
-               "source" : {
-                  "name" : "value",
-                  "type" : "OperandRef"
-               }
-            },
-            "operand" : [ {
-               "name" : "value",
-               "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}FHIRSubstanceStatus",
                   "type" : "NamedTypeSpecifier"
                }
             } ]
@@ -3933,7 +3050,27 @@
             "operand" : [ {
                "name" : "value",
                "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}TestReportStatus",
+                  "name" : "{http://hl7.org/fhir}EncounterState",
+                  "type" : "NamedTypeSpecifier"
+               }
+            } ]
+         }, {
+            "name" : "ToString",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "type" : "FunctionDef",
+            "expression" : {
+               "path" : "value",
+               "type" : "Property",
+               "source" : {
+                  "name" : "value",
+                  "type" : "OperandRef"
+               }
+            },
+            "operand" : [ {
+               "name" : "value",
+               "operandTypeSpecifier" : {
+                  "name" : "{http://hl7.org/fhir}EncounterClass",
                   "type" : "NamedTypeSpecifier"
                }
             } ]
@@ -3954,26 +3091,6 @@
                "name" : "value",
                "operandTypeSpecifier" : {
                   "name" : "{http://hl7.org/fhir}HTTPVerb",
-                  "type" : "NamedTypeSpecifier"
-               }
-            } ]
-         }, {
-            "name" : "ToString",
-            "context" : "Patient",
-            "accessLevel" : "Public",
-            "type" : "FunctionDef",
-            "expression" : {
-               "path" : "value",
-               "type" : "Property",
-               "source" : {
-                  "name" : "value",
-                  "type" : "OperandRef"
-               }
-            },
-            "operand" : [ {
-               "name" : "value",
-               "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}CodeSystemContentMode",
                   "type" : "NamedTypeSpecifier"
                }
             } ]
@@ -4033,7 +3150,7 @@
             "operand" : [ {
                "name" : "value",
                "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}FHIRDeviceStatus",
+                  "name" : "{http://hl7.org/fhir}ContactPointSystem",
                   "type" : "NamedTypeSpecifier"
                }
             } ]
@@ -4053,7 +3170,7 @@
             "operand" : [ {
                "name" : "value",
                "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}ContactPointSystem",
+                  "name" : "{http://hl7.org/fhir}MedicationOrderStatus",
                   "type" : "NamedTypeSpecifier"
                }
             } ]
@@ -4093,47 +3210,7 @@
             "operand" : [ {
                "name" : "value",
                "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}PropertyType",
-                  "type" : "NamedTypeSpecifier"
-               }
-            } ]
-         }, {
-            "name" : "ToString",
-            "context" : "Patient",
-            "accessLevel" : "Public",
-            "type" : "FunctionDef",
-            "expression" : {
-               "path" : "value",
-               "type" : "Property",
-               "source" : {
-                  "name" : "value",
-                  "type" : "OperandRef"
-               }
-            },
-            "operand" : [ {
-               "name" : "value",
-               "operandTypeSpecifier" : {
                   "name" : "{http://hl7.org/fhir}markdown",
-                  "type" : "NamedTypeSpecifier"
-               }
-            } ]
-         }, {
-            "name" : "ToString",
-            "context" : "Patient",
-            "accessLevel" : "Public",
-            "type" : "FunctionDef",
-            "expression" : {
-               "path" : "value",
-               "type" : "Property",
-               "source" : {
-                  "name" : "value",
-                  "type" : "OperandRef"
-               }
-            },
-            "operand" : [ {
-               "name" : "value",
-               "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}TypeDerivationRule",
                   "type" : "NamedTypeSpecifier"
                }
             } ]
@@ -4173,47 +3250,7 @@
             "operand" : [ {
                "name" : "value",
                "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}GuidanceResponseStatus",
-                  "type" : "NamedTypeSpecifier"
-               }
-            } ]
-         }, {
-            "name" : "ToString",
-            "context" : "Patient",
-            "accessLevel" : "Public",
-            "type" : "FunctionDef",
-            "expression" : {
-               "path" : "value",
-               "type" : "Property",
-               "source" : {
-                  "name" : "value",
-                  "type" : "OperandRef"
-               }
-            },
-            "operand" : [ {
-               "name" : "value",
-               "operandTypeSpecifier" : {
                   "name" : "{http://hl7.org/fhir}QuantityComparator",
-                  "type" : "NamedTypeSpecifier"
-               }
-            } ]
-         }, {
-            "name" : "ToString",
-            "context" : "Patient",
-            "accessLevel" : "Public",
-            "type" : "FunctionDef",
-            "expression" : {
-               "path" : "value",
-               "type" : "Property",
-               "source" : {
-                  "name" : "value",
-                  "type" : "OperandRef"
-               }
-            },
-            "operand" : [ {
-               "name" : "value",
-               "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}RelatedArtifactType",
                   "type" : "NamedTypeSpecifier"
                }
             } ]
@@ -4253,7 +3290,7 @@
             "operand" : [ {
                "name" : "value",
                "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}MeasureReportType",
+                  "name" : "{http://hl7.org/fhir}DeviceStatus",
                   "type" : "NamedTypeSpecifier"
                }
             } ]
@@ -4273,7 +3310,7 @@
             "operand" : [ {
                "name" : "value",
                "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}ActionPrecheckBehavior",
+                  "name" : "{http://hl7.org/fhir}Measmnt_Principle",
                   "type" : "NamedTypeSpecifier"
                }
             } ]
@@ -4313,27 +3350,7 @@
             "operand" : [ {
                "name" : "value",
                "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}MedicationStatementTaken",
-                  "type" : "NamedTypeSpecifier"
-               }
-            } ]
-         }, {
-            "name" : "ToString",
-            "context" : "Patient",
-            "accessLevel" : "Public",
-            "type" : "FunctionDef",
-            "expression" : {
-               "path" : "value",
-               "type" : "Property",
-               "source" : {
-                  "name" : "value",
-                  "type" : "OperandRef"
-               }
-            },
-            "operand" : [ {
-               "name" : "value",
-               "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}CompartmentType",
+                  "name" : "{http://hl7.org/fhir}AllergyIntoleranceStatus",
                   "type" : "NamedTypeSpecifier"
                }
             } ]
@@ -4433,7 +3450,7 @@
             "operand" : [ {
                "name" : "value",
                "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}CodeSystemHierarchyMeaning",
+                  "name" : "{http://hl7.org/fhir}AnswerFormat",
                   "type" : "NamedTypeSpecifier"
                }
             } ]
@@ -4474,26 +3491,6 @@
                "name" : "value",
                "operandTypeSpecifier" : {
                   "name" : "{http://hl7.org/fhir}BundleType",
-                  "type" : "NamedTypeSpecifier"
-               }
-            } ]
-         }, {
-            "name" : "ToString",
-            "context" : "Patient",
-            "accessLevel" : "Public",
-            "type" : "FunctionDef",
-            "expression" : {
-               "path" : "value",
-               "type" : "Property",
-               "source" : {
-                  "name" : "value",
-                  "type" : "OperandRef"
-               }
-            },
-            "operand" : [ {
-               "name" : "value",
-               "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}SystemVersionProcessingMode",
                   "type" : "NamedTypeSpecifier"
                }
             } ]
