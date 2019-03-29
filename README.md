@@ -5,7 +5,7 @@ The CQL Testing Framework provides a simple mechanism for developing and maintai
 Current capabilities include:
 
 * Author test case data and expectations using [YAML](https://yaml.org/)
-* Execute test cases against CQL logic using [FHIR DSTU2](http://hl7.org/fhir/DSTU2/resourcelist.html) model and [VSAC](https://vsac.nlm.nih.gov/) value sets
+* Execute test cases against CQL logic using [FHIR 1.0.2 (DSTU2)](http://hl7.org/fhir/DSTU2/resourcelist.html) or [FHIR 3.0.0 (STU3)](http://hl7.org/fhir/STU3/resourcelist.html) model and [VSAC](https://vsac.nlm.nih.gov/) value sets
 * Display _diff_ rendering of actual vs. expected results for test failures
 * Run standalone or integrate CQL tests into existing [Mocha](https://mochajs.org/) test suites
 * Export test data as FHIR bundles for integration into a test server
@@ -13,7 +13,7 @@ Current capabilities include:
 * Configure project to support custom layouts
 
 Current limitations:
-* Only FHIR DSTU2 is supported
+* Only FHIR 1.0.2 (DSTU2) and 3.0.0 (STU3) are supported
 * Only the following resources are supported: Patient, Condition, Encounter, MedicationOrder, MedicationStatement, Observation, Procedure
 * Only VSAC value sets are supported
 
@@ -186,54 +186,64 @@ The `data` section of the YAML file contains all of the data that will be associ
 
 ### Resource Types
 
-The following FHIR DSTU2 resource types are supported: `Patient`, `Condition`, `Encounter`, `MedicationOrder`, `MedicationStatement`, `Observation`, `Procedure`.  Further details on each type are below.
+The following FHIR resource types are supported: `Patient`, `Condition`, `Encounter`, `MedicationOrder` (DSTU2 only), `MedicationRequest` (STU3 only),`MedicationStatement`, `Observation`, `Procedure`.  Further details on each type are below.
 
 ### Resource Type: Patient
 
-FHIR doc: [http://hl7.org/fhir/DSTU2/patient.html](http://hl7.org/fhir/DSTU2/patient.html)
+FHIR doc:
+* DSTU2: [http://hl7.org/fhir/DSTU2/patient.html](http://hl7.org/fhir/DSTU2/patient.html)
+* STU3: [http://hl7.org/fhir/STU3/patient.html](http://hl7.org/fhir/STU3/patient.html)
 
 Supported attributes:
 
 * **resourceType** _(must be Patient)_
 * **id** _(id)_
 * **name** _(name)_
-* **gender** _(string, [options](http://hl7.org/fhir/DSTU2/valueset-administrative-gender.html)_
+* **gender** _(string, options: [DSTU2](http://hl7.org/fhir/DSTU2/valueset-administrative-gender.html) / [STU3](http://hl7.org/fhir/STU3/valueset-administrative-gender.html))_
 * **birthDate** _(date)_
 
 ### Resource Type: Condition
 
-FHIR doc: [http://hl7.org/fhir/DSTU2/condition.html](http://hl7.org/fhir/DSTU2/condition.html)
+FHIR doc:
+* DSTU2: [http://hl7.org/fhir/DSTU2/condition.html](http://hl7.org/fhir/DSTU2/condition.html)
+* STU3: [http://hl7.org/fhir/STU3/condition.html](http://hl7.org/fhir/STU3/condition.html)
 
 Supported attributes:
 
 * **resourceType**: _(must be Condition)_,
 * **id**: _(id)_
-* **patient**: _(patient-reference, default: current patient)_
+* **patient (DSTU2)**: _(patient-reference, default: current patient)_
+* **subject (STU3)**: _(patient-reference, default: current patient)_
 * **code**: _(concept)_
-* **clinicalStatus**: _(string, [options](http://hl7.org/fhir/DSTU2/valueset-condition-clinical.html), default: resolved if abatementDateTime is specified, active otherwise)_
-* **verificationStatus**: _(string, [options](http://hl7.org/fhir/DSTU2/valueset-condition-ver-status.html), default: confirmed)_
+* **clinicalStatus**: _(string, options: [DSTU2](http://hl7.org/fhir/DSTU2/valueset-condition-clinical.html) / [STU3](http://hl7.org/fhir/STU3/valueset-condition-clinical.html), default: resolved if abatementDateTime is specified, active otherwise)_
+* **verificationStatus**: _(string, options: [DSTU2](http://hl7.org/fhir/DSTU2/valueset-condition-ver-status.html) / [STU3](http://hl7.org/fhir/STU3/valueset-condition-ver-status.html), default: confirmed)_
 * **onsetDateTime**: _(datetime)_
-* **dateRecorded**: _(date)_
+* **dateRecorded (DSTU2)**: _(date)_
+* **assertedDate (STU3)**: _(dateTime)_
 * **abatementDateTime**: _(datetime)_
 
 ### Resource Type: Encounter
 
-FHIR doc: [http://hl7.org/fhir/DSTU2/encounter.html](http://hl7.org/fhir/DSTU2/encounter.html)
+FHIR doc:
+* DSTU2: [http://hl7.org/fhir/DSTU2/encounter.html](http://hl7.org/fhir/DSTU2/encounter.html)
+* STU3: [http://hl7.org/fhir/STU3/encounter.html](http://hl7.org/fhir/STU3/encounter.html)
 
 Supported attributes:
 
 * **resourceType**: _(must be Encounter)_
 * **id**: _(id)_
-* **status**: _(string, [options](http://hl7.org/fhir/DSTU2/valueset-encounter-state.html), default: finished)_
-* **class**: _(string, [options](http://hl7.org/fhir/DSTU2/valueset-encounter-class.html))_
+* **status**: _(string, options: [DSTU2](http://hl7.org/fhir/DSTU2/valueset-encounter-state.html) / [STU3](http://hl7.org/fhir/STU3/valueset-encounter-status.html), default: finished)_
+* **class**: _(string (DSTU2) / concept (STU3), options: [DSTU2](http://hl7.org/fhir/DSTU2/valueset-encounter-class.html) / [STU3](http://hl7.org/fhir/STU3/v3/ActEncounterCode/vs.html))_
 * **type**: _(concept)_
-* **patient**: _(patient-reference, default: current patient)_
+* **patient (DSTU2)**: _(patient-reference, default: current patient)_
+* **subject (STU3)**: _(patient-reference, default: current patient)_
 * **reason**: _(sequence of concepts)_
 * **period**: _(period)_
 
-### Resource Type: MedicationOrder
+### Resource Type: MedicationOrder (DSTU2 only)
 
-FHIR doc: [http://hl7.org/fhir/DSTU2/medicationorder.html](http://hl7.org/fhir/DSTU2/medicationorder.html)
+FHIR doc:
+* DSTU2: [http://hl7.org/fhir/DSTU2/medicationorder.html](http://hl7.org/fhir/DSTU2/medicationorder.html)
 
 Supported attributes:
 
@@ -245,32 +255,52 @@ Supported attributes:
 * **patient**: _(patient-reference, default: current patient)_
 * **medicationCodeableConcept**: _(concept)_
 
+### Resource Type: MedicationRequest (STU3 only)
+
+FHIR doc:
+* STU3: [http://hl7.org/fhir/STU3/medicationrequest.html](http://hl7.org/fhir/STU3/medicationrequest.html)
+
+Supported attributes:
+
+* **resourceType**: _(must be MedicationRequest)_
+* **id**: _(id)_
+* **authoredOn**: _(dateTime)_
+* **status**: _(string, [options](http://hl7.org/fhir/STU3/valueset-medication-request-status.html), default: active)_
+* **subject**: _(patient-reference, default: current patient)_
+* **medicationCodeableConcept**: _(concept)_
+
 ### Resource Type: MedicationStatement
 
-FHIR doc: [http://hl7.org/fhir/DSTU2/medicationstatement.html](http://hl7.org/fhir/DSTU2/medicationstatement.html)
+FHIR doc:
+* DSTU2: [http://hl7.org/fhir/DSTU2/medicationstatement.html](http://hl7.org/fhir/DSTU2/medicationstatement.html)
+* STU3: [http://hl7.org/fhir/STU3/medicationstatement.html](http://hl7.org/fhir/STU3/medicationstatement.html)
 
 Supported attributes:
 
 * **resourceType**: _(must be MedicationStatement)_
 * **id**: _(id)_
-* **patient**: _(patient-reference, default: current patient)_
+* **patient (DSTU2)**: _(patient-reference, default: current patient)_
+* **subject (STU3)**: _(patient-reference, default: current patient)_
 * **dateAsserted**: _(dateTime)_
-* **status**: _(string, [options](http://hl7.org/fhir/DSTU2/valueset-medication-statement-status.html), default: active)_
-* **wasNotTaken**: _(boolean, default: false)_
+* **status**: _(string, options: [DSTU2](http://hl7.org/fhir/DSTU2/valueset-medication-statement-status.html) / [STU3](http://hl7.org/fhir/STU3/valueset-medication-statement-status.html), default: active)_
+* **wasNotTaken (DSTU2)**: _(boolean, default: false)_
+* **taken (STU3)**: _(string, [options](http://hl7.org/fhir/STU3/valueset-medication-statement-taken.html), default: y)_
 * **effectiveDateTime**: _(dateTime)_
 * **effectivePeriod**: _(period)_
 * **medicationCodeableConcept**: _(concept)_
 
 ### Resource Type: Observation
 
-FHIR doc: [http://hl7.org/fhir/DSTU2/observation.html](http://hl7.org/fhir/DSTU2/observation.html)
+FHIR doc:
+* DSTU2: [http://hl7.org/fhir/DSTU2/observation.html](http://hl7.org/fhir/DSTU2/observation.html)
+* STU3: [http://hl7.org/fhir/STU3/observation.html](http://hl7.org/fhir/STU3/observation.html)
 
 Supported attributes:
 
 * **resourceType**: _(must be Observation)_
 * **id**: _(id)_
-* **status**: _(string, [options](http://hl7.org/fhir/DSTU2/valueset-observation-status.html), default: final)_
-* **category**: _(concept)_
+* **status**: _(string, options: [DSTU2](http://hl7.org/fhir/DSTU2/valueset-observation-status.html) / [STU3](http://hl7.org/fhir/STU3/valueset-observation-status.html), default: final), default: final)_
+* **category**: _(concept (DSTU2), sequence of concepts (STU3))_
 * **code**: _(concept)_
 * **subject**: _(patient-reference, default: current patient)_
 * **effectiveDateTime**: _(dateTime)_
@@ -287,17 +317,20 @@ Supported attributes:
 
 ### Resource Type: Procedure
 
-FHIR doc: [http://hl7.org/fhir/DSTU2/procedure.html](http://hl7.org/fhir/DSTU2/procedure.html)
+FHIR doc:
+* DSTU2: [http://hl7.org/fhir/DSTU2/procedure.html](http://hl7.org/fhir/DSTU2/procedure.html)
+* STU3: [http://hl7.org/fhir/STU3/procedure.html](http://hl7.org/fhir/STU3/procedure.html)
 
 Supported attributes:
 
 * **resourceType**: _(must be Procedure)_
 * **id**: _(id)_
 * **subject**: _(patient-reference, default: current patient)_
-* **status**: _(string, [options](http://hl7.org/fhir/DSTU2/valueset-procedure-status.html), default: completed)_
+* **status**: _(string, options: [DSTU2](http://hl7.org/fhir/DSTU2/valueset-procedure-status.html) / [STU3](http://hl7.org/fhir/STU3/valueset-event-status.html), default: completed)_
 * **category**: _(concept)_
 * **code**: _(concept)_
-* **notPerformed**: _(boolean, default: false)_
+* **notPerformed (DSTU2)**: _(boolean, default: false)_
+* **notDone (STU3)**: _(boolean, default: false)_
 * **performedDateTime**: _(dateTime)_
 * **performedPeriod**: _(period)_
 * **outcome**: _(concept)_
