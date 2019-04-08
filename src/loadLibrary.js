@@ -13,8 +13,6 @@ const semver = require('semver');
  */
 function loadLibrary(library, paths) {
   const libraries = paths.reduce((accumulator, current) => detectLibraries(current, accumulator), []);
-  // const libraries = [];
-  // paths.forEach(p => detectLibraries(p, libraries));
   const primaryId = typeof library === 'string' ? { id: library } : library;
   const primaryLib = findLibrary(primaryId, libraries);
   const includedLibs = findIncludedLibraries(primaryLib, libraries);
