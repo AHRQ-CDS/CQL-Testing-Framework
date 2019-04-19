@@ -68,6 +68,7 @@ function yamlToTestCase(yamlFilePath, fhirVersion) {
     case 'MedicationStatement': addResource(handleMedicationStatement(d, p, fhirVersion)); break;
     case 'Observation': addResource(handleObservation(d, p, fhirVersion)); break;
     case 'Procedure': addResource(handleProcedure(d, p, fhirVersion)); break;
+    case 'FamilyMemberHistory': addResource(handleFamilyMemberHistory(d, p, fhirVersion)); break;
     default:
       throw new Error(`${testName}: Unsupported resourceType '${d.resourceType}'`);
     }
@@ -87,7 +88,8 @@ function handlePatient(d, fhirVersion) {
     id: getId(d.id),
     name: getName(d.name, fhirVersion),
     gender: d.gender,
-    birthDate: getDate(d.birthDate)
+    birthDate: getDate(d.birthDate),
+    extension: getExtension(d.extension)
   };
 }
 
@@ -133,6 +135,38 @@ function handleEncounter(d, p, fhirVersion) {
     [patientKey]: getPatientReference(p.id),
     reason: getCodeableConceptArray(d.reason),
     period: getPeriod(d.period)
+  };
+}
+
+function handleFamilyMemberHistory(d, p, fhirVersion) {
+  let cond = d.condition;
+  if (!Array.isArray(cond)) { cond = [cond]; }
+  cond = cond.map( c => {
+    return {
+      'code': c.code ? getCodeableConcept(c.code) : null,
+      'note': getString(c.note, '')
+    };
+  });
+  if (fhirVersion === '1.0.2') {
+    if (d.note && d.note.length > 1) {
+      throw new Error('FamilyMemberHistory.note has a max cardinality of 1 in version 1.0.2.');
+    }
+    cond.forEach( c => {
+      if (c.note.length > 1) {
+        throw new Error('FamilyMemberHistory.condition.note has a max cardinality of 1 in version 1.0.2.');
+      }
+    });
+  }
+  return {
+    resourceType: 'FamilyMemberHistory',
+    id: getId(d.id),
+    patient: getPatientReference(p.id),
+    date: getDateTime(d.date),
+    status: getString(d.status, 'completed'),
+    name: getString(d.name, 'Unknown'),
+    relationship: getCodeableConcept(d.relationship),
+    condition: cond,
+    note: getString(d.note, '')
   };
 }
 
@@ -356,6 +390,9 @@ function getCoding(code) {
         case 'ICD-10-CM': case 'ICD10CM': coding.system = 'http://hl7.org/fhir/sid/icd-10-cm'; break;
         case 'ICD-9': case 'ICD9': case 'ICD-9-CM': coding.system = 'http://hl7.org/fhir/sid/icd-9-cm'; break;
         case 'OBS-CAT': case 'OBSCAT': coding.system = 'http://hl7.org/fhir/observation-category'; break;
+        case 'FAMILY-MEMBER': coding.system = 'http://hl7.org/fhir/ValueSet/v3-FamilyMember'; break;
+        case 'US-CORE-RACE': coding.system = 'http://hl7.org/fhir/v3/Race'; break;
+        case 'US-CORE-ETHNICITY': coding.system = 'http://hl7.org/fhir/v3/Ethnicity'; break;
         }
         if (coding.system.indexOf('://') === -1 && !coding.system.startsWith('urn:')) {
           console.warn(`Unrecognized code system: ${coding.system}`);
@@ -397,6 +434,22 @@ function getObservationComponents(components) {
       };
     });
   }
+}
+
+function getExtension(extension) {
+  extensionArray = [];
+  if (extension != null) {
+    if (!Array.isArray(extension)) {
+      extension = [extension];
+    }
+    extension.forEach( ext => {
+      extensionArray.push({
+        'url': ext.url,
+        'valueCodeableConcept': getCodeableConcept(ext.valueCodeableConcept)
+      });
+    });
+  }
+  return extensionArray;
 }
 
 module.exports = loadYamlTestCases;
