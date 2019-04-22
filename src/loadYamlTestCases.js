@@ -63,12 +63,14 @@ function yamlToTestCase(yamlFilePath, fhirVersion) {
     switch (d.resourceType) {
     case 'Condition': addResource(handleCondition(d, p, fhirVersion)); break;
     case 'Encounter': addResource(handleEncounter(d, p, fhirVersion)); break;
+    case 'FamilyMemberHistory': addResource(handleFamilyMemberHistory(d, p, fhirVersion)); break;
     case 'MedicationOrder': addResource(handleMedicationOrder(d, p, fhirVersion)); break;
     case 'MedicationRequest': addResource(handleMedicationRequest(d, p, fhirVersion)); break;
     case 'MedicationStatement': addResource(handleMedicationStatement(d, p, fhirVersion)); break;
     case 'Observation': addResource(handleObservation(d, p, fhirVersion)); break;
     case 'Procedure': addResource(handleProcedure(d, p, fhirVersion)); break;
-    case 'FamilyMemberHistory': addResource(handleFamilyMemberHistory(d, p, fhirVersion)); break;
+    case 'ProcedureRequest': addResource(handleProcedureRequest(d, p, fhirVersion)); break;
+    case 'ReferralRequest': addResource(handleReferralRequest(d, p, fhirVersion)); break;
     default:
       throw new Error(`${testName}: Unsupported resourceType '${d.resourceType}'`);
     }
@@ -275,6 +277,84 @@ function handleProcedure(d, p, fhirVersion) {
   };
 }
 
+function handleProcedureRequest(d, p, fhirVersion) {
+  let orderedAuthoredOnKey, orderedAuthoredOnValue;
+  let scheduledOccurrenceDateTimeKey, scheduledOccurrenceDateTimeValue;
+  let scheduledOccurrencePeriodKey, scheduledOccurrencePeriodValue;
+  if (fhirVersion === '1.0.2') {
+    if (d.category) {
+      throw new Error('ProcedureRequest.category is not supported in 1.0.2.');
+    }
+    if (d.occurrenceDateTime || d.occurrencePeriod) {
+      throw new Error('ProcedureRequest.occurrence[x] not supported in 1.0.2, use ProcedureRequest.scheduled[x] instead.');
+    }
+    orderedAuthoredOnKey = 'orderedOn';
+    orderedAuthoredOnValue = d.orderedOn ? getDateTime(d.orderedOn) : undefined;
+    scheduledOccurrenceDateTimeKey = 'scheduledDateTime';
+    scheduledOccurrenceDateTimeValue = d.scheduledDateTime ? getDateTime(d.scheduledDateTime) : undefined;
+    scheduledOccurrencePeriodKey = 'scheduledPeriod';
+    scheduledOccurrencePeriodValue = d.scheduledPeriod ? getPeriod(d.scheduledPeriod) : undefined;
+  } else {
+    if (d.status == undefined) {
+      throw new Error('ProcedureRequest.status is a required field in 3.0.1.');
+    }
+    if (d.scheduledDateTime || d.scheduledPeriod) {
+      throw new Error('ProcedureRequest.scheduled[x] not supported in 3.0.0, use ProcedureRequest.occurrence[x] instead.');
+    }
+    orderedAuthoredOnKey = 'authoredOn';
+    orderedAuthoredOnValue = d.authoredOn ? getDateTime(d.authoredOn) : undefined;
+    scheduledOccurrenceDateTimeKey = 'occurrenceDateTime';
+    scheduledOccurrenceDateTimeValue = d.occurrenceDateTime ? getDateTime(d.occurrenceDateTime) : undefined;
+    scheduledOccurrencePeriodKey = 'occurrencePeriod';
+    scheduledOccurrencePeriodValue = d.occurrencePeriod ? getPeriod(d.occurrencePeriod) : undefined;
+  }
+  return {
+    resourceType: 'ProcedureRequest',
+    id: getId(d.id),
+    subject: getPatientReference(p.id),
+    status: getString(d.status, 'accepted'),
+    category: getCodeableConcept(d.category),
+    code: getCodeableConcept(d.code),
+    [orderedAuthoredOnKey]: orderedAuthoredOnValue,
+    [scheduledOccurrenceDateTimeKey]: scheduledOccurrenceDateTimeValue,
+    [scheduledOccurrencePeriodKey]: scheduledOccurrencePeriodValue
+  };
+}
+
+function handleReferralRequest(d, p, fhirVersion) {
+  let dateAuthoredOnKey, dateAuthoredOnValue;
+  if (fhirVersion === '1.0.2') {
+    if (d.authoredOn) {
+      throw new Error('ReferralRequest.authoredOn not supported in 1.0.2, use ReferralRequest.date instead.');
+    }
+    dateAuthoredOnKey = 'date';
+    dateAuthoredOnValue = d.orderedOn ? getDateTime(d.orderedOn) : undefined;
+  } else {
+    if (d.date) {
+      throw new Error('ReferralRequest.date not supported in 1.0.2, use ReferralRequest.authoredOn instead.');
+    }
+    if (d.dateSent) {
+      throw new Error('ReferralRequest.dateSent is not supported in 3.0.1.');
+    }
+    if (d.fulfillmentTime) {
+      throw new Error('ReferralRequest.fulfillmentTime is not supported in 3.0.1.');
+    }
+    dateAuthoredOnKey = 'authoredOn';
+    dateAuthoredOnValue = d.authoredOn ? getDateTime(d.authoredOn) : undefined;
+  }
+  return {
+    resourceType: 'ReferralRequest',
+    id: getId(d.id),
+    subject: getPatientReference(p.id),
+    status: getString(d.status, 'accepted'),
+    specialty: getCodeableConcept(d.specialty),
+    serviceRequested: getCodeableConcept(d.serviceRequested),
+    [dateAuthoredOnKey]: dateAuthoredOnValue,
+    dateSent: d.dateSent ? getDateTime(d.dateSent) : undefined,
+    fulfillmentTime: d.fulfillmentTime ? getPeriod(d.fulfillmentTime) : undefined
+  };
+}
+
 function getId(id) {
   return id ? id : uuidv4();
 }
@@ -393,6 +473,7 @@ function getCoding(code) {
         case 'FAMILY-MEMBER': coding.system = 'http://hl7.org/fhir/ValueSet/v3-FamilyMember'; break;
         case 'US-CORE-RACE': coding.system = 'http://hl7.org/fhir/v3/Race'; break;
         case 'US-CORE-ETHNICITY': coding.system = 'http://hl7.org/fhir/v3/Ethnicity'; break;
+        case 'ICD-10-PCS': case 'ICD10PCS': coding.system = 'http://hl7.org/fhir/us/core/ValueSet/us-core-procedure-icd10pcs'; break;
         }
         if (coding.system.indexOf('://') === -1 && !coding.system.startsWith('urn:')) {
           console.warn(`Unrecognized code system: ${coding.system}`);
