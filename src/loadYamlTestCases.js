@@ -281,7 +281,9 @@ function handleProcedureRequest(d, p, fhirVersion) {
   let orderedAuthoredOnKey, orderedAuthoredOnValue;
   let scheduledOccurrenceDateTimeKey, scheduledOccurrenceDateTimeValue;
   let scheduledOccurrencePeriodKey, scheduledOccurrencePeriodValue;
+  let activeInProgressCode;
   if (fhirVersion === '1.0.2') {
+    activeInProgressCode = 'in-progress';
     if (d.category) {
       throw new Error('ProcedureRequest.category is not supported in 1.0.2.');
     }
@@ -295,6 +297,7 @@ function handleProcedureRequest(d, p, fhirVersion) {
     scheduledOccurrencePeriodKey = 'scheduledPeriod';
     scheduledOccurrencePeriodValue = d.scheduledPeriod ? getPeriod(d.scheduledPeriod) : undefined;
   } else {
+    activeInProgressCode = 'active';
     if (d.scheduledDateTime || d.scheduledPeriod) {
       throw new Error('ProcedureRequest.scheduled[x] not supported in 3.0.0, use ProcedureRequest.occurrence[x] instead.');
     }
@@ -309,7 +312,7 @@ function handleProcedureRequest(d, p, fhirVersion) {
     resourceType: 'ProcedureRequest',
     id: getId(d.id),
     subject: getPatientReference(p.id),
-    status: getString(d.status, 'active'),
+    status: getString(d.status, activeInProgressCode),
     category: getCodeableConcept(d.category),
     code: getCodeableConcept(d.code),
     [orderedAuthoredOnKey]: orderedAuthoredOnValue,
@@ -326,7 +329,7 @@ function handleReferralRequest(d, p, fhirVersion) {
       throw new Error('ReferralRequest.authoredOn not supported in 1.0.2, use ReferralRequest.date instead.');
     }
     dateAuthoredOnKey = 'date';
-    dateAuthoredOnValue = d.orderedOn ? getDateTime(d.orderedOn) : undefined;
+    dateAuthoredOnValue = d.date ? getDateTime(d.date) : undefined;
   } else {
     patientSubject = 'subject';
     if (d.date) {
