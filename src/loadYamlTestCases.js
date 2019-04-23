@@ -146,7 +146,7 @@ function handleFamilyMemberHistory(d, p, fhirVersion) {
   cond = cond.map( c => {
     return {
       'code': c.code ? getCodeableConcept(c.code) : null,
-      'note': getString(c.note, '')
+      'note': Array.isArray(c.note) ? c.note.map( n => getAnnotation(n) ) : getAnnotation(c.note)
     };
   });
   if (fhirVersion === '1.0.2') {
@@ -154,7 +154,7 @@ function handleFamilyMemberHistory(d, p, fhirVersion) {
       throw new Error('FamilyMemberHistory.note has a max cardinality of 1 in version 1.0.2.');
     }
     cond.forEach( c => {
-      if (c.note.length > 1) {
+      if (c.note && c.note.length > 1) {
         throw new Error('FamilyMemberHistory.condition.note has a max cardinality of 1 in version 1.0.2.');
       }
     });
@@ -168,7 +168,7 @@ function handleFamilyMemberHistory(d, p, fhirVersion) {
     name: getString(d.name, 'Unknown'),
     relationship: getCodeableConcept(d.relationship),
     condition: cond,
-    note: getString(d.note, '')
+    note: Array.isArray(d.note) ? d.note.map( n => getAnnotation(n) ) : getAnnotation(d.note)
   };
 }
 
@@ -295,9 +295,6 @@ function handleProcedureRequest(d, p, fhirVersion) {
     scheduledOccurrencePeriodKey = 'scheduledPeriod';
     scheduledOccurrencePeriodValue = d.scheduledPeriod ? getPeriod(d.scheduledPeriod) : undefined;
   } else {
-    if (d.status == undefined) {
-      throw new Error('ProcedureRequest.status is a required field in 3.0.1.');
-    }
     if (d.scheduledDateTime || d.scheduledPeriod) {
       throw new Error('ProcedureRequest.scheduled[x] not supported in 3.0.0, use ProcedureRequest.occurrence[x] instead.');
     }
@@ -312,7 +309,7 @@ function handleProcedureRequest(d, p, fhirVersion) {
     resourceType: 'ProcedureRequest',
     id: getId(d.id),
     subject: getPatientReference(p.id),
-    status: getString(d.status, 'accepted'),
+    status: getString(d.status, 'active'),
     category: getCodeableConcept(d.category),
     code: getCodeableConcept(d.code),
     [orderedAuthoredOnKey]: orderedAuthoredOnValue,
@@ -322,14 +319,16 @@ function handleProcedureRequest(d, p, fhirVersion) {
 }
 
 function handleReferralRequest(d, p, fhirVersion) {
-  let dateAuthoredOnKey, dateAuthoredOnValue;
+  let dateAuthoredOnKey, dateAuthoredOnValue, patientSubject, serviceArray;
   if (fhirVersion === '1.0.2') {
+    patientSubject = 'patient';
     if (d.authoredOn) {
       throw new Error('ReferralRequest.authoredOn not supported in 1.0.2, use ReferralRequest.date instead.');
     }
     dateAuthoredOnKey = 'date';
     dateAuthoredOnValue = d.orderedOn ? getDateTime(d.orderedOn) : undefined;
   } else {
+    patientSubject = 'subject';
     if (d.date) {
       throw new Error('ReferralRequest.date not supported in 1.0.2, use ReferralRequest.authoredOn instead.');
     }
@@ -342,13 +341,14 @@ function handleReferralRequest(d, p, fhirVersion) {
     dateAuthoredOnKey = 'authoredOn';
     dateAuthoredOnValue = d.authoredOn ? getDateTime(d.authoredOn) : undefined;
   }
+  serviceArray = Array.isArray(d.serviceRequested) ? d.serviceRequested : [d.serviceRequested];
   return {
     resourceType: 'ReferralRequest',
     id: getId(d.id),
-    subject: getPatientReference(p.id),
-    status: getString(d.status, 'accepted'),
+    [patientSubject]: getPatientReference(p.id),
+    status: getString(d.status, 'active'),
     specialty: getCodeableConcept(d.specialty),
-    serviceRequested: getCodeableConcept(d.serviceRequested),
+    serviceRequested: getCodeableConceptArray(serviceArray),
     [dateAuthoredOnKey]: dateAuthoredOnValue,
     dateSent: d.dateSent ? getDateTime(d.dateSent) : undefined,
     fulfillmentTime: d.fulfillmentTime ? getPeriod(d.fulfillmentTime) : undefined
@@ -379,6 +379,16 @@ function getName(name, fhirVersion) {
 
 function getPatientReference(id) {
   return id ? { reference: `Patient/${id}` } : undefined;
+}
+
+function getAnnotation(ant) {
+  if (ant) {
+    return {
+      authorString: getString(ant.author, undefined),
+      time: getDateTime(ant.time, undefined),
+      text: getString(ant.text, '')
+    };
+  }
 }
 
 function getDate(date, defaultValue) {
@@ -468,12 +478,12 @@ function getCoding(code) {
         case 'CVX': coding.system = 'http://hl7.org/fhir/sid/cvx'; break;
         case 'ICD-10': case 'ICD10': coding.system = 'http://hl7.org/fhir/sid/icd-10'; break;
         case 'ICD-10-CM': case 'ICD10CM': coding.system = 'http://hl7.org/fhir/sid/icd-10-cm'; break;
+        case 'ICD-10-PCS': case 'ICD10PCS': coding.system = 'http://hl7.org/fhir/us/core/ValueSet/us-core-procedure-icd10pcs'; break;
         case 'ICD-9': case 'ICD9': case 'ICD-9-CM': coding.system = 'http://hl7.org/fhir/sid/icd-9-cm'; break;
         case 'OBS-CAT': case 'OBSCAT': coding.system = 'http://hl7.org/fhir/observation-category'; break;
-        case 'FAMILY-MEMBER': coding.system = 'http://hl7.org/fhir/ValueSet/v3-FamilyMember'; break;
-        case 'US-CORE-RACE': coding.system = 'http://hl7.org/fhir/v3/Race'; break;
-        case 'US-CORE-ETHNICITY': coding.system = 'http://hl7.org/fhir/v3/Ethnicity'; break;
-        case 'ICD-10-PCS': case 'ICD10PCS': coding.system = 'http://hl7.org/fhir/us/core/ValueSet/us-core-procedure-icd10pcs'; break;
+        case 'V3-ROLE-CODE': coding.system = 'http://hl7.org/fhir/v3/RoleCode'; break;
+        case 'V3-RACE': coding.system = 'http://hl7.org/fhir/v3/Race'; break;
+        case 'V3-ETHNICITY': coding.system = 'http://hl7.org/fhir/v3/Ethnicity'; break;
         }
         if (coding.system.indexOf('://') === -1 && !coding.system.startsWith('urn:')) {
           console.warn(`Unrecognized code system: ${coding.system}`);
@@ -518,7 +528,7 @@ function getObservationComponents(components) {
 }
 
 function getExtension(extension) {
-  extensionArray = [];
+  let extensionArray = [];
   if (extension != null) {
     if (!Array.isArray(extension)) {
       extension = [extension];
