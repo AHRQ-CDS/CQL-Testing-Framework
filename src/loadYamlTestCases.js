@@ -63,11 +63,14 @@ function yamlToTestCase(yamlFilePath, fhirVersion) {
     switch (d.resourceType) {
     case 'Condition': addResource(handleCondition(d, p, fhirVersion)); break;
     case 'Encounter': addResource(handleEncounter(d, p, fhirVersion)); break;
+    case 'FamilyMemberHistory': addResource(handleFamilyMemberHistory(d, p, fhirVersion)); break;
     case 'MedicationOrder': addResource(handleMedicationOrder(d, p, fhirVersion)); break;
     case 'MedicationRequest': addResource(handleMedicationRequest(d, p, fhirVersion)); break;
     case 'MedicationStatement': addResource(handleMedicationStatement(d, p, fhirVersion)); break;
     case 'Observation': addResource(handleObservation(d, p, fhirVersion)); break;
     case 'Procedure': addResource(handleProcedure(d, p, fhirVersion)); break;
+    case 'ProcedureRequest': addResource(handleProcedureRequest(d, p, fhirVersion)); break;
+    case 'ReferralRequest': addResource(handleReferralRequest(d, p, fhirVersion)); break;
     default:
       throw new Error(`${testName}: Unsupported resourceType '${d.resourceType}'`);
     }
@@ -87,7 +90,8 @@ function handlePatient(d, fhirVersion) {
     id: getId(d.id),
     name: getName(d.name, fhirVersion),
     gender: d.gender,
-    birthDate: getDate(d.birthDate)
+    birthDate: getDate(d.birthDate),
+    extension: getExtension(d.extension)
   };
 }
 
@@ -133,6 +137,38 @@ function handleEncounter(d, p, fhirVersion) {
     [patientKey]: getPatientReference(p.id),
     reason: getCodeableConceptArray(d.reason),
     period: getPeriod(d.period)
+  };
+}
+
+function handleFamilyMemberHistory(d, p, fhirVersion) {
+  let cond = d.condition;
+  if (!Array.isArray(cond)) { cond = [cond]; }
+  cond = cond.map( c => {
+    return {
+      'code': c.code ? getCodeableConcept(c.code) : null,
+      'note': Array.isArray(c.note) ? c.note.map( n => getAnnotation(n) ) : getAnnotation(c.note)
+    };
+  });
+  if (fhirVersion === '1.0.2') {
+    if (d.note && d.note.length > 1) {
+      throw new Error('FamilyMemberHistory.note has a max cardinality of 1 in version 1.0.2.');
+    }
+    cond.forEach( c => {
+      if (c.note && c.note.length > 1) {
+        throw new Error('FamilyMemberHistory.condition.note has a max cardinality of 1 in version 1.0.2.');
+      }
+    });
+  }
+  return {
+    resourceType: 'FamilyMemberHistory',
+    id: getId(d.id),
+    patient: getPatientReference(p.id),
+    date: getDateTime(d.date),
+    status: getString(d.status, 'completed'),
+    name: getString(d.name, 'Unknown'),
+    relationship: getCodeableConcept(d.relationship),
+    condition: cond,
+    note: Array.isArray(d.note) ? d.note.map( n => getAnnotation(n) ) : getAnnotation(d.note)
   };
 }
 
@@ -241,6 +277,87 @@ function handleProcedure(d, p, fhirVersion) {
   };
 }
 
+function handleProcedureRequest(d, p, fhirVersion) {
+  let orderedAuthoredOnKey, orderedAuthoredOnValue;
+  let scheduledOccurrenceDateTimeKey, scheduledOccurrenceDateTimeValue;
+  let scheduledOccurrencePeriodKey, scheduledOccurrencePeriodValue;
+  let activeInProgressCode;
+  if (fhirVersion === '1.0.2') {
+    activeInProgressCode = 'in-progress';
+    if (d.category) {
+      throw new Error('ProcedureRequest.category is not supported in 1.0.2.');
+    }
+    if (d.occurrenceDateTime || d.occurrencePeriod) {
+      throw new Error('ProcedureRequest.occurrence[x] not supported in 1.0.2, use ProcedureRequest.scheduled[x] instead.');
+    }
+    orderedAuthoredOnKey = 'orderedOn';
+    orderedAuthoredOnValue = d.orderedOn ? getDateTime(d.orderedOn) : undefined;
+    scheduledOccurrenceDateTimeKey = 'scheduledDateTime';
+    scheduledOccurrenceDateTimeValue = d.scheduledDateTime ? getDateTime(d.scheduledDateTime) : undefined;
+    scheduledOccurrencePeriodKey = 'scheduledPeriod';
+    scheduledOccurrencePeriodValue = d.scheduledPeriod ? getPeriod(d.scheduledPeriod) : undefined;
+  } else {
+    activeInProgressCode = 'active';
+    if (d.scheduledDateTime || d.scheduledPeriod) {
+      throw new Error('ProcedureRequest.scheduled[x] not supported in 3.0.0, use ProcedureRequest.occurrence[x] instead.');
+    }
+    orderedAuthoredOnKey = 'authoredOn';
+    orderedAuthoredOnValue = d.authoredOn ? getDateTime(d.authoredOn) : undefined;
+    scheduledOccurrenceDateTimeKey = 'occurrenceDateTime';
+    scheduledOccurrenceDateTimeValue = d.occurrenceDateTime ? getDateTime(d.occurrenceDateTime) : undefined;
+    scheduledOccurrencePeriodKey = 'occurrencePeriod';
+    scheduledOccurrencePeriodValue = d.occurrencePeriod ? getPeriod(d.occurrencePeriod) : undefined;
+  }
+  return {
+    resourceType: 'ProcedureRequest',
+    id: getId(d.id),
+    subject: getPatientReference(p.id),
+    status: getString(d.status, activeInProgressCode),
+    category: getCodeableConcept(d.category),
+    code: getCodeableConcept(d.code),
+    [orderedAuthoredOnKey]: orderedAuthoredOnValue,
+    [scheduledOccurrenceDateTimeKey]: scheduledOccurrenceDateTimeValue,
+    [scheduledOccurrencePeriodKey]: scheduledOccurrencePeriodValue
+  };
+}
+
+function handleReferralRequest(d, p, fhirVersion) {
+  let dateAuthoredOnKey, dateAuthoredOnValue, patientSubject, serviceArray;
+  if (fhirVersion === '1.0.2') {
+    patientSubject = 'patient';
+    if (d.authoredOn) {
+      throw new Error('ReferralRequest.authoredOn not supported in 1.0.2, use ReferralRequest.date instead.');
+    }
+    dateAuthoredOnKey = 'date';
+    dateAuthoredOnValue = d.date ? getDateTime(d.date) : undefined;
+  } else {
+    patientSubject = 'subject';
+    if (d.date) {
+      throw new Error('ReferralRequest.date not supported in 1.0.2, use ReferralRequest.authoredOn instead.');
+    }
+    if (d.dateSent) {
+      throw new Error('ReferralRequest.dateSent is not supported in 3.0.1.');
+    }
+    if (d.fulfillmentTime) {
+      throw new Error('ReferralRequest.fulfillmentTime is not supported in 3.0.1.');
+    }
+    dateAuthoredOnKey = 'authoredOn';
+    dateAuthoredOnValue = d.authoredOn ? getDateTime(d.authoredOn) : undefined;
+  }
+  serviceArray = Array.isArray(d.serviceRequested) ? d.serviceRequested : [d.serviceRequested];
+  return {
+    resourceType: 'ReferralRequest',
+    id: getId(d.id),
+    [patientSubject]: getPatientReference(p.id),
+    status: getString(d.status, 'active'),
+    specialty: getCodeableConcept(d.specialty),
+    serviceRequested: getCodeableConceptArray(serviceArray),
+    [dateAuthoredOnKey]: dateAuthoredOnValue,
+    dateSent: d.dateSent ? getDateTime(d.dateSent) : undefined,
+    fulfillmentTime: d.fulfillmentTime ? getPeriod(d.fulfillmentTime) : undefined
+  };
+}
+
 function getId(id) {
   return id ? id : uuidv4();
 }
@@ -265,6 +382,16 @@ function getName(name, fhirVersion) {
 
 function getPatientReference(id) {
   return id ? { reference: `Patient/${id}` } : undefined;
+}
+
+function getAnnotation(ant) {
+  if (ant) {
+    return {
+      authorString: getString(ant.author, undefined),
+      time: getDateTime(ant.time, undefined),
+      text: getString(ant.text, '')
+    };
+  }
 }
 
 function getDate(date, defaultValue) {
@@ -354,8 +481,13 @@ function getCoding(code) {
         case 'CVX': coding.system = 'http://hl7.org/fhir/sid/cvx'; break;
         case 'ICD-10': case 'ICD10': coding.system = 'http://hl7.org/fhir/sid/icd-10'; break;
         case 'ICD-10-CM': case 'ICD10CM': coding.system = 'http://hl7.org/fhir/sid/icd-10-cm'; break;
-        case 'ICD-9': case 'ICD9': case 'ICD-9-CM': coding.system = 'http://hl7.org/fhir/sid/icd-9-cm'; break;
+        case 'ICD-10-PCS': case 'ICD10PCS': coding.system = 'http://www.icd10data.com/icd10pcs'; break;
+        case 'ICD-9-D': case 'ICD9D': case 'ICD-9-CM-D': case 'ICD9CMD': coding.system = 'http://hl7.org/fhir/sid/icd-9-cm/diagnosis'; break;
+        case 'ICD-9-P': case 'ICD9P': case 'ICD-9-CM-P': case 'ICD9CMP': coding.system = 'http://hl7.org/fhir/sid/icd-9-cm/procedure'; break;
         case 'OBS-CAT': case 'OBSCAT': coding.system = 'http://hl7.org/fhir/observation-category'; break;
+        case 'V3-ROLE-CODE': coding.system = 'http://hl7.org/fhir/v3/RoleCode'; break;
+        case 'V3-RACE': coding.system = 'http://hl7.org/fhir/v3/Race'; break;
+        case 'V3-ETHNICITY': coding.system = 'http://hl7.org/fhir/v3/Ethnicity'; break;
         }
         if (coding.system.indexOf('://') === -1 && !coding.system.startsWith('urn:')) {
           console.warn(`Unrecognized code system: ${coding.system}`);
@@ -397,6 +529,22 @@ function getObservationComponents(components) {
       };
     });
   }
+}
+
+function getExtension(extension) {
+  let extensionArray = [];
+  if (extension != null) {
+    if (!Array.isArray(extension)) {
+      extension = [extension];
+    }
+    extension.forEach( ext => {
+      extensionArray.push({
+        'url': ext.url,
+        'valueCodeableConcept': getCodeableConcept(ext.valueCodeableConcept)
+      });
+    });
+  }
+  return extensionArray;
 }
 
 module.exports = loadYamlTestCases;
