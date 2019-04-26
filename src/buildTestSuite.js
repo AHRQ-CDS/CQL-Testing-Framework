@@ -2,6 +2,7 @@ const fs = require('fs-extra');
 const path = require('path');
 const cql = require('cql-execution');
 const fhir = require('cql-exec-fhir');
+const uuidv4 = require('uuid/v4');
 const {expect} = require('chai');
 
 function buildTestSuite(testCases, library, codeService, fhirVersion, options) {
@@ -11,10 +12,16 @@ function buildTestSuite(testCases, library, codeService, fhirVersion, options) {
   if (options && options.date != null && options.date.length > 0) {
     executionDateTime = cql.DateTime.parse(options.date);
   }
-  let dumpPath;
+  let dumpBundlesPath, dumpResultsPath, dumpHooksPath, resourceTypes;
   if (options.dumpFiles && options.dumpFiles.enabled) {
-    dumpPath = path.join(options.dumpFiles.path, libraryHandle);
-    fs.mkdirpSync(dumpPath);
+    const dumpPath = path.join(options.dumpFiles.path, libraryHandle);
+    dumpBundlesPath = path.join(dumpPath, 'bundles');
+    fs.mkdirpSync(path.join(dumpBundlesPath));
+    dumpResultsPath = path.join(dumpPath, 'results');
+    fs.mkdirpSync(path.join(dumpResultsPath));
+    dumpHooksPath = path.join(dumpPath, 'hooks-requests');
+    fs.mkdirpSync(path.join(dumpHooksPath));
+    resourceTypes = extractResourceTypesFromLibrary(library);
   }
   const executor = new cql.Executor(library, codeService);
   describe(libraryHandle, () => {
@@ -61,15 +68,20 @@ function buildTestSuite(testCases, library, codeService, fhirVersion, options) {
     for (const testCase of testCases) {
       const testFunc = testCase.skip ? it.skip : testCase.only ? it.only : it;
       testFunc(testCase.name, () => {
-        if (dumpPath) {
-          const fileName = path.join(dumpPath, `${testCase.name.replace(/[\s/\\]/g, '_')}.json`);
-          fs.writeFileSync(fileName, JSON.stringify(testCase.bundle, null, 2), 'utf8');
+        const dumpFileName = `${testCase.name.replace(/[\s/\\]/g, '_')}.json`;
+        if (dumpBundlesPath) {
+          const filePath = path.join(dumpBundlesPath, dumpFileName);
+          fs.writeFileSync(filePath, JSON.stringify(testCase.bundle, null, 2), 'utf8');
+        }
+        if (dumpHooksPath) {
+          const filePath = path.join(dumpHooksPath, dumpFileName);
+          fs.writeFileSync(filePath, JSON.stringify(createHooksRequest(testCase.bundle, resourceTypes), null, 2), 'utf8');
         }
         patientSource.loadBundles([testCase.bundle]);
         const results = executor.exec(patientSource, executionDateTime);
-        if (dumpPath) {
-          const fileName = path.join(dumpPath, `${testCase.name.replace(/[\s/\\]/g, '_')}_RESULTS.json`);
-          fs.writeFileSync(fileName, JSON.stringify(results, null, 2), 'utf8');
+        if (dumpResultsPath) {
+          const filePath = path.join(dumpResultsPath, dumpFileName);
+          fs.writeFileSync(filePath, JSON.stringify(results, null, 2), 'utf8');
         }
         const patientId = testCase.bundle.entry[0].resource.id;
         expect(results.patientResults[patientId]).to.exist;
@@ -100,6 +112,82 @@ function simplifyResult(result) {
     }
   }
   return result;
+}
+
+function createHooksRequest(bundle, resourceTypes) {
+  // Clone it so we don't unintentionall mess it up
+  bundle = JSON.parse(JSON.stringify(bundle));
+
+  const request = {
+    hookInstance: uuidv4(),
+    hook: 'patient-view',
+    user: 'Practitioner/example',
+    context: {},
+    prefetch: {}
+  };
+
+  // First add all of the test data from the bundle
+  for (const entry of bundle.entry) {
+    if (entry.resource == null) {
+      continue;
+    }
+    const type = entry.resource.resourceType;
+    if (type === 'Patient') {
+      request.context.patientId = entry.resource.id;
+      request.prefetch['Patient'] = entry.resource;
+    } else {
+      if (request.prefetch[type] == null) {
+        request.prefetch[type] = {
+          resourceType: 'Bundle',
+          type: 'searchset',
+          entry: []
+        };
+      }
+      request.prefetch[type].entry.push({ resource: entry.resource });
+    }
+  }
+
+  // Next add any missing prefetch queries (based on resource types used in ELM)
+  for (const type of resourceTypes) {
+    if (request.prefetch[type] == null) {
+      request.prefetch[type] = {
+        resourceType: 'Bundle',
+        type: 'searchset',
+        entry: []
+      };
+    }
+  }
+
+  return request;
+}
+
+// NOTE: The following functions follow the basic pattern used by cql-services to extract prefetch queries from ELM
+
+function extractResourceTypesFromLibrary(library) {
+  const types = new Set();
+  if (library && library.source && library.source.library && library.source.library.statements && library.source.library.statements.def) {
+    for (const expDef of Object.values(library.source.library.statements.def)) {
+      extractResourceTypesFromExpression(types, expDef.expression);
+    }
+  }
+  return Array.from(types);
+}
+
+function extractResourceTypesFromExpression(types, expression) {
+  if (expression && Array.isArray(expression)) {
+    expression.forEach(e => extractResourceTypesFromExpression(types, e));
+  } else if (expression && typeof expression === 'object') {
+    if (expression.type === 'Retrieve') {
+      const match = /^(\{http:\/\/hl7.org\/fhir\})?([A-Z][a-zA-Z]+)$/.exec(expression.dataType);
+      if (match) {
+        types.add(match[2]);
+      }
+    } else {
+      for (const val of Object.values(expression)) {
+        extractResourceTypesFromExpression(types, val);
+      }
+    }
+  }
 }
 
 module.exports = buildTestSuite;
