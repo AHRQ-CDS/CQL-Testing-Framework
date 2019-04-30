@@ -143,7 +143,9 @@ function createHooksRequest(bundle, resourceTypes) {
           entry: []
         };
       }
-      request.prefetch[type].entry.push({ resource: entry.resource });
+      if (resourceTypes.includes(type)) {
+        request.prefetch[type].entry.push({ resource: entry.resource });
+      }
     }
   }
 
