@@ -136,14 +136,14 @@ function createHooksRequest(bundle, resourceTypes) {
       request.context.patientId = entry.resource.id;
       request.prefetch['Patient'] = entry.resource;
     } else {
-      if (request.prefetch[type] == null) {
-        request.prefetch[type] = {
-          resourceType: 'Bundle',
-          type: 'searchset',
-          entry: []
-        };
-      }
       if (resourceTypes.includes(type)) {
+        if (request.prefetch[type] == null) {
+          request.prefetch[type] = {
+            resourceType: 'Bundle',
+            type: 'searchset',
+            entry: []
+          };
+        }
         request.prefetch[type].entry.push({ resource: entry.resource });
       }
     }
