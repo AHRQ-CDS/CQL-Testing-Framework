@@ -2,17 +2,20 @@ const fs = require('fs-extra');
 const path = require('path');
 const cql = require('cql-execution');
 const fhir = require('cql-exec-fhir');
-const uuidv4 = require('uuid/v4');
 const {expect} = require('chai');
+const hooksExporter = require('./exporters/hooks');
+const postmanExporter = require('./exporters/postman');
 
-function buildTestSuite(testCases, library, codeService, fhirVersion, options) {
+function buildTestSuite(testCases, library, codeService, fhirVersion, config) {
   const identifier = library.source.library.identifier;
   const libraryHandle = `${identifier.id}_v${identifier.version}`;
+  const hooks = config.get('hooks');
+  const options = config.get('options');
   let executionDateTime;
   if (options && options.date != null && options.date.length > 0) {
     executionDateTime = cql.DateTime.parse(options.date);
   }
-  let dumpBundlesPath, dumpResultsPath, dumpHooksPath, resourceTypes;
+  let dumpBundlesPath, dumpResultsPath, dumpHooksPath, dumpPostmanPath, prefetchKeys;
   if (options.dumpFiles && options.dumpFiles.enabled) {
     const dumpPath = path.join(options.dumpFiles.path, libraryHandle);
     dumpBundlesPath = path.join(dumpPath, 'bundles');
@@ -21,7 +24,12 @@ function buildTestSuite(testCases, library, codeService, fhirVersion, options) {
     fs.mkdirpSync(path.join(dumpResultsPath));
     dumpHooksPath = path.join(dumpPath, 'hooks-requests');
     fs.mkdirpSync(path.join(dumpHooksPath));
-    resourceTypes = extractResourceTypesFromLibrary(library);
+    // Only dump the postman collections if we have at least one hookId
+    if (hooks.length > 0) {
+      dumpPostmanPath = path.join(dumpPath, 'postman');
+      fs.mkdirpSync(path.join(dumpPostmanPath));
+    }
+    prefetchKeys = hooksExporter.extractPrefetchKeys(library);
   }
   const executor = new cql.Executor(library, codeService);
   describe(libraryHandle, () => {
@@ -63,6 +71,18 @@ function buildTestSuite(testCases, library, codeService, fhirVersion, options) {
         });
     });
 
+    let postmanCollection;
+    if (dumpPostmanPath) {
+      before('Initialize Postman Collection', () => {
+        postmanCollection = postmanExporter.initPostmanCollection(libraryHandle, hooks);
+      });
+
+      after('Dump Postman Collection', () => {
+        const filePath = path.join(dumpPostmanPath, `${libraryHandle.replace(/[\s./\\]/g, '_')}.postman_collection.json`);
+        fs.writeFileSync(filePath, JSON.stringify(postmanCollection, null, 2), 'utf8');
+      });
+    }
+
     afterEach('Reset the patient source', () => patientSource.reset());
 
     for (const testCase of testCases) {
@@ -73,9 +93,15 @@ function buildTestSuite(testCases, library, codeService, fhirVersion, options) {
           const filePath = path.join(dumpBundlesPath, dumpFileName);
           fs.writeFileSync(filePath, JSON.stringify(testCase.bundle, null, 2), 'utf8');
         }
-        if (dumpHooksPath) {
-          const filePath = path.join(dumpHooksPath, dumpFileName);
-          fs.writeFileSync(filePath, JSON.stringify(createHooksRequest(testCase.bundle, resourceTypes), null, 2), 'utf8');
+        if (dumpHooksPath || dumpPostmanPath) {
+          const hooksRequest = hooksExporter.createHooksRequest(testCase.bundle, prefetchKeys);
+          if (dumpHooksPath) {
+            const filePath = path.join(dumpHooksPath, dumpFileName);
+            fs.writeFileSync(filePath, JSON.stringify(hooksRequest, null, 2), 'utf8');
+          }
+          if (dumpPostmanPath) {
+            postmanExporter.addHooksRequest(testCase.name, hooksRequest, hooks, postmanCollection);
+          }
         }
         patientSource.loadBundles([testCase.bundle]);
         const results = executor.exec(patientSource, executionDateTime);
@@ -112,84 +138,6 @@ function simplifyResult(result) {
     }
   }
   return result;
-}
-
-function createHooksRequest(bundle, resourceTypes) {
-  // Clone it so we don't unintentionall mess it up
-  bundle = JSON.parse(JSON.stringify(bundle));
-
-  const request = {
-    hookInstance: uuidv4(),
-    hook: 'patient-view',
-    user: 'Practitioner/example',
-    context: {},
-    prefetch: {}
-  };
-
-  // First add all of the test data from the bundle
-  for (const entry of bundle.entry) {
-    if (entry.resource == null) {
-      continue;
-    }
-    const type = entry.resource.resourceType;
-    if (type === 'Patient') {
-      request.context.patientId = entry.resource.id;
-      request.prefetch['Patient'] = entry.resource;
-    } else {
-      if (resourceTypes.includes(type)) {
-        if (request.prefetch[type] == null) {
-          request.prefetch[type] = {
-            resourceType: 'Bundle',
-            type: 'searchset',
-            entry: []
-          };
-        }
-        request.prefetch[type].entry.push({ resource: entry.resource });
-      }
-    }
-  }
-
-  // Next add any missing prefetch queries (based on resource types used in ELM)
-  for (const type of resourceTypes) {
-    if (request.prefetch[type] == null) {
-      request.prefetch[type] = {
-        resourceType: 'Bundle',
-        type: 'searchset',
-        entry: []
-      };
-    }
-  }
-
-  return request;
-}
-
-// NOTE: The following functions follow the basic pattern used by cql-services to extract prefetch queries from ELM
-
-function extractResourceTypesFromLibrary(library) {
-  const types = new Set();
-  if (library && library.source && library.source.library && library.source.library.statements && library.source.library.statements.def) {
-    for (const expDef of Object.values(library.source.library.statements.def)) {
-      extractResourceTypesFromExpression(types, expDef.expression);
-    }
-  }
-  return Array.from(types);
-}
-
-function extractResourceTypesFromExpression(types, expression) {
-  if (expression && Array.isArray(expression)) {
-    expression.forEach(e => extractResourceTypesFromExpression(types, e));
-  } else if (expression && typeof expression === 'object') {
-    if (expression.type === 'Retrieve') {
-      const match = /^(\{http:\/\/hl7.org\/fhir\})?([A-Z][a-zA-Z]+)$/.exec(expression.dataType);
-      if (match) {
-        types.add(match[2]);
-      }
-    } else {
-      for (const val of Object.values(expression)) {
-        extractResourceTypesFromExpression(types, val);
-      }
-    }
-  }
 }
 
 module.exports = buildTestSuite;

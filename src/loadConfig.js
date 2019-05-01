@@ -36,6 +36,13 @@ function newConfig() {
         arg: 'library-paths'
       },
     },
+    hooks: {
+      doc: 'The hook id(s) corresponding to the library (needed only for exporting Postman collections)',
+      format: 'Array',
+      default: [],
+      env: 'CQLT_HOOKS',
+      arg: 'hooks'
+    },
     tests: {
       path: {
         doc: 'The file path containing the test case files',

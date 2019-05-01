@@ -17,7 +17,7 @@ function test(configPath) {
     const fhirVersion = getFHIRVersion(library);
     const testCases = loadYamlTestCases(config.get('tests.path'), fhirVersion);
     const codeService = loadCodeService(config.get('options.vsac.cache'));
-    buildTestSuite(testCases, library, codeService, fhirVersion, config.get('options'));
+    buildTestSuite(testCases, library, codeService, fhirVersion, config);
   }
 }
 
