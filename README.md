@@ -109,6 +109,7 @@ The following configuration parameters are currently supported:
   * **name**: The name of the CQL library to test _(required, string)_
   * **version**: The version of the CQL library to test _(optional, string, default: latest version)_'
   * **paths**: The path(s) at which the library and its dependencies can be found _(optional, string array, default: cql)_'
+* **hooks**: The hook id(s) corresponding to this library; needed only for exporting Postman collections _(optional)_
 * **tests**:
   * **path**: The file path containing the test case files _(optional, string, default: tests)_
 * **options**:
@@ -118,7 +119,7 @@ The following configuration parameters are currently supported:
     * **password**: The UMLS password to use when connecting to the VSAC _(optional, string)_
     * **cache**: The file path for the value set cache _(optional, string, default: .vscache)_
   * **dumpFiles**:
-    * **enabled**: Indicates if test data and actual results should be dumped to files for debugging _(optional, boolean, default: false)_
+    * **enabled**: Indicates if test data and actual results should be dumped to files for debugging or testing; supports bundles, CQL Hooks requests, and Postman collections of CQL Hooks requests _(optional, boolean, default: false)_
     * **path**: The file path to dump files to, if enabled _(optional, string, default: dump\_files)_
 
 All file paths are relative to the location of the `cqlt.yaml` configuraton file unless the file path is absolute.
@@ -130,6 +131,7 @@ The following is an example `cqlt.yaml` file that corresponds with the file stru
 library:
   name: My_CDS_Artifact
   paths: ../cql
+hooks: my-cds-hook
 tests:
   path: cases
 options:

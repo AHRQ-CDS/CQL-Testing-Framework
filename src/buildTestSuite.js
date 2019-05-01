@@ -4,15 +4,18 @@ const cql = require('cql-execution');
 const fhir = require('cql-exec-fhir');
 const uuidv4 = require('uuid/v4');
 const {expect} = require('chai');
+const postman = require('./exporters/postman');
 
-function buildTestSuite(testCases, library, codeService, fhirVersion, options) {
+function buildTestSuite(testCases, library, codeService, fhirVersion, config) {
   const identifier = library.source.library.identifier;
   const libraryHandle = `${identifier.id}_v${identifier.version}`;
+  const hooks = config.get('hooks');
+  const options = config.get('options');
   let executionDateTime;
   if (options && options.date != null && options.date.length > 0) {
     executionDateTime = cql.DateTime.parse(options.date);
   }
-  let dumpBundlesPath, dumpResultsPath, dumpHooksPath, resourceTypes;
+  let dumpBundlesPath, dumpResultsPath, dumpHooksPath, dumpPostmanPath, resourceTypes;
   if (options.dumpFiles && options.dumpFiles.enabled) {
     const dumpPath = path.join(options.dumpFiles.path, libraryHandle);
     dumpBundlesPath = path.join(dumpPath, 'bundles');
@@ -21,6 +24,11 @@ function buildTestSuite(testCases, library, codeService, fhirVersion, options) {
     fs.mkdirpSync(path.join(dumpResultsPath));
     dumpHooksPath = path.join(dumpPath, 'hooks-requests');
     fs.mkdirpSync(path.join(dumpHooksPath));
+    // Only dump the postman collections if we have at least one hookId
+    if (hooks.length > 0) {
+      dumpPostmanPath = path.join(dumpPath, 'postman');
+      fs.mkdirpSync(path.join(dumpPostmanPath));
+    }
     resourceTypes = extractResourceTypesFromLibrary(library);
   }
   const executor = new cql.Executor(library, codeService);
@@ -63,6 +71,18 @@ function buildTestSuite(testCases, library, codeService, fhirVersion, options) {
         });
     });
 
+    let postmanCollection;
+    if (dumpPostmanPath) {
+      before('Initialize Postman Collection', () => {
+        postmanCollection = postman.initPostmanCollection(libraryHandle, hooks);
+      });
+
+      after('Dump Postman Collection', () => {
+        const filePath = path.join(dumpPostmanPath, `${libraryHandle.replace(/[\s./\\]/g, '_')}.postman_collection.json`);
+        fs.writeFileSync(filePath, JSON.stringify(postmanCollection, null, 2), 'utf8');
+      });
+    }
+
     afterEach('Reset the patient source', () => patientSource.reset());
 
     for (const testCase of testCases) {
@@ -73,9 +93,15 @@ function buildTestSuite(testCases, library, codeService, fhirVersion, options) {
           const filePath = path.join(dumpBundlesPath, dumpFileName);
           fs.writeFileSync(filePath, JSON.stringify(testCase.bundle, null, 2), 'utf8');
         }
-        if (dumpHooksPath) {
-          const filePath = path.join(dumpHooksPath, dumpFileName);
-          fs.writeFileSync(filePath, JSON.stringify(createHooksRequest(testCase.bundle, resourceTypes), null, 2), 'utf8');
+        if (dumpHooksPath || dumpPostmanPath) {
+          const hooksRequest = createHooksRequest(testCase.bundle, resourceTypes);
+          if (dumpHooksPath) {
+            const filePath = path.join(dumpHooksPath, dumpFileName);
+            fs.writeFileSync(filePath, JSON.stringify(hooksRequest, null, 2), 'utf8');
+          }
+          if (dumpPostmanPath) {
+            postman.addHooksRequest(testCase.name, hooksRequest, hooks, postmanCollection);
+          }
         }
         patientSource.loadBundles([testCase.bundle]);
         const results = executor.exec(patientSource, executionDateTime);
