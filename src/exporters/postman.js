@@ -24,7 +24,7 @@ function initPostmanCollection(libraryHandle, hooks) {
   // If there are multiple hooks, then create folders within the collection for each hook
   if (hooks.length > 1) {
     hooks.forEach(hook => {
-      postmanCollection.items.push({
+      postmanCollection.item.push({
         name: hook,
         item: [],
         event: initEvents()
