@@ -109,7 +109,9 @@ The following configuration parameters are currently supported:
   * **name**: The name of the CQL library to test _(required, string)_
   * **version**: The version of the CQL library to test _(optional, string, default: latest version)_'
   * **paths**: The path(s) at which the library and its dependencies can be found _(optional, string array, default: cql)_'
-* **hooks**: The hook id(s) corresponding to this library; needed only for exporting Postman collections _(optional)_
+* **hook**:
+  * **id**: The hook id corresponding to this library; needed only for exporting Postman collections _(optional)_
+  * **pmTestGenSupport**: The path to a Node module that supports Postman test generation _(optional)_
 * **tests**:
   * **path**: The file path containing the test case files _(optional, string, default: tests)_
 * **options**:
@@ -131,11 +133,53 @@ The following is an example `cqlt.yaml` file that corresponds with the file stru
 library:
   name: My_CDS_Artifact
   paths: ../cql
-hooks: my-cds-hook
+hook:
+  id: my-cds-hook
+  pmTestGenSupport: pm-test-gen.js
 tests:
   path: cases
 options:
   date: "2018-12-10T00:00:00.0Z"
+```
+
+## The Postman Test Generator Support File
+
+If the artifact under test is configured to run with the [CQL Services](https://github.com/AHRQ-CDS/AHRQ-CDS-Connect-CQL-SERVICES) CQL Hooks feature, the CQL Testing Framework can optionally generate corresponding collections and tests for the popular [Postman](https://www.getpostman.com/) API testing tool.  As long as `dumpFiles` is enabled and a `hook.id` is configured, a Postman collection will be generated.
+
+Since CQL Services allows CQL Hooks to be configured in many ways, additional support is needed to automatically create tests that will exercise the API and validate results.  Developers can optionally add this support by creating a special Node module that exports one or more of the following function signatures:
+
+* `function expectOK(testCase)`: returns `boolean` indicating if the HTTP response should be OK
+* `function expectCards(testCase)`: returns `boolean` indicating if cards should be returned
+* `function expectCardsContent(testCase)`: returns JSON `object` or `array` of JSON `object`s representing card content that should be returned
+
+The following is a simple example of a `pm-test-gen-support.js` file:
+
+```js
+function expectOK(testCase) {
+  return true;
+}
+
+function expectCards(testCase) {
+  if (testCase.expected != null) {
+    return testCase.expected.Recommendation != null;
+  }
+}
+
+function expectCardsContent(testCase) {
+  if (expectCards(testCase)) {
+    return {
+      summary: 'My CDS Hook Summary',
+      indicator: 'info',
+      detail: testCase.expected.Recommendation,
+      source: {
+        label: 'My CDS Source',
+        url: 'https://www.example.org/my-cds-source'
+      }
+    };
+  }
+}
+
+module.exports = { expectOK, expectCards, expectCardsContent };
 ```
 
 ## The test/test.js File

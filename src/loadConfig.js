@@ -36,12 +36,21 @@ function newConfig() {
         arg: 'library-paths'
       },
     },
-    hooks: {
-      doc: 'The hook id(s) corresponding to the library (needed only for exporting Postman collections)',
-      format: 'Array',
-      default: [],
-      env: 'CQLT_HOOKS',
-      arg: 'hooks'
+    hook: {
+      id: {
+        doc: 'The hook id corresponding to the library (needed only for exporting Postman collections)',
+        format: 'String',
+        default: '',
+        env: 'CQLT_HOOK_ID',
+        arg: 'hook-id'
+      },
+      pmTestGenSupport: {
+        doc: 'The path to a Node module that supports Postman test generation',
+        format: 'String',
+        default: '',
+        env: 'CQLT_HOOK_PM_TEST_GEN_SUPPORT',
+        arg: 'hook-pm-test-gen-support'
+      }
     },
     tests: {
       path: {
@@ -131,8 +140,10 @@ function resolvePathsToConfigFile(configPath, config) {
     }
     return path.resolve(path.dirname(configPath), thePath);
   };
-  ['tests.path', 'options.vsac.cache', 'options.dumpFiles.path'].forEach((key) => {
-    config.set(key, resolvePath(config.get(key)));
+  ['tests.path', 'hook.pmTestGenSupport', 'options.vsac.cache', 'options.dumpFiles.path'].forEach((key) => {
+    if (config.get(key) != '') {
+      config.set(key, resolvePath(config.get(key)));
+    }
   });
   config.set('library.paths', config.get('library.paths').map(resolvePath));
 }

@@ -9,7 +9,6 @@ const postmanExporter = require('./exporters/postman');
 function buildTestSuite(testCases, library, codeService, fhirVersion, config) {
   const identifier = library.source.library.identifier;
   const libraryHandle = `${identifier.id}_v${identifier.version}`;
-  const hooks = config.get('hooks');
   const options = config.get('options');
   let executionDateTime;
   if (options && options.date != null && options.date.length > 0) {
@@ -25,7 +24,7 @@ function buildTestSuite(testCases, library, codeService, fhirVersion, config) {
     dumpHooksPath = path.join(dumpPath, 'hooks-requests');
     fs.mkdirpSync(path.join(dumpHooksPath));
     // Only dump the postman collections if we have at least one hookId
-    if (hooks.length > 0) {
+    if (config.get('hook.id') !== '') {
       dumpPostmanPath = path.join(dumpPath, 'postman');
       fs.mkdirpSync(path.join(dumpPostmanPath));
     }
@@ -74,7 +73,7 @@ function buildTestSuite(testCases, library, codeService, fhirVersion, config) {
     let postmanCollection;
     if (dumpPostmanPath) {
       before('Initialize Postman Collection', () => {
-        postmanCollection = postmanExporter.initPostmanCollection(libraryHandle, hooks);
+        postmanCollection = postmanExporter.initPostmanCollection(libraryHandle);
       });
 
       after('Dump Postman Collection', () => {
@@ -100,7 +99,7 @@ function buildTestSuite(testCases, library, codeService, fhirVersion, config) {
             fs.writeFileSync(filePath, JSON.stringify(hooksRequest, null, 2), 'utf8');
           }
           if (dumpPostmanPath) {
-            postmanExporter.addHooksRequest(testCase.name, hooksRequest, hooks, postmanCollection);
+            postmanExporter.addHooksRequest(testCase, hooksRequest, config.get('hook'), postmanCollection);
           }
         }
         patientSource.loadBundles([testCase.bundle]);
