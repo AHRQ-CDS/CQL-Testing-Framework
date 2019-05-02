@@ -24,7 +24,7 @@ You must [install Node.js](https://nodejs.org/en/download/) to use the CQL Testi
 
 # Integrating the CQL Testing Framework
 
-The CQL Testing Framework is a Node.js module.  For the alpha release, it is distributed as a compressed file: `cql-testing-v1.0.0-alpha.5.tgz`. If you've downloaded the cql-testing source code, you'll find a copy of this file in the `dist/` folder.
+The CQL Testing Framework is a [Node.js module](https://nodejs.org/api/modules.html).  For the alpha release, it is distributed as a compressed file: `cql-testing-v1.0.0-alpha.5.tgz`. If you've downloaded the cql-testing source code, you'll find a copy of this file in the `dist/` folder.
 
 ## Typical Project Structure
 
@@ -151,7 +151,7 @@ options:
 
 If the artifact under test is configured to run with the [CQL Services](https://github.com/AHRQ-CDS/AHRQ-CDS-Connect-CQL-SERVICES) CQL Hooks feature, the CQL Testing Framework can optionally generate corresponding collections and tests for the popular [Postman](https://www.getpostman.com/) API testing tool.  As long as `dumpFiles` is enabled and a `hook.id` is configured, a Postman collection will be generated.
 
-Since CQL Services allows CQL Hooks to be configured in many ways, additional support is needed to automatically create tests that will exercise the API and validate results.  Developers can optionally add this support by creating a special Node module that exports one or more of the following function signatures:
+Since CQL Services allows CQL Hooks to be configured in many ways, additional support is needed to automatically create tests that will exercise the API and validate results.  Developers can optionally add this support by creating a special [Node module](https://nodejs.org/api/modules.html) that exports one or more of the following function signatures:
 
 * `function expectOK(testCase)`: returns `boolean` indicating if the HTTP response should be OK
 * `function expectCards(testCase)`: returns `boolean` indicating if cards should be returned
@@ -189,7 +189,7 @@ module.exports = { expectOK, expectCards, expectCardsContent };
 
 ## The test/test.js File
 
-Since the CQL Testing Framework leverages the Mocha testing library, it requires a `test.js` file as an entrypoint to the test suite.  The following is a very simple `test.js` file:
+Since the CQL Testing Framework leverages the Mocha testing library, it [requires](https://mochajs.org/#getting-started) a `test.js` file as an entrypoint to the test suite.  The following is a very simple `test.js` file:
 
 ```js
 const cqlt = require('cql-testing');
