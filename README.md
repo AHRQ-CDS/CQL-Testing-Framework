@@ -46,6 +46,7 @@ The following is a typical file structure for a CQL project.  This documentation
     │   ├── is-not-included.yaml
     │   └── another-test-case.yaml
     ├── cqlt.yaml
+    ├── pm-test-gen.js
     └── test.js
 ```
 
@@ -77,6 +78,10 @@ The `test/cases` folder contains the test cases defined in the YAML format. Desc
 
 The `test/cqlt.yaml` file contains configuration data used by the CQL Testing Framework. This configuration file is described in more detail below.
 
+### ./test/pm-test-gen.js
+
+The `test/pm-test-gen.js` file is _optional_.  If provided, it is used to generate Postman tests for CQL Hooks implementations. This file is described in more detail below.
+
 ### ./test/test.js
 
 The `test/test.js` file is a very simple "bootstrap" file used as an entry point for running the CQL tests using the Mocha test runner. It is covered in more detail below.
@@ -106,23 +111,23 @@ The `cqlt.yaml` file provides important configuration data about where your CQL 
 The following configuration parameters are currently supported:
 
 * **library**:
-  * **name**: The name of the CQL library to test _(required, string)_
-  * **version**: The version of the CQL library to test _(optional, string, default: latest version)_'
-  * **paths**: The path(s) at which the library and its dependencies can be found _(optional, string array, default: cql)_'
+    * **name**: The name of the CQL library to test _(required, string)_
+    * **version**: The version of the CQL library to test _(optional, string, default: latest version)_'
+    * **paths**: The path(s) at which the library and its dependencies can be found _(optional, string array, default: cql)_'
 * **hook**:
-  * **id**: The hook id corresponding to this library; needed only for exporting Postman collections _(optional)_
-  * **pmTestGenSupport**: The path to a Node module that supports Postman test generation _(optional)_
+    * **id**: The hook id corresponding to this library; needed only for exporting Postman collections _(optional)_
+    * **pmTestGenSupport**: The path to a Node module that supports Postman test generation _(optional)_
 * **tests**:
-  * **path**: The file path containing the test case files _(optional, string, default: tests)_
+    * **path**: The file path containing the test case files _(optional, string, default: tests)_
 * **options**:
-  * **date**: The execution date to use as "Now()" when CQL executes tests _(optional, ISO 8601 formatted date string enclosed in double-quotes (`"`), default: now)_
-  * **vsac**:
-    * **user**: The UMLS user name to use when connecting to the VSAC _(optional, string)_
-    * **password**: The UMLS password to use when connecting to the VSAC _(optional, string)_
-    * **cache**: The file path for the value set cache _(optional, string, default: .vscache)_
-  * **dumpFiles**:
-    * **enabled**: Indicates if test data and actual results should be dumped to files for debugging or testing; supports bundles, CQL Hooks requests, and Postman collections of CQL Hooks requests _(optional, boolean, default: false)_
-    * **path**: The file path to dump files to, if enabled _(optional, string, default: dump\_files)_
+    * **date**: The execution date to use as "Now()" when CQL executes tests _(optional, ISO 8601 formatted date string enclosed in double-quotes (`"`), default: now)_
+    * **vsac**:
+        * **user**: The UMLS user name to use when connecting to the VSAC _(optional, string)_
+        * **password**: The UMLS password to use when connecting to the VSAC _(optional, string)_
+        * **cache**: The file path for the value set cache _(optional, string, default: .vscache)_
+    * **dumpFiles**:
+        * **enabled**: Indicates if test data and actual results should be dumped to files for debugging or testing; supports bundles, CQL Hooks requests, and Postman collections of CQL Hooks requests _(optional, boolean, default: false)_
+        * **path**: The file path to dump files to, if enabled _(optional, string, default: dump\_files)_
 
 All file paths are relative to the location of the `cqlt.yaml` configuraton file unless the file path is absolute.
 
