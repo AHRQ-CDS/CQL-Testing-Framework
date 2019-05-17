@@ -46,13 +46,12 @@ function buildTestSuite(testCases, library, codeService, fhirVersion, config) {
 
     before('Download value set definitions from VSAC if necessary', function(done) {
       this.timeout(30000);
-      const vs = Object.keys(library.valuesets).map(key => library.valuesets[key]);
       let user, pass;
       if (options.vsac && options.vsac.user && options.vsac.user !== '') {
         user = options.vsac.user;
         pass = options.vsac.password;
       }
-      codeService.ensureValueSets(vs, user, pass)
+      codeService.ensureValueSetsInLibrary(library, true, user, pass)
         .then(() => done())
         .catch((err) => {
           if (err instanceof Error) {
