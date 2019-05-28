@@ -252,10 +252,10 @@ cql-exec-fhir@^1.1.1:
   dependencies:
     xml2js "~0.4.19"
 
-cql-exec-vsac@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/cql-exec-vsac/-/cql-exec-vsac-1.0.1.tgz#14b513c3eee914e3e2f5d83a2320a369c6a76a98"
-  integrity sha512-Tyfc//2R5KZ7boDxfBgMeDBwHoF64zDmSIr717t145i7KFWQ5EiIs3yj2acnj9pOvHStU9ZcR0CY8xsf4y8Nqg==
+cql-exec-vsac@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/cql-exec-vsac/-/cql-exec-vsac-1.0.3.tgz#ec2e6dffb5cdbe32ece0e587f9b03aa4a0c78406"
+  integrity sha512-8PMg2gyXCUGRbm1Cf8YwZbSJxQaVXLGfJZmRMZx6ySGYeCoUbTzP+nNo2qvgwKzuX5QY4d5HUIYnbB41o+xaUA==
   dependencies:
     debug "^2.6.4"
     mkdirp "^0.5.1"

@@ -24,7 +24,7 @@ You must [install Node.js](https://nodejs.org/en/download/) to use the CQL Testi
 
 # Integrating the CQL Testing Framework
 
-The CQL Testing Framework is a [Node.js module](https://nodejs.org/api/modules.html).  For the beta release, it is distributed as a compressed file: `cql-testing-v1.0.0-beta.1.tgz`. If you've downloaded the cql-testing source code, you'll find a copy of this file in the `dist/` folder.
+The CQL Testing Framework is a [Node.js module](https://nodejs.org/api/modules.html).  For the beta release, it is distributed as a compressed file: `cql-testing-v1.0.0-beta.2.tgz`. If you've downloaded the cql-testing source code, you'll find a copy of this file in the `dist/` folder.
 
 ## Typical Project Structure
 
@@ -99,7 +99,7 @@ The snippet below is a minimal `package.json` file for integrating the CQL Testi
   },
   "devDependencies": {
     "mocha": "^5.2.0",
-    "cql-testing": "file:./cql-testing-v1.0.0-beta.1.tgz"
+    "cql-testing": "file:./cql-testing-v1.0.0-beta.2.tgz"
   }
 }
 ```
