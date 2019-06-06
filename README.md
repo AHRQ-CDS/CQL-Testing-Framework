@@ -210,7 +210,7 @@ This assumes that the `cqlt.yaml` config file is in the same folder as the `test
 
 ## The test/cases/*.yaml Files
 
-CQL Testing Framework tests are written as files in the YAML format.  See the full documentation for creating YAML test cases as [CREATING-TEST-CASES.md](CREATING-TEST-CASES.md).
+CQL Testing Framework tests are written as files in the YAML format.  See the full documentation for creating YAML test cases at [CREATING-TEST-CASES.md](CREATING-TEST-CASES.md).
 
 ## Running the CQL Tests
 
