@@ -1,0 +1,58 @@
+---
+name: Example of using reusable resources
+
+reusable:
+  &painRelatedConditions
+    - resourceType: Condition
+      code: SNOMED#203082005 Fibromyalgia (disorder)
+      onsetDateTime: 2012-04-05
+    - resourceType: Condition
+      code: SNOMED#191722009 Agoraphobia with panic attacks (disorder)
+      onsetDateTime: 2014-09-05
+
+data:
+-
+  resourceType: Patient
+  name: Fuller Jackson
+  gender: male
+  birthDate: 1954-02-16
+-
+  allFrom: *painRelatedConditions
+
+results:
+  Summary:
+    Patient:
+      Name: Fuller Jackson
+      Gender: male
+      Age: 64
+      MeetsInclusionCriteria: true
+    PertinentMedicalHistory:
+      ConditionsAssociatedWithChronicPain:
+      -
+        Name: Fibromyalgia (disorder)
+        Status: active
+        Onset: '2012-04-05T00:00:00.000+00:00'
+        DateRecorded: null
+      RiskFactorsForOpioidRelatedHarms:
+      -
+        Name: Agoraphobia with panic attacks (disorder)
+        Status: active
+        Onset: '2014-09-05T00:00:00.000+00:00'
+        DateRecorded: null
+        Abatement: null
+        Visit: null
+    PainAssessments:
+      NumericPainIntensityAssessments: []
+      PainEnjoymentGeneralActivityAssessments: []
+      STarTBackAssessments: []
+    HistoricalTreatments:
+      OpioidMedications: []
+      NonOpioidMedications: []
+      NonPharmacologicTreatments: []
+      StoolSoftenersAndLaxatives: []
+    RiskConsiderations:
+      RiskScreeningsRelevantToPainManagement: []
+      BenzodiazepineMedications: []
+      NaloxoneMedications: []
+      UrineDrugScreens: []
+      MostRecentMME: null

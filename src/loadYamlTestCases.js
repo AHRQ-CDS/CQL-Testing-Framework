@@ -57,30 +57,28 @@ function yamlToTestCase(yamlFilePath, fhirVersion) {
 
   for (let i = 1; i < doc.data.length; i++) {
     const d = doc.data[i];
-    if (!d.resourceType) {
-      throw new Error(`${testName}: Every data element must specify its 'resourceType'`);
-    }
-    switch (d.resourceType) {
-    case 'Condition': addResource(handleCondition(d, p, fhirVersion)); break;
-    case 'Encounter': addResource(handleEncounter(d, p, fhirVersion)); break;
-    case 'FamilyMemberHistory': addResource(handleFamilyMemberHistory(d, p, fhirVersion)); break;
-    case 'MedicationOrder': addResource(handleMedicationOrder(d, p, fhirVersion)); break;
-    case 'MedicationRequest': addResource(handleMedicationRequest(d, p, fhirVersion)); break;
-    case 'MedicationStatement': addResource(handleMedicationStatement(d, p, fhirVersion)); break;
-    case 'Observation': addResource(handleObservation(d, p, fhirVersion)); break;
-    case 'Procedure': addResource(handleProcedure(d, p, fhirVersion)); break;
-    case 'ProcedureRequest': addResource(handleProcedureRequest(d, p, fhirVersion)); break;
-    case 'ReferralRequest': addResource(handleReferralRequest(d, p, fhirVersion)); break;
-    default:
-      throw new Error(`${testName}: Unsupported resourceType '${d.resourceType}'`);
+
+    if (d.allFrom != undefined) {
+      d.allFrom.forEach( element => {
+        if (!element.resourceType) {
+          throw new Error(`${testName}: Every data element must specify its 'resourceType'`);
+        }
+        addResource(handleResource(element,p,fhirVersion,testName));
+      });
+    } else if (d.iterateOver != undefined) {
+      // recursive
+    } else {
+      if (!d.resourceType) {
+        throw new Error(`${testName}: Every data element must specify its 'resourceType'`);
+      }
+      addResource(handleResource(d,p,fhirVersion,testName));
     }
   }
-
+    
   if (doc.results == null) {
     console.warn(`${testName}: No results specified.`);
     doc.results = {};
   }
-
   return new TestCase(testName, bundle, doc.results, false, doc.only);
 }
 
@@ -93,6 +91,23 @@ function handlePatient(d, fhirVersion) {
     birthDate: getDate(d.birthDate),
     extension: getExtension(d.extension)
   };
+}
+
+function handleResource(d, p, fhirVersion, testName) {
+  switch (d.resourceType) {
+  case 'Condition': return handleCondition(d, p, fhirVersion);
+  case 'Encounter': return handleEncounter(d, p, fhirVersion);
+  case 'FamilyMemberHistory': return handleFamilyMemberHistory(d, p, fhirVersion);
+  case 'MedicationOrder': return handleMedicationOrder(d, p, fhirVersion);
+  case 'MedicationRequest': return handleMedicationRequest(d, p, fhirVersion);
+  case 'MedicationStatement': return handleMedicationStatement(d, p, fhirVersion);
+  case 'Observation': return handleObservation(d, p, fhirVersion);
+  case 'Procedure': return handleProcedure(d, p, fhirVersion);
+  case 'ProcedureRequest': return handleProcedureRequest(d, p, fhirVersion);
+  case 'ReferralRequest': return handleReferralRequest(d, p, fhirVersion);
+  default:
+    throw new Error(`${testName}: Unsupported resourceType '${d.resourceType}'`);
+  }
 }
 
 function handleCondition(d, p, fhirVersion) {
