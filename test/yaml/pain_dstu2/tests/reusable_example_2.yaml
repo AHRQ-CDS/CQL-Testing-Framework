@@ -1,0 +1,55 @@
+---
+name: Second example of using reusable resources
+
+reusable:
+- &painRelatedConditions
+  - resourceType: Condition
+    code: SNOMED#203082005 Fibromyalgia (disorder)
+    onsetDateTime: 2012-04-05
+  - resourceType: Condition
+    code: SNOMED#191722009 Agoraphobia with panic attacks (disorder)
+    onsetDateTime: 2014-09-05
+- &nonOpioidMedicationOrders
+  - resourceType: MedicationOrder
+    code: RXNORM#104474 Aspirin 75 MG Oral Tablet
+    dateWritten: 2018-09-06
+  - resourceType: MedicationOrder
+    code: RXNORM#197591 Diazepam 5 MG Oral Tablet
+    dateWritten: 2018-11-05
+- &nonOpioidMedicationStatements
+  - resourceType: MedicationStatement
+    code: RXNORM#310965 Ibuprofen 200 MG Oral Tablet
+    effectiveDateTime: 2017-11-12
+  - resourceType: MedicationStatement
+    code: RXNORM#197591 Diazepam 5 MG Oral Tablet
+    effectiveDateTime: 2018-12-01
+
+data:
+-
+  resourceType: Patient
+  name: Fuller Jackson
+  gender: male
+  birthDate: 1954-02-16
+# The `allFrom` keyword will cause all referenced resources to be included.
+-
+  allFrom: *painRelatedConditions
+# The `iterateOver` keyword will cause a set of test cases to be created, each containing 
+# a different one of the referenced resources.
+-
+  iterateOver: *nonOpioidMedicationOrders
+-
+  iterateOver: *nonOpioidMedicationStatements
+
+
+results:
+  # Cannot check for strict equality in this example, since each test case created by 
+  # `iterateOver` has a different output summary.
+  
+  # Must verify certain output object properties by listing them under `outputShould`.
+  outputExpectedTo:
+    # The following indicates that the Summary object should exist.
+    Summary: exist
+    # The following indicates that the these outputs should be arrays of length 1
+    ReportConditionsAssociatedWithChronicPain: have length 1
+    ReportRiskFactorsForOpioidRelatedHarms: have length 1
+    ReportNonOpioidMedications: have length 2

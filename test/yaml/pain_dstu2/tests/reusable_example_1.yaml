@@ -2,13 +2,13 @@
 name: First example of using reusable resources
 
 reusable:
-  &painRelatedConditions
-    - resourceType: Condition
-      code: SNOMED#203082005 Fibromyalgia (disorder)
-      onsetDateTime: 2012-04-05
-    - resourceType: Condition
-      code: SNOMED#191722009 Agoraphobia with panic attacks (disorder)
-      onsetDateTime: 2014-09-05
+- &painRelatedConditions
+  - resourceType: Condition
+    code: SNOMED#203082005 Fibromyalgia (disorder)
+    onsetDateTime: 2012-04-05
+  - resourceType: Condition
+    code: SNOMED#191722009 Agoraphobia with panic attacks (disorder)
+    onsetDateTime: 2014-09-05
 
 data:
 -
@@ -62,6 +62,6 @@ results:
   outputExpectedTo:
     # The following indicates that the Summary object should exist.
     Summary: exist
-    # The following indicates that the following should be arrays of length 1
+    # The following indicates that these outputs should be arrays of length 1
     ReportConditionsAssociatedWithChronicPain: have length 1
     ReportRiskFactorsForOpioidRelatedHarms: have length 1

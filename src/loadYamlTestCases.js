@@ -8,6 +8,21 @@ function loadYamlTestCases(yamlPath, fhirVersion) {
   return recursiveLoadYamlTestCases(yamlPath, fhirVersion, []);
 }
 
+function deepCopy(anObject) {
+  if (!anObject) {
+    return anObject;
+  }
+
+  let tmp;
+  let anotherObject = Array.isArray(anObject) ? [] : {};
+  for (const k in anObject) {
+    tmp = anObject[k];
+    anotherObject[k] = (typeof tmp === 'object') ? deepCopy(tmp) : tmp;
+  }
+
+  return anotherObject;
+}
+
 function recursiveLoadYamlTestCases(yamlPath, fhirVersion, testCases = []) {
   const stat = fs.statSync(yamlPath);
   if (stat.isDirectory()) {
@@ -16,7 +31,7 @@ function recursiveLoadYamlTestCases(yamlPath, fhirVersion, testCases = []) {
       recursiveLoadYamlTestCases(file, fhirVersion, testCases);
     }
   } else if (stat.isFile() && (yamlPath.endsWith('.yaml') || yamlPath.endsWith('.yml'))) {
-    testCases.push(yamlToTestCase(yamlPath, fhirVersion));
+    Array.prototype.push.apply(testCases,yamlToTestCase(yamlPath, fhirVersion));
   }
   return testCases;
 }
@@ -34,13 +49,26 @@ function yamlToTestCase(yamlFilePath, fhirVersion) {
 
   // Handle the data
 
-  const bundle = {
+  // Note that bundle is always an array
+  var bundle = [{
     resourceType: 'Bundle',
     id: testName,
     type: 'collection',
     entry: []
+  }];
+  const addResource = (resource) => bundle.forEach(bun => bun.entry.push({ resource }));
+  const addIterateResource = function(resource) {
+    // Copy over bundle array
+    let iterates = deepCopy(bundle);
+
+    // Add resource to each copied bundle
+    iterates.forEach(function(iter) {
+      iter.entry.push( {resource} );
+    });
+
+    // Return the copy
+    return iterates;
   };
-  const addResource = (resource) => bundle.entry.push({ resource });
 
   if (!doc.data) {
     console.warn(`${testName}: No data elements found.`);
@@ -59,6 +87,7 @@ function yamlToTestCase(yamlFilePath, fhirVersion) {
     const d = doc.data[i];
 
     if (d.allFrom != undefined) {
+      // Add all resources under the `allFrom` property.
       d.allFrom.forEach( element => {
         if (!element.resourceType) {
           throw new Error(`${testName}: Every data element must specify its 'resourceType'`);
@@ -66,7 +95,20 @@ function yamlToTestCase(yamlFilePath, fhirVersion) {
         addResource(handleResource(element,p,fhirVersion,testName));
       });
     } else if (d.iterateOver != undefined) {
-      // recursive
+      // For each resource under the `iterateOver` property, replicate the existing 
+      // bundle(s) and add the resources, one to each copy.
+      let iterateArray = [];
+      d.iterateOver.forEach( element => {
+        if (!element.resourceType) {
+          throw new Error(`${testName}: Every data element must specify its 'resourceType'`);
+        }
+        // Get a copy of the existing bundle(s) and add the element to them.
+        let iterate = addIterateResource(handleResource(element,p,fhirVersion,testName));
+        // Each resource element is added to only one of the copies
+        Array.prototype.push.apply(iterateArray,iterate);
+      });
+      // Reset bundle to point at our expanded copy.
+      bundle = iterateArray;
     } else {
       if (!d.resourceType) {
         throw new Error(`${testName}: Every data element must specify its 'resourceType'`);
@@ -79,7 +121,14 @@ function yamlToTestCase(yamlFilePath, fhirVersion) {
     console.warn(`${testName}: No results specified.`);
     doc.results = {};
   }
-  return new TestCase(testName, bundle, doc.results, false, doc.only);
+  let returnedTestCases = [];
+  for (let i = 0; i < bundle.length; i++) {
+    let iterateTestName = testName + (i > 0 ? ` (${i})` : '');
+    returnedTestCases.push(
+      new TestCase(iterateTestName, bundle[i], doc.results, false, doc.only)
+    );
+  }
+  return returnedTestCases;
 }
 
 function handlePatient(d, fhirVersion) {
