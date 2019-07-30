@@ -1,5 +1,5 @@
 ---
-name: Example of using reusable resources
+name: First example of using reusable resources
 
 reusable:
   &painRelatedConditions
@@ -16,10 +16,12 @@ data:
   name: Fuller Jackson
   gender: male
   birthDate: 1954-02-16
+# The `allFrom` keyword will cause all referenced resources to be included.
 -
   allFrom: *painRelatedConditions
 
 results:
+  # To check for strict equality, simply list desired output objects under `results`.
   Summary:
     Patient:
       Name: Fuller Jackson
@@ -56,3 +58,10 @@ results:
       NaloxoneMedications: []
       UrineDrugScreens: []
       MostRecentMME: null
+  # Can also verify certain output object properties by listing them under `outputShould`.
+  outputExpectedTo:
+    # The following indicates that the Summary object should exist.
+    Summary: exist
+    # The following indicates that the following should be arrays of length 1
+    ReportConditionsAssociatedWithChronicPain: have length 1
+    ReportRiskFactorsForOpioidRelatedHarms: have length 1
