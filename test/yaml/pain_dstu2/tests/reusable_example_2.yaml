@@ -1,28 +1,9 @@
 ---
 name: Second example of using reusable resources
 
-reusable:
-- &painRelatedConditions
-  - resourceType: Condition
-    code: SNOMED#203082005 Fibromyalgia (disorder)
-    onsetDateTime: 2012-04-05
-  - resourceType: Condition
-    code: SNOMED#191722009 Agoraphobia with panic attacks (disorder)
-    onsetDateTime: 2014-09-05
-- &nonOpioidMedicationOrders
-  - resourceType: MedicationOrder
-    code: RXNORM#104474 Aspirin 75 MG Oral Tablet
-    dateWritten: 2018-09-06
-  - resourceType: MedicationOrder
-    code: RXNORM#197591 Diazepam 5 MG Oral Tablet
-    dateWritten: 2018-11-05
-- &nonOpioidMedicationStatements
-  - resourceType: MedicationStatement
-    code: RXNORM#310965 Ibuprofen 200 MG Oral Tablet
-    effectiveDateTime: 2017-11-12
-  - resourceType: MedicationStatement
-    code: RXNORM#197591 Diazepam 5 MG Oral Tablet
-    effectiveDateTime: 2018-12-01
+externalResourceLibraries:
+- reusable_resources
+- more_resources
 
 data:
 -

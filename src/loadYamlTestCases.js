@@ -1,4 +1,5 @@
 const path = require('path');
+const os = require('os');
 const yaml = require('js-yaml');
 const fs   = require('fs');
 const uuidv4 = require('uuid/v4');
@@ -37,10 +38,36 @@ function recursiveLoadYamlTestCases(yamlPath, fhirVersion, testCases = []) {
 }
 
 function yamlToTestCase(yamlFilePath, fhirVersion) {
-  // Get document, or throw exception on error
-  const doc = yaml.safeLoad(fs.readFileSync(yamlFilePath, 'utf8'));
+  // Get document as a string
+  let docString = fs.readFileSync(yamlFilePath, 'utf8');
+  // Look for any referenced external libraries
+  let matches = docString.match(/externalResourceLibraries:\s(-\s*\w*\s*)+/);
+  matches = matches ? matches[0] : null;
+  let libraryFiles = [''];
+  if (matches) {
+    libraryFiles = matches.match(/(-\s*\w*)+/g);
+    libraryFiles = libraryFiles.map(file => file.replace(/-\s*/,''));
+    libraryFiles = libraryFiles.map(file => !file.match(/$.ya?ml/) ? file.concat('.yml') : file);
+    let dirName = path.dirname(yamlFilePath);
+    libraryFiles = libraryFiles.map(file => file = dirName + path.sep + file);
+    // Loop over library files and try to splice them into the document
+    libraryFiles.forEach( lib => {
+      if (fs.existsSync(lib)) {
+        let lastDirectiveIndex = docString.indexOf('---') + 3;
+        docString = docString.slice(0,lastDirectiveIndex) + os.EOL + fs.readFileSync(lib, 'utf8') + os.EOL + docString.slice(lastDirectiveIndex+1);
+      }
+      else throw new Error(`Could not find YAML resource library: `.concat(lib));
+    });
+  }
+  
+  // Try to load the document
+  const doc = yaml.safeLoad(docString);
   if (!doc.name) {
-    throw new Error(`Every test case must specify its 'name'`);
+    if (!doc.data & !doc.results) {
+      console.log('Ignoring potential library file: '.concat(yamlFilePath));
+      return;
+    }
+    else throw new Error(`Every test case must specify its 'name'`);
   }
   const testName = doc.name;
   if (doc.skip) {
