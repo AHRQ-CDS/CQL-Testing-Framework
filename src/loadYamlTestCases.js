@@ -63,7 +63,7 @@ function yamlToTestCase(yamlFilePath, fhirVersion) {
   // Try to load the document
   const doc = yaml.safeLoad(docString);
   if (!doc.name) {
-    if (!doc.data & !doc.results) {
+    if (!doc.data && !doc.results) {
       console.log('Ignoring potential library file: '.concat(yamlFilePath));
       return;
     }
@@ -77,7 +77,7 @@ function yamlToTestCase(yamlFilePath, fhirVersion) {
   // Handle the data
 
   // Note that bundle is always an array
-  var bundle = [{
+  let bundle = [{
     resourceType: 'Bundle',
     id: testName,
     type: 'collection',
