@@ -1,6 +1,8 @@
 ---
 name: Second example of using reusable resources
 
+# Referenced resources don't have to be included in the test case file. They can exist 
+# in separate YAML files as long as they are named under externalResourceLibraries.
 externalResourceLibraries:
 - reusable_resources
 - more_resources
