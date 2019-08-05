@@ -353,8 +353,8 @@ As mentioned earlier, resources can be defined in separate YAML files (using the
 ### Reuse Methods
 
 There are two methods that are currently supported for resource reuse:
-- `importAll`: Imports all resources included within the referenced anchor into the current test case.
-- `iterateOver`: Creates a set of test cases, each containing just one of the resources within the referenced anchor. If the referenced anchor contains `N` resources, `N` different test cases will be created, each of which will also contain any other resources listed in the file.
+- `$importAll`: Imports all resources included within the referenced anchor into the current test case.
+- `$iterateOver`: Creates a set of test cases, each containing just one of the resources within the referenced anchor. If the referenced anchor contains `N` resources, `N` different test cases will be created, each of which will also contain any other resources listed in the file.
 
 ### Example
 
@@ -390,7 +390,7 @@ data:
   birthDate: 1954-02-16
 # Note use of alias (*) indicator to reference `painRelatedConditions`.
 -
-  importAll: *painRelatedConditions
+  $importAll: *painRelatedConditions
 ```
 
-See `test\yaml\pain_dstu2\tests\` for more examples, including use of the `iterateOver` keyword.
+See `test\yaml\pain_dstu2\tests\` for more examples, including use of the `$iterateOver` keyword.

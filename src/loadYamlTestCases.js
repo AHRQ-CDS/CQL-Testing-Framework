@@ -113,19 +113,19 @@ function yamlToTestCase(yamlFilePath, fhirVersion) {
   for (let i = 1; i < doc.data.length; i++) {
     const d = doc.data[i];
 
-    if (d.importAll != undefined) {
-      // Add all resources under the `importAll` property.
-      d.importAll.forEach( element => {
+    if (d.$importAll != undefined) {
+      // Add all resources under the `$importAll` property.
+      d.$importAll.forEach( element => {
         if (!element.resourceType) {
           throw new Error(`${testName}: Every data element must specify its 'resourceType'`);
         }
         addResource(handleResource(element,p,fhirVersion,testName));
       });
-    } else if (d.iterateOver != undefined) {
-      // For each resource under the `iterateOver` property, replicate the existing 
+    } else if (d.$iterateOver != undefined) {
+      // For each resource under the `$iterateOver` property, replicate the existing 
       // bundle(s) and add the resources, one to each copy.
       let iterateArray = [];
-      d.iterateOver.forEach( element => {
+      d.$iterateOver.forEach( element => {
         if (!element.resourceType) {
           throw new Error(`${testName}: Every data element must specify its 'resourceType'`);
         }
