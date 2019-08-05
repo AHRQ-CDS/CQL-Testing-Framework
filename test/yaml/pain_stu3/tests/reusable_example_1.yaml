@@ -16,52 +16,15 @@ data:
   name: Fuller Jackson
   gender: male
   birthDate: 1954-02-16
-# The `allFrom` keyword will cause all referenced resources to be included.
+# The `importAll` keyword will cause all referenced resources to be included.
 -
-  allFrom: *painRelatedConditions
+  importAll: *painRelatedConditions
 
 results:
   # To check for strict equality, simply list desired output objects under `results`.
-  Summary:
-    Patient:
-      Name: Fuller Jackson
-      Gender: male
-      Age: 64
-      MeetsInclusionCriteria: true
-    PertinentMedicalHistory:
-      ConditionsAssociatedWithChronicPain:
-      -
-        Name: Fibromyalgia (disorder)
-        Status: active
-        Onset: '2012-04-05T00:00:00.000+00:00'
-        DateRecorded: null
-      RiskFactorsForOpioidRelatedHarms:
-      -
-        Name: Agoraphobia with panic attacks (disorder)
-        Status: active
-        Onset: '2014-09-05T00:00:00.000+00:00'
-        DateRecorded: null
-        Abatement: null
-        Visit: null
-    PainAssessments:
-      NumericPainIntensityAssessments: []
-      PainEnjoymentGeneralActivityAssessments: []
-      STarTBackAssessments: []
-    HistoricalTreatments:
-      OpioidMedications: []
-      NonOpioidMedications: []
-      NonPharmacologicTreatments: []
-      StoolSoftenersAndLaxatives: []
-    RiskConsiderations:
-      RiskScreeningsRelevantToPainManagement: []
-      BenzodiazepineMedications: []
-      NaloxoneMedications: []
-      UrineDrugScreens: []
-      MostRecentMME: null
-  # Can also verify certain output object properties by listing them under `outputShould`.
-  outputExpectedTo:
-    # The following indicates that the Summary object should exist.
-    Summary: exist
-    # The following indicates that these outputs should be arrays of length 1
-    ReportConditionsAssociatedWithChronicPain: have length 1
-    ReportRiskFactorsForOpioidRelatedHarms: have length 1
+  # Can also verify certain output object properties by using `$should` expressions.
+  # The following indicates that the Summary object should exist.
+  Summary: $should exist
+  # The following indicates that these outputs should be arrays of length 1
+  ReportConditionsAssociatedWithChronicPain: $should have length 1
+  ReportRiskFactorsForOpioidRelatedHarms: $should have length 1

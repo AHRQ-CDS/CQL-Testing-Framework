@@ -354,7 +354,7 @@ As mentioned earlier, resources can be defined in separate YAML files (using the
 ### Reuse Methods
 
 There are two methods that are currently supported for resource reuse:
-- `allFrom`: Copies in all resources included within the referenced anchor.
+- `importAll`: Copies in all resources included within the referenced anchor.
 - `iterateOver`: Replicates the test case and inserts the resources included within the referenced anchor, one resource per replicate.
 
 ### Example
@@ -390,7 +390,7 @@ data:
   birthDate: 1954-02-16
 # Note use of alias (*) indicator.
 -
-  allFrom: *painRelatedConditions
+  importAll: *painRelatedConditions
 ```
 
 See `test\yaml\pain_dstu2\tests\` for more examples.

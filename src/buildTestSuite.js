@@ -110,36 +110,30 @@ function buildTestSuite(testCases, library, codeService, fhirVersion, config) {
         const patientId = testCase.bundle.entry[0].resource.id;
         expect(results.patientResults[patientId]).to.exist;
         for (const expr of Object.keys(testCase.expected)) {
-          if (expr == 'outputExpectedTo') {
-            for (const out of Object.keys(testCase.expected[expr])) {
-              resultExpectedTo(out, results.patientResults[patientId][out], testCase.expected[expr][out]);
-            }
-          } else {
-            checkResult(expr, results.patientResults[patientId][expr], testCase.expected[expr]);
-          }
+          checkResult(expr, results.patientResults[patientId][expr], testCase.expected[expr]);
         }
       });
     }
   });
 }
 
-function resultExpectedTo(expr, actual, expectedTo) {
-  const message = `${expr} expected to ${expectedTo}`;
-  let expectedString = String(expectedTo);
-  if (expectedString == 'exist') {
-    expect(actual, message).to.exist;
-  } else if (/^have length (\d+)/.test(expectedString)) {
-    let expectedLength = Number(expectedString.match(/^have length (\d+)/)[1]);
-    expect(actual, message).to.have.lengthOf(expectedLength);
-  } else { // By default assume checking for equality
-    checkResult(expr, actual, expectedTo);
-  }
-}
-
 function checkResult(expr, actual, expected) {
-  const simpleResult = simplifyResult(actual);
-  const message = `${expr}=<${simpleResult}>`;
-  expect(simpleResult, message).to.eql(expected);
+  if (/^\$should/.test(expected)) {
+    let expectedString = String(expected);
+    const message = `${expr} ${expectedString.slice(1)}`;
+    if (/^\$should exist/.test(expectedString)) {
+      expect(actual, message).to.exist;
+    } else if (/^\$should have length (\d+)/.test(expectedString)) {
+      let expectedLength = Number(expectedString.match(/^\$should have length (\d+)/)[1]);
+      expect(actual, message).to.have.lengthOf(expectedLength);
+    } else { // By default assume checking for equality
+      checkResult(expr, actual, expected);
+    }
+  } else {
+    const simpleResult = simplifyResult(actual);
+    const message = `${expr}=<${simpleResult}>`;
+    expect(simpleResult, message).to.eql(expected);
+  }
 }
 
 function simplifyResult(result) {

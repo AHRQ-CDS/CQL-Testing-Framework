@@ -113,9 +113,9 @@ function yamlToTestCase(yamlFilePath, fhirVersion) {
   for (let i = 1; i < doc.data.length; i++) {
     const d = doc.data[i];
 
-    if (d.allFrom != undefined) {
-      // Add all resources under the `allFrom` property.
-      d.allFrom.forEach( element => {
+    if (d.importAll != undefined) {
+      // Add all resources under the `importAll` property.
+      d.importAll.forEach( element => {
         if (!element.resourceType) {
           throw new Error(`${testName}: Every data element must specify its 'resourceType'`);
         }

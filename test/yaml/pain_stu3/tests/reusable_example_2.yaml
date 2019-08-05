@@ -13,9 +13,9 @@ data:
   name: Fuller Jackson
   gender: male
   birthDate: 1954-02-16
-# The `allFrom` keyword will cause all referenced resources to be included.
+# The `importAll` keyword will cause all referenced resources to be included.
 -
-  allFrom: *painRelatedConditions
+  importAll: *painRelatedConditions
 # The `iterateOver` keyword will cause a set of test cases to be created, each containing 
 # a different one of the referenced resources.
 -
@@ -28,11 +28,10 @@ results:
   # Cannot check for strict equality in this example, since each test case created by 
   # `iterateOver` has a different output summary.
   
-  # Must verify certain output object properties by listing them under `outputShould`.
-  outputExpectedTo:
-    # The following indicates that the Summary object should exist.
-    Summary: exist
-    # The following indicates that the these outputs should be arrays of length 1
-    ReportConditionsAssociatedWithChronicPain: have length 1
-    ReportRiskFactorsForOpioidRelatedHarms: have length 1
-    ReportNonOpioidMedications: have length 2
+  # Must verify certain output object properties by using `$should` expressions.
+  # The following indicates that the Summary object should exist.
+  Summary: $should exist
+  # The following indicates that the these outputs should be arrays of length 1
+  ReportConditionsAssociatedWithChronicPain: $should have length 1
+  ReportRiskFactorsForOpioidRelatedHarms: $should have length 1
+  ReportNonOpioidMedications: $should have length 2
