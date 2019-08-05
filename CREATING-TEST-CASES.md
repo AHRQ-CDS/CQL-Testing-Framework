@@ -4,10 +4,10 @@ CQL Testing Framework tests are written as files in the YAML format.  If you are
 
 Each YAML file in the `tests` folder is a separate test case.  Each file has the following general components:
 
-* **name**: The name of the test case
-* **externalResourceLibraries**: A YAML array of the names of other YAML files which may contain anchored resource definitions which can be referenced below under data.
+* **name**: The name of the test case.
+* **externalResourceLibraries**: A YAML array of the names of other YAML files which may contain anchored resource definitions which can be referenced below under data. See "Reusing Resources" below for more information.
 * **data**: A sequence (i.e., array) of the resource instances making up the test case (with the `Patient` resource as the first one). Can include YAML references to anchored resources defined in any libraries listed under externalResourceLibraries.
-* **results**: A hash (i.e. object) for which each key corresponds to a CQL expression name and the value is the _expected_ result for that CQL expression
+* **results**: A hash (i.e. object) for which each key corresponds to a CQL expression name and the value is the _expected_ result for that CQL expression.
 
 The following is a very simple example of a test case for a fictional CQL library with inclusion criteria that the patient must be male, over 18, and have an Opiod prescription on record.  It sets up test data for a 40 year-old male with an Oxycodone prescription and specifies that the `MeetsInclusionCriteria` CQL expression should evaluate to `true`.
 
@@ -329,20 +329,19 @@ results:
 
 _NOTE: When comparing _expected_ results, the CQL Testing Framework converts CQL Dates and DateTimes to _strings_ before comparing.  For this reason, you must specify any expected dates or datetime results as strings, delimited with single quotes (e.g.,  `'2017-11-15T16:00:00.000+00:00'`).
 
-Aside from directly specifying the expected value of expressions output by the CQL, tests results can also verify certain output expression properties. This is done by listing the expected properties under a special outputExpectedTo field, as shown in the following example:
+Aside from directly specifying the expected value of expressions output by the CQL, tests results can also verify certain output expression properties. This is done by the special `$should` expression, as shown in the following example:
 
 ```yaml
 results:
   # To check for strict equality, simply list desired output objects under `results`.
   FirstCqlExpression:
   ...
-  # Can also verify certain output object properties by listing them under `outputShould`.
-  outputExpectedTo:
-    # The following indicates that the SecondCqlExpression object should exist.
-    SecondCqlExpression: exist
-    # The following indicates that these outputs should be arrays of length 1
-    ThirdCqlExpression: have length 1
-    FourthCqlExpression: have length 1
+  # Can also verify certain output object properties by using `$should` expressions.
+  # The following indicates that the SecondCqlExpression object should exist.
+  SecondCqlExpression: $should exist
+  # The following indicates that these outputs should be arrays of length 1
+  ThirdCqlExpression: $should have length 1
+  FourthCqlExpression: $should have length 1
 ```
 
 Currently only the `exist` and `have length` methods are supported.
@@ -354,8 +353,8 @@ As mentioned earlier, resources can be defined in separate YAML files (using the
 ### Reuse Methods
 
 There are two methods that are currently supported for resource reuse:
-- `importAll`: Copies in all resources included within the referenced anchor.
-- `iterateOver`: Replicates the test case and inserts the resources included within the referenced anchor, one resource per replicate.
+- `importAll`: Imports all resources included within the referenced anchor into the current test case.
+- `iterateOver`: Creates a set of test cases, each containing just one of the resources within the referenced anchor. If the referenced anchor contains `N` resources, `N` different test cases will be created, each of which will also contain any other resources listed in the file.
 
 ### Example
 
@@ -363,7 +362,7 @@ Consider some resources stored in a plain YAML file named `reusable_resources.ym
 
 ```yaml
 reusable_resources:
-# Note use of anchor (&) indicator.
+# Note use of anchor (&) indicator that allows `painRelatedConditions` to be referenced elsewhere.
 - &painRelatedConditions
   - resourceType: Condition
     code: SNOMED#203082005 Fibromyalgia (disorder)
@@ -379,6 +378,7 @@ These resources can be referenced in a named test case YAML file as follows:
 ---
 name: Example of using reusable resources
 
+# This tells `cql-testing` to import everything contained in `reusable_resources.yml`.
 externalResourceLibraries:
 - reusable_resources
 
@@ -388,9 +388,9 @@ data:
   name: Fuller Jackson
   gender: male
   birthDate: 1954-02-16
-# Note use of alias (*) indicator.
+# Note use of alias (*) indicator to reference `painRelatedConditions`.
 -
   importAll: *painRelatedConditions
 ```
 
-See `test\yaml\pain_dstu2\tests\` for more examples.
+See `test\yaml\pain_dstu2\tests\` for more examples, including use of the `iterateOver` keyword.
