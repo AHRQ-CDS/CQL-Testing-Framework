@@ -16,7 +16,10 @@ data:
   name: Fuller Jackson
   gender: male
   birthDate: 1954-02-16
-# The `importAll` keyword will cause all referenced resources to be included.
+# The `importAll` keyword will cause all resources in the referenced external library 
+# to be included in this test case. In the example below painRelatedConditions is contained 
+# in reusable_resources.yml and consists of two Condition resources, both of which will be 
+# imported into this test case.
 -
   importAll: *painRelatedConditions
 

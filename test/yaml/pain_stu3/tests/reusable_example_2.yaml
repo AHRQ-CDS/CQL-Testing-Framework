@@ -13,20 +13,32 @@ data:
   name: Fuller Jackson
   gender: male
   birthDate: 1954-02-16
-# The `importAll` keyword will cause all referenced resources to be included.
+# The `importAll` keyword will cause all resources in the referenced external library 
+# to be included in this test case. In the example below painRelatedConditions is contained 
+# in reusable_resources.yml and consists of two Condition resources, both of which will be 
+# imported into this test case.
 -
   importAll: *painRelatedConditions
 # The `iterateOver` keyword will cause a set of test cases to be created, each containing 
-# a different one of the referenced resources.
+# just one of the resources in the referenced external library. In the example below 
+# nonOpioidMedicationOrders is contained in more_resources.yml and consists of two 
+# MedicationOrder resources, from which two separate test cases are generated, each 
+# with one of the MedicationOrder resources. Both test cases will include everything from 
+# painRelatedConditions.
 -
   iterateOver: *nonOpioidMedicationOrders
+# There can be more than one usage of the `iterateOver` keyword in a single file, in which 
+# case the effects are combined to generate all possible combintation of resources. In the 
+# example below, nonOpioidMedicationStatements is contained in more_resources.yml and consists 
+# of two MedicationStatement resources. A total of 2*2=4 separate test cases are created 
+# consisting of all possible combinations of resources from nonOpioidMedicationOrders and 
+# nonOpioidMedicationStatements. All test cases will include everything from painRelatedConditions.
 -
   iterateOver: *nonOpioidMedicationStatements
 
-
 results:
   # Cannot check for strict equality in this example, since each test case created by 
-  # `iterateOver` has a different output summary.
+  # `iterateOver` has a different output Summary object.
   
   # Must verify certain output object properties by using `$should` expressions.
   # The following indicates that the Summary object should exist.
@@ -34,4 +46,5 @@ results:
   # The following indicates that the these outputs should be arrays of length 1
   ReportConditionsAssociatedWithChronicPain: $should have length 1
   ReportRiskFactorsForOpioidRelatedHarms: $should have length 1
+  # The following indicates that the this output should be an array of length 2
   ReportNonOpioidMedications: $should have length 2
