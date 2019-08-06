@@ -107,7 +107,7 @@ The snippet below is a minimal `package.json` file for integrating the CQL Testi
   },
   "devDependencies": {
     "mocha": "^5.2.0",
-    "cql-testing": "^1.0.0-beta.3"
+    "cql-testing": "^1.0.0"
   }
 }
 ```
