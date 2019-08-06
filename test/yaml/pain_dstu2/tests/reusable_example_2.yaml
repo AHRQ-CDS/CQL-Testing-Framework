@@ -2,8 +2,8 @@
 name: Second example of using reusable resources
 
 # Referenced resources don't have to be included in the test case file. They can exist 
-# in separate YAML files as long as they are named under externalResourceLibraries.
-externalResourceLibraries:
+# in separate YAML files as long as they are named under externalData.
+externalData:
 - reusable_resources
 - more_resources
 
@@ -13,33 +13,33 @@ data:
   name: Fuller Jackson
   gender: male
   birthDate: 1954-02-16
-# The `$importAll` keyword will cause all resources in the referenced external library 
+# The `$import` keyword will cause all resources in the referenced external YAML file  
 # to be included in this test case. In the example below painRelatedConditions is contained 
 # in reusable_resources.yml and consists of two Condition resources, both of which will be 
 # imported into this test case.
 -
-  $importAll: *painRelatedConditions
-# The `$iterateOver` keyword will cause a set of test cases to be created, each containing 
-# just one of the resources in the referenced external library. In the example below 
+  $import: *painRelatedConditions
+# The `$iterate` keyword will cause a set of test cases to be created, each containing 
+# just one of the resources in the referenced external YAML file. In the example below 
 # nonOpioidMedicationOrders is contained in more_resources.yml and consists of two 
 # MedicationOrder resources, from which two separate test cases are generated, each 
 # with one of the MedicationOrder resources. Both test cases will include everything from 
 # painRelatedConditions.
 -
-  $iterateOver: *nonOpioidMedicationOrders
-# There can be more than one usage of the `$iterateOver` keyword in a single file, in which 
+  $iterate: *nonOpioidMedicationOrders
+# There can be more than one usage of the `$iterate` keyword in a single file, in which 
 # case the effects are combined to generate all possible combintation of resources. In the 
 # example below, nonOpioidMedicationStatements is contained in more_resources.yml and consists 
 # of two MedicationStatement resources. A total of 2*2=4 separate test cases are created 
 # consisting of all possible combinations of resources from nonOpioidMedicationOrders and 
 # nonOpioidMedicationStatements. All test cases will include everything from painRelatedConditions.
 -
-  $iterateOver: *nonOpioidMedicationStatements
+  $iterate: *nonOpioidMedicationStatements
 
 
 results:
   # Cannot check for strict equality in this example, since each test case created by 
-  # `$iterateOver` has a different output Summary object.
+  # `$iterate` has a different output Summary object.
   
   # Must verify certain output object properties by using `$should` expressions.
   # The following indicates that the Summary object should exist.

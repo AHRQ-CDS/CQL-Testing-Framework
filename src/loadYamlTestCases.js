@@ -32,7 +32,7 @@ function recursiveLoadYamlTestCases(yamlPath, fhirVersion, testCases = []) {
       recursiveLoadYamlTestCases(file, fhirVersion, testCases);
     }
   } else if (stat.isFile() && (yamlPath.endsWith('.yaml') || yamlPath.endsWith('.yml'))) {
-    Array.prototype.push.apply(testCases,yamlToTestCase(yamlPath, fhirVersion));
+    testCases.push(...yamlToTestCase(yamlPath, fhirVersion));
   }
   return testCases;
 }
@@ -41,12 +41,21 @@ function yamlToTestCase(yamlFilePath, fhirVersion) {
   // Get document as a string
   let docString = fs.readFileSync(yamlFilePath, 'utf8');
   // Look for any referenced external libraries
-  let matches = docString.match(/externalResourceLibraries:\s(-\s*\w*\s*)+/);
+  let matches = docString.match(/externalData:\s*(\[?-?\s*\w*\s*,?\]?)+/);
   matches = matches ? matches[0] : null;
   let libraryFiles = [''];
   if (matches) {
-    libraryFiles = matches.match(/(-\s*\w*)+/g);
-    libraryFiles = libraryFiles.map(file => file.replace(/-\s*/,''));
+    let matchNames = matches.split('[');
+    if (matchNames.length == 1) { // There are no square brackets
+      // This must be a block style array.
+      libraryFiles = matchNames[0].match(/(-\s*\w*)+/g);
+      libraryFiles = libraryFiles.map(file => file.replace(/-\s*/,''));
+    } else { // There are square brackets
+      // This must be a flow style array
+      matchNames = matchNames[1].split(']')[0];
+      libraryFiles = matchNames.split(',');
+      libraryFiles = libraryFiles.map( file => file.trim());
+    }
     libraryFiles = libraryFiles.map(file => !file.match(/$.ya?ml/) ? file.concat('.yml') : file);
     let dirName = path.dirname(yamlFilePath);
     libraryFiles = libraryFiles.map(file => file = dirName + path.sep + file);
@@ -65,7 +74,7 @@ function yamlToTestCase(yamlFilePath, fhirVersion) {
   if (!doc.name) {
     if (!doc.data && !doc.results) {
       console.log('Ignoring potential library file: '.concat(yamlFilePath));
-      return;
+      return [];
     }
     else throw new Error(`Every test case must specify its 'name'`);
   }
@@ -113,19 +122,19 @@ function yamlToTestCase(yamlFilePath, fhirVersion) {
   for (let i = 1; i < doc.data.length; i++) {
     const d = doc.data[i];
 
-    if (d.$importAll != undefined) {
-      // Add all resources under the `$importAll` property.
-      d.$importAll.forEach( element => {
+    if (d.$import != undefined) {
+      // Add all resources under the `$import` property.
+      d.$import.forEach( element => {
         if (!element.resourceType) {
           throw new Error(`${testName}: Every data element must specify its 'resourceType'`);
         }
         addResource(handleResource(element,p,fhirVersion,testName));
       });
-    } else if (d.$iterateOver != undefined) {
-      // For each resource under the `$iterateOver` property, replicate the existing 
+    } else if (d.$iterate != undefined) {
+      // For each resource under the `$iterate` property, replicate the existing 
       // bundle(s) and add the resources, one to each copy.
       let iterateArray = [];
-      d.$iterateOver.forEach( element => {
+      d.$iterate.forEach( element => {
         if (!element.resourceType) {
           throw new Error(`${testName}: Every data element must specify its 'resourceType'`);
         }

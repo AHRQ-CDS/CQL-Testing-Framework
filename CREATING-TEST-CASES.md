@@ -5,8 +5,8 @@ CQL Testing Framework tests are written as files in the YAML format.  If you are
 Each YAML file in the `tests` folder is a separate test case.  Each file has the following general components:
 
 * **name**: The name of the test case.
-* **externalResourceLibraries**: A YAML array of the names of other YAML files which may contain anchored resource definitions which can be referenced below under data. See "Reusing Resources" below for more information.
-* **data**: A sequence (i.e., array) of the resource instances making up the test case (with the `Patient` resource as the first one). Can include YAML references to anchored resources defined in any libraries listed under externalResourceLibraries.
+* **externalData**: A YAML [array](https://yaml.org/spec/1.2/spec.html#id2802662) of the names of other YAML files which may contain [anchored](https://yaml.org/spec/1.2/spec.html#id2785586) resource definitions which can be referenced below under the `data` section. See "Reusing Resources" below for more information.
+* **data**: A sequence (i.e., array) of the resource instances making up the test case (with the `Patient` resource as the first one). Can include YAML references to anchored resources defined in any YAML files listed under the `externalData` section.
 * **results**: A hash (i.e. object) for which each key corresponds to a CQL expression name and the value is the _expected_ result for that CQL expression.
 
 The following is a very simple example of a test case for a fictional CQL library with inclusion criteria that the patient must be male, over 18, and have an Opiod prescription on record.  It sets up test data for a 40 year-old male with an Oxycodone prescription and specifies that the `MeetsInclusionCriteria` CQL expression should evaluate to `true`.
@@ -353,14 +353,15 @@ As mentioned earlier, resources can be defined in separate YAML files (using the
 ### Reuse Methods
 
 There are two methods that are currently supported for resource reuse:
-- `$importAll`: Imports all resources included within the referenced anchor into the current test case.
-- `$iterateOver`: Creates a set of test cases, each containing just one of the resources within the referenced anchor. If the referenced anchor contains `N` resources, `N` different test cases will be created, each of which will also contain any other resources listed in the file.
+- `$import`: Imports all resources included within the referenced anchor into the current test case.
+- `$iterate`: Creates a set of test cases, each containing just one of the resources within the referenced anchor. If the referenced anchor contains `N` resources, `N` different test cases will be created, each of which will also contain any other resources listed in the main test case file. If there are multiple `$iterate` methods, a test case will be generated for every possible combination of them. For example, if there are two `$iterate` methods and the first contains `M` resources and the second contains `N` resources, this will result in `M x N` test cases.
 
-### Example
+#### Example
 
 Consider some resources stored in a plain YAML file named `reusable_resources.yml`:
 
 ```yaml
+# This key should be unique, but otherwise can be named anything that is valid YAML.
 reusable_resources:
 # Note use of anchor (&) indicator that allows `painRelatedConditions` to be referenced elsewhere.
 - &painRelatedConditions
@@ -376,10 +377,10 @@ These resources can be referenced in a named test case YAML file as follows:
 
 ```yaml
 ---
-name: Example of using reusable resources
+name: Example of using reusable resources from another file
 
 # This tells `cql-testing` to import everything contained in `reusable_resources.yml`.
-externalResourceLibraries:
+externalData:
 - reusable_resources
 
 data:
@@ -390,7 +391,47 @@ data:
   birthDate: 1954-02-16
 # Note use of alias (*) indicator to reference `painRelatedConditions`.
 -
-  $importAll: *painRelatedConditions
+  $import: *painRelatedConditions
 ```
 
-See `test\yaml\pain_dstu2\tests\` for more examples, including use of the `$iterateOver` keyword.
+See `test\yaml\pain_dstu2\tests\` for more examples, including use of the `$iterate` keyword.
+
+### Intra reusable resources
+
+Because they rely on the built-in YAML features of anchors and references, reusable resources can be placed in the main test case file instead of in a separate file. This can useful if there is a single or small handful of data elements that are being reused. The following example illustrates this capability.
+
+#### Example
+
+In the following example the CQL library is expected to output three seperate expressions which should all include the same resources.
+
+```yaml
+---
+name: Example of using reusable resources from within the same file
+
+# This key should be unique, but otherwise can be named anything that is valid YAML.
+reusable_resources:
+- &painRelatedConditions
+  - resourceType: Condition
+    code: SNOMED#203082005 Fibromyalgia (disorder)
+    onsetDateTime: 2012-04-05
+  - resourceType: Condition
+    code: SNOMED#191722009 Agoraphobia with panic attacks (disorder)
+    onsetDateTime: 2014-09-05
+
+# In contrast with previous example, there are no external data files listed here.
+
+data:
+-
+  resourceType: Patient
+  name: Fuller Jackson
+  gender: male
+  birthDate: 1954-02-16
+-
+  $import: *painRelatedConditions
+
+# These three output expressions should contain the same results
+results:
+  PainRelatedConditions: *painRelatedConditions
+  ConditionsRelatedToPain: *painRelatedConditions
+  AllConditions: *painRelatedConditions
+```
