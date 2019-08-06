@@ -126,8 +126,8 @@ function checkResult(expr, actual, expected) {
     } else if (/^\$should have length (\d+)/.test(expectedString)) {
       let expectedLength = Number(expectedString.match(/^\$should have length (\d+)/)[1]);
       expect(actual, message).to.have.lengthOf(expectedLength);
-    } else { // By default assume checking for equality
-      checkResult(expr, actual, expected);
+    } else { // Anything else is not supported
+      throw new Error(`Unsupported $should method: ${message}`);
     }
   } else {
     const simpleResult = simplifyResult(actual);

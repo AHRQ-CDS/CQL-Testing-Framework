@@ -32,12 +32,12 @@ function recursiveLoadYamlTestCases(yamlPath, fhirVersion, testCases = []) {
       recursiveLoadYamlTestCases(file, fhirVersion, testCases);
     }
   } else if (stat.isFile() && (yamlPath.endsWith('.yaml') || yamlPath.endsWith('.yml'))) {
-    testCases.push(...yamlToTestCase(yamlPath, fhirVersion));
+    testCases.push(...yamlToTestCases(yamlPath, fhirVersion));
   }
   return testCases;
 }
 
-function yamlToTestCase(yamlFilePath, fhirVersion) {
+function yamlToTestCases(yamlFilePath, fhirVersion) {
   // Get document as a string
   let docString = fs.readFileSync(yamlFilePath, 'utf8');
   // Look for any referenced external libraries
@@ -58,14 +58,14 @@ function yamlToTestCase(yamlFilePath, fhirVersion) {
     }
     libraryFiles = libraryFiles.map(file => !file.match(/$.ya?ml/) ? file.concat('.yml') : file);
     let dirName = path.dirname(yamlFilePath);
-    libraryFiles = libraryFiles.map(file => file = dirName + path.sep + file);
+    libraryFiles = libraryFiles.map(file => file = path.join(dirName, file));
     // Loop over library files and try to splice them into the document
     libraryFiles.forEach( lib => {
       if (fs.existsSync(lib)) {
         let lastDirectiveIndex = docString.indexOf('---') + 3;
         docString = docString.slice(0,lastDirectiveIndex) + os.EOL + fs.readFileSync(lib, 'utf8') + os.EOL + docString.slice(lastDirectiveIndex+1);
       }
-      else throw new Error(`Could not find YAML resource library: `.concat(lib));
+      else throw new Error(`Could not find YAML resource library: ${lib}`);
     });
   }
   
@@ -73,7 +73,7 @@ function yamlToTestCase(yamlFilePath, fhirVersion) {
   const doc = yaml.safeLoad(docString);
   if (!doc.name) {
     if (!doc.data && !doc.results) {
-      console.log('Ignoring potential library file: '.concat(yamlFilePath));
+      console.log(`Ignoring potential library file: ${yamlFilePath}`);
       return [];
     }
     else throw new Error(`Every test case must specify its 'name'`);
@@ -85,19 +85,19 @@ function yamlToTestCase(yamlFilePath, fhirVersion) {
 
   // Handle the data
 
-  // Note that bundle is always an array
-  let bundle = [{
+  // Note that bundles is always an array
+  let bundles = [{
     resourceType: 'Bundle',
     id: testName,
     type: 'collection',
     entry: []
   }];
-  const addResource = (resource) => bundle.forEach(bun => bun.entry.push({ resource }));
+  const addResource = (resource) => bundles.forEach(bun => bun.entry.push({ resource }));
   const addIterateResource = function(resource) {
-    // Copy over bundle array
-    let iterates = deepCopy(bundle);
+    // Copy over bundles array
+    let iterates = deepCopy(bundles);
 
-    // Add resource to each copied bundle
+    // Add resource to each copied bundles
     iterates.forEach(function(iter) {
       iter.entry.push( {resource} );
     });
@@ -132,19 +132,19 @@ function yamlToTestCase(yamlFilePath, fhirVersion) {
       });
     } else if (d.$iterate != undefined) {
       // For each resource under the `$iterate` property, replicate the existing 
-      // bundle(s) and add the resources, one to each copy.
+      // bundles and add the resources, one to each copy.
       let iterateArray = [];
       d.$iterate.forEach( element => {
         if (!element.resourceType) {
           throw new Error(`${testName}: Every data element must specify its 'resourceType'`);
         }
-        // Get a copy of the existing bundle(s) and add the element to them.
+        // Get a copy of the existing bundles and add the element to them.
         let iterate = addIterateResource(handleResource(element,p,fhirVersion,testName));
         // Each resource element is added to only one of the copies
         Array.prototype.push.apply(iterateArray,iterate);
       });
-      // Reset bundle to point at our expanded copy.
-      bundle = iterateArray;
+      // Reset bundles to point at our expanded copy.
+      bundles = iterateArray;
     } else {
       if (!d.resourceType) {
         throw new Error(`${testName}: Every data element must specify its 'resourceType'`);
@@ -158,10 +158,10 @@ function yamlToTestCase(yamlFilePath, fhirVersion) {
     doc.results = {};
   }
   let returnedTestCases = [];
-  for (let i = 0; i < bundle.length; i++) {
+  for (let i = 0; i < bundles.length; i++) {
     let iterateTestName = testName + (i > 0 ? ` (${i})` : '');
     returnedTestCases.push(
-      new TestCase(iterateTestName, bundle[i], doc.results, false, doc.only)
+      new TestCase(iterateTestName, bundles[i], doc.results, false, doc.only)
     );
   }
   return returnedTestCases;
