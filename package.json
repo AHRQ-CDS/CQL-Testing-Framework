@@ -1,13 +1,13 @@
 {
   "name": "cql-testing",
-  "version": "1.0.0-beta.3",
+  "version": "1.0.0",
   "description": "Provides utilities for testing CQL logic",
   "license": "Apache-2.0",
   "main": "src/index.js",
   "scripts": {
     "test": "./node_modules/.bin/mocha --reporter spec --recursive",
     "test:watch": "npm test -- --watch",
-    "test:debug": "./node_modules/.bin/mocha --inspect --debug-brk --reporter spec --recursive",
+    "test:debug": "./node_modules/.bin/mocha --inspect --inspect-brk --reporter spec --recursive",
     "lint": "./node_modules/.bin/eslint .",
     "lint:fix": "./node_modules/.bin/eslint . --fix"
   },

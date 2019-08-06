@@ -1,0 +1,39 @@
+---
+name: First example of using reusable resources
+
+# This key should be unique, but otherwise can be named anything that is valid YAML.
+reusable:
+- &painRelatedConditions
+  - resourceType: Condition
+    code: SNOMED#203082005 Fibromyalgia (disorder)
+    onsetDateTime: 2012-04-05
+  - resourceType: Condition
+    code: SNOMED#191722009 Agoraphobia with panic attacks (disorder)
+    onsetDateTime: 2014-09-05
+- &reportedConditions
+    - Name: Fibromyalgia (disorder)
+      Onset: '2012-04-05T00:00:00.000+00:00'
+      Status: active
+      DateRecorded: null
+
+data:
+-
+  resourceType: Patient
+  name: Fuller Jackson
+  gender: male
+  birthDate: 1954-02-16
+# The `$import` keyword will cause all resources in the referenced anchor to be 
+# included in this test case. In the example below painRelatedConditions is contained 
+# within `reusable` at the top of this file and consists of two Condition resources, 
+# both of which will be imported into this test case.
+-
+  $import: *painRelatedConditions
+
+results:
+  # To check for strict equality, simply list desired output objects under `results`.
+  ReportConditionsAssociatedWithChronicPain: *reportedConditions
+  # Can also verify certain output object properties by using `$should` expressions.
+  # The following indicates that the Summary object should exist.
+  Summary: $should exist
+  # The following indicates that this output should be arrays of length 1
+  ReportRiskFactorsForOpioidRelatedHarms: $should have length 1

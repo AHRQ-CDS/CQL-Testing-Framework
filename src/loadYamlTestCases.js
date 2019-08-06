@@ -1,4 +1,5 @@
 const path = require('path');
+const os = require('os');
 const yaml = require('js-yaml');
 const fs   = require('fs');
 const uuidv4 = require('uuid/v4');
@@ -6,6 +7,21 @@ const TestCase = require('./testCase');
 
 function loadYamlTestCases(yamlPath, fhirVersion) {
   return recursiveLoadYamlTestCases(yamlPath, fhirVersion, []);
+}
+
+function deepCopy(anObject) {
+  if (!anObject) {
+    return anObject;
+  }
+
+  let tmp;
+  let anotherObject = Array.isArray(anObject) ? [] : {};
+  for (const k in anObject) {
+    tmp = anObject[k];
+    anotherObject[k] = (typeof tmp === 'object') ? deepCopy(tmp) : tmp;
+  }
+
+  return anotherObject;
 }
 
 function recursiveLoadYamlTestCases(yamlPath, fhirVersion, testCases = []) {
@@ -16,16 +32,51 @@ function recursiveLoadYamlTestCases(yamlPath, fhirVersion, testCases = []) {
       recursiveLoadYamlTestCases(file, fhirVersion, testCases);
     }
   } else if (stat.isFile() && (yamlPath.endsWith('.yaml') || yamlPath.endsWith('.yml'))) {
-    testCases.push(yamlToTestCase(yamlPath, fhirVersion));
+    testCases.push(...yamlToTestCases(yamlPath, fhirVersion));
   }
   return testCases;
 }
 
-function yamlToTestCase(yamlFilePath, fhirVersion) {
-  // Get document, or throw exception on error
-  const doc = yaml.safeLoad(fs.readFileSync(yamlFilePath, 'utf8'));
+function yamlToTestCases(yamlFilePath, fhirVersion) {
+  // Get document as a string
+  let docString = fs.readFileSync(yamlFilePath, 'utf8');
+  // Look for any referenced external data files
+  let matches = docString.match(/externalData:\s*(\[?-?\s*\w*\s*,?\]?)+/);
+  matches = matches ? matches[0] : null;
+  let extDataFiles = [''];
+  if (matches) {
+    let matchNames = matches.split('[');
+    if (matchNames.length == 1) { // There are no square brackets
+      // This must be a block style array.
+      extDataFiles = matchNames[0].match(/(-\s*\w*)+/g);
+      extDataFiles = extDataFiles.map(file => file.replace(/-\s*/,''));
+    } else { // There are square brackets
+      // This must be a flow style array
+      matchNames = matchNames[1].split(']')[0];
+      extDataFiles = matchNames.split(',');
+      extDataFiles = extDataFiles.map( file => file.trim());
+    }
+    extDataFiles = extDataFiles.map(file => !file.match(/$.ya?ml/) ? file.concat('.yml') : file);
+    let dirName = path.dirname(yamlFilePath);
+    extDataFiles = extDataFiles.map(file => file = path.join(dirName, file));
+    // Loop over external data files and try to splice them into the document
+    extDataFiles.forEach( lib => {
+      if (fs.existsSync(lib)) {
+        let lastDirectiveIndex = docString.indexOf('---') + 3;
+        docString = docString.slice(0,lastDirectiveIndex) + os.EOL + fs.readFileSync(lib, 'utf8') + os.EOL + docString.slice(lastDirectiveIndex+1);
+      }
+      else throw new Error(`Could not find YAML external data file: ${lib}`);
+    });
+  }
+
+  // Try to load the document
+  const doc = yaml.safeLoad(docString);
   if (!doc.name) {
-    throw new Error(`Every test case must specify its 'name'`);
+    if (!doc.data && !doc.results) {
+      console.log(`Ignoring potential external data file: ${yamlFilePath}`);
+      return [];
+    }
+    else throw new Error(`Every test case must specify its 'name'`);
   }
   const testName = doc.name;
   if (doc.skip) {
@@ -34,13 +85,26 @@ function yamlToTestCase(yamlFilePath, fhirVersion) {
 
   // Handle the data
 
-  const bundle = {
+  // Note that bundles is always an array
+  let bundles = [{
     resourceType: 'Bundle',
     id: testName,
     type: 'collection',
     entry: []
+  }];
+  const addResource = (resource) => bundles.forEach(bun => bun.entry.push({ resource }));
+  const addIterateResource = function(resource) {
+    // Copy over bundles array
+    let iterates = deepCopy(bundles);
+
+    // Add resource to each copied bundles
+    iterates.forEach(function(iter) {
+      iter.entry.push( {resource} );
+    });
+
+    // Return the copy
+    return iterates;
   };
-  const addResource = (resource) => bundle.entry.push({ resource });
 
   if (!doc.data) {
     console.warn(`${testName}: No data elements found.`);
@@ -57,22 +121,35 @@ function yamlToTestCase(yamlFilePath, fhirVersion) {
 
   for (let i = 1; i < doc.data.length; i++) {
     const d = doc.data[i];
-    if (!d.resourceType) {
-      throw new Error(`${testName}: Every data element must specify its 'resourceType'`);
-    }
-    switch (d.resourceType) {
-    case 'Condition': addResource(handleCondition(d, p, fhirVersion)); break;
-    case 'Encounter': addResource(handleEncounter(d, p, fhirVersion)); break;
-    case 'FamilyMemberHistory': addResource(handleFamilyMemberHistory(d, p, fhirVersion)); break;
-    case 'MedicationOrder': addResource(handleMedicationOrder(d, p, fhirVersion)); break;
-    case 'MedicationRequest': addResource(handleMedicationRequest(d, p, fhirVersion)); break;
-    case 'MedicationStatement': addResource(handleMedicationStatement(d, p, fhirVersion)); break;
-    case 'Observation': addResource(handleObservation(d, p, fhirVersion)); break;
-    case 'Procedure': addResource(handleProcedure(d, p, fhirVersion)); break;
-    case 'ProcedureRequest': addResource(handleProcedureRequest(d, p, fhirVersion)); break;
-    case 'ReferralRequest': addResource(handleReferralRequest(d, p, fhirVersion)); break;
-    default:
-      throw new Error(`${testName}: Unsupported resourceType '${d.resourceType}'`);
+
+    if (d.$import != undefined) {
+      // Add all resources under the `$import` property.
+      d.$import.forEach( element => {
+        if (!element.resourceType) {
+          throw new Error(`${testName}: Every data element must specify its 'resourceType'`);
+        }
+        addResource(handleResource(element,p,fhirVersion,testName));
+      });
+    } else if (d.$iterate != undefined) {
+      // For each resource under the `$iterate` property, replicate the existing
+      // bundles and add the resources, one to each copy.
+      let iterateArray = [];
+      d.$iterate.forEach( element => {
+        if (!element.resourceType) {
+          throw new Error(`${testName}: Every data element must specify its 'resourceType'`);
+        }
+        // Get a copy of the existing bundles and add the element to them.
+        let iterate = addIterateResource(handleResource(element,p,fhirVersion,testName));
+        // Each resource element is added to only one of the copies
+        Array.prototype.push.apply(iterateArray,iterate);
+      });
+      // Reset bundles to point at our expanded copy.
+      bundles = iterateArray;
+    } else {
+      if (!d.resourceType) {
+        throw new Error(`${testName}: Every data element must specify its 'resourceType'`);
+      }
+      addResource(handleResource(d,p,fhirVersion,testName));
     }
   }
 
@@ -80,8 +157,14 @@ function yamlToTestCase(yamlFilePath, fhirVersion) {
     console.warn(`${testName}: No results specified.`);
     doc.results = {};
   }
-
-  return new TestCase(testName, bundle, doc.results, false, doc.only);
+  let returnedTestCases = [];
+  for (let i = 0; i < bundles.length; i++) {
+    let iterateTestName = testName + (i > 0 ? ` (${i})` : '');
+    returnedTestCases.push(
+      new TestCase(iterateTestName, bundles[i], doc.results, false, doc.only)
+    );
+  }
+  return returnedTestCases;
 }
 
 function handlePatient(d, fhirVersion) {
@@ -93,6 +176,23 @@ function handlePatient(d, fhirVersion) {
     birthDate: getDate(d.birthDate),
     extension: getExtension(d.extension)
   };
+}
+
+function handleResource(d, p, fhirVersion, testName) {
+  switch (d.resourceType) {
+  case 'Condition': return handleCondition(d, p, fhirVersion);
+  case 'Encounter': return handleEncounter(d, p, fhirVersion);
+  case 'FamilyMemberHistory': return handleFamilyMemberHistory(d, p, fhirVersion);
+  case 'MedicationOrder': return handleMedicationOrder(d, p, fhirVersion);
+  case 'MedicationRequest': return handleMedicationRequest(d, p, fhirVersion);
+  case 'MedicationStatement': return handleMedicationStatement(d, p, fhirVersion);
+  case 'Observation': return handleObservation(d, p, fhirVersion);
+  case 'Procedure': return handleProcedure(d, p, fhirVersion);
+  case 'ProcedureRequest': return handleProcedureRequest(d, p, fhirVersion);
+  case 'ReferralRequest': return handleReferralRequest(d, p, fhirVersion);
+  default:
+    throw new Error(`${testName}: Unsupported resourceType '${d.resourceType}'`);
+  }
 }
 
 function handleCondition(d, p, fhirVersion) {

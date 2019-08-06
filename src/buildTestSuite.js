@@ -118,9 +118,22 @@ function buildTestSuite(testCases, library, codeService, fhirVersion, config) {
 }
 
 function checkResult(expr, actual, expected) {
-  const simpleResult = simplifyResult(actual);
-  const message = `${expr}=<${simpleResult}>`;
-  expect(simpleResult, message).to.eql(expected);
+  if (/^\$should/.test(expected)) {
+    let expectedString = String(expected);
+    const message = `${expr} ${expectedString.slice(1)}`;
+    if (/^\$should exist/.test(expectedString)) {
+      expect(actual, message).to.exist;
+    } else if (/^\$should have length (\d+)/.test(expectedString)) {
+      let expectedLength = Number(expectedString.match(/^\$should have length (\d+)/)[1]);
+      expect(actual, message).to.have.lengthOf(expectedLength);
+    } else { // Anything else is not supported
+      throw new Error(`Unsupported $should method: ${message}`);
+    }
+  } else {
+    const simpleResult = simplifyResult(actual);
+    const message = `${expr}=<${simpleResult}>`;
+    expect(simpleResult, message).to.eql(expected);
+  }
 }
 
 function simplifyResult(result) {
