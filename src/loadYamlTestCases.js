@@ -40,40 +40,40 @@ function recursiveLoadYamlTestCases(yamlPath, fhirVersion, testCases = []) {
 function yamlToTestCases(yamlFilePath, fhirVersion) {
   // Get document as a string
   let docString = fs.readFileSync(yamlFilePath, 'utf8');
-  // Look for any referenced external libraries
+  // Look for any referenced external data files
   let matches = docString.match(/externalData:\s*(\[?-?\s*\w*\s*,?\]?)+/);
   matches = matches ? matches[0] : null;
-  let libraryFiles = [''];
+  let extDataFiles = [''];
   if (matches) {
     let matchNames = matches.split('[');
     if (matchNames.length == 1) { // There are no square brackets
       // This must be a block style array.
-      libraryFiles = matchNames[0].match(/(-\s*\w*)+/g);
-      libraryFiles = libraryFiles.map(file => file.replace(/-\s*/,''));
+      extDataFiles = matchNames[0].match(/(-\s*\w*)+/g);
+      extDataFiles = extDataFiles.map(file => file.replace(/-\s*/,''));
     } else { // There are square brackets
       // This must be a flow style array
       matchNames = matchNames[1].split(']')[0];
-      libraryFiles = matchNames.split(',');
-      libraryFiles = libraryFiles.map( file => file.trim());
+      extDataFiles = matchNames.split(',');
+      extDataFiles = extDataFiles.map( file => file.trim());
     }
-    libraryFiles = libraryFiles.map(file => !file.match(/$.ya?ml/) ? file.concat('.yml') : file);
+    extDataFiles = extDataFiles.map(file => !file.match(/$.ya?ml/) ? file.concat('.yml') : file);
     let dirName = path.dirname(yamlFilePath);
-    libraryFiles = libraryFiles.map(file => file = path.join(dirName, file));
-    // Loop over library files and try to splice them into the document
-    libraryFiles.forEach( lib => {
+    extDataFiles = extDataFiles.map(file => file = path.join(dirName, file));
+    // Loop over external data files and try to splice them into the document
+    extDataFiles.forEach( lib => {
       if (fs.existsSync(lib)) {
         let lastDirectiveIndex = docString.indexOf('---') + 3;
         docString = docString.slice(0,lastDirectiveIndex) + os.EOL + fs.readFileSync(lib, 'utf8') + os.EOL + docString.slice(lastDirectiveIndex+1);
       }
-      else throw new Error(`Could not find YAML resource library: ${lib}`);
+      else throw new Error(`Could not find YAML external data file: ${lib}`);
     });
   }
-  
+
   // Try to load the document
   const doc = yaml.safeLoad(docString);
   if (!doc.name) {
     if (!doc.data && !doc.results) {
-      console.log(`Ignoring potential library file: ${yamlFilePath}`);
+      console.log(`Ignoring potential external data file: ${yamlFilePath}`);
       return [];
     }
     else throw new Error(`Every test case must specify its 'name'`);
@@ -131,7 +131,7 @@ function yamlToTestCases(yamlFilePath, fhirVersion) {
         addResource(handleResource(element,p,fhirVersion,testName));
       });
     } else if (d.$iterate != undefined) {
-      // For each resource under the `$iterate` property, replicate the existing 
+      // For each resource under the `$iterate` property, replicate the existing
       // bundles and add the resources, one to each copy.
       let iterateArray = [];
       d.$iterate.forEach( element => {
@@ -152,7 +152,7 @@ function yamlToTestCases(yamlFilePath, fhirVersion) {
       addResource(handleResource(d,p,fhirVersion,testName));
     }
   }
-    
+
   if (doc.results == null) {
     console.warn(`${testName}: No results specified.`);
     doc.results = {};
