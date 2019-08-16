@@ -1,0 +1,184 @@
+{
+   "library" : {
+      "identifier" : {
+         "id" : "simple_concomitant_exposure_STU3",
+         "version" : "1.0.0"
+      },
+      "schemaIdentifier" : {
+         "id" : "urn:hl7-org:elm",
+         "version" : "r1"
+      },
+      "usings" : {
+         "def" : [ {
+            "localIdentifier" : "System",
+            "uri" : "urn:hl7-org:elm-types:r1"
+         }, {
+            "localIdentifier" : "FHIR",
+            "uri" : "http://hl7.org/fhir",
+            "version" : "3.0.0"
+         } ]
+      },
+      "includes" : {
+         "def" : [ {
+            "localIdentifier" : "C3F",
+            "path" : "CDS_Connect_Commons_for_FHIRv300",
+            "version" : "1.1.0"
+         }, {
+            "localIdentifier" : "FHIRHelpers",
+            "path" : "FHIRHelpers",
+            "version" : "3.0.0"
+         } ]
+      },
+      "parameters" : {
+         "def" : [ {
+            "name" : "InclusionMedicationsLookbackPeriod",
+            "accessLevel" : "Public",
+            "default" : {
+               "value" : 180,
+               "unit" : "days",
+               "type" : "Quantity"
+            }
+         } ]
+      },
+      "codeSystems" : {
+         "def" : [ {
+            "name" : "RXNORM",
+            "id" : "http://www.nlm.nih.gov/research/umls/rxnorm",
+            "accessLevel" : "Public"
+         } ]
+      },
+      "valueSets" : {
+         "def" : [ {
+            "name" : "Warfarin",
+            "id" : "2.16.840.1.113883.3.117.1.7.1.232",
+            "accessLevel" : "Public"
+         }, {
+            "name" : "Medications for Primary Headache NSAIDs",
+            "id" : "2.16.840.1.113762.1.4.1046.84",
+            "accessLevel" : "Public"
+         } ]
+      },
+      "statements" : {
+         "def" : [ {
+            "name" : "Patient",
+            "context" : "Patient",
+            "expression" : {
+               "type" : "SingletonFrom",
+               "operand" : {
+                  "dataType" : "{http://hl7.org/fhir}Patient",
+                  "type" : "Retrieve"
+               }
+            }
+         }, {
+            "name" : "WarfarinMedicationStatements",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "expression" : {
+               "name" : "ActiveOrCompletedMedicationStatement",
+               "libraryName" : "C3F",
+               "type" : "FunctionRef",
+               "operand" : [ {
+                  "name" : "MedicationStatementLookBack",
+                  "libraryName" : "C3F",
+                  "type" : "FunctionRef",
+                  "operand" : [ {
+                     "dataType" : "{http://hl7.org/fhir}MedicationStatement",
+                     "codeProperty" : "medication",
+                     "type" : "Retrieve",
+                     "codes" : {
+                        "name" : "Warfarin",
+                        "type" : "ValueSetRef"
+                     }
+                  }, {
+                     "name" : "InclusionMedicationsLookbackPeriod",
+                     "type" : "ParameterRef"
+                  } ]
+               } ]
+            }
+         }, {
+            "name" : "NsaidsMedicationStatements",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "expression" : {
+               "name" : "ActiveOrCompletedMedicationStatement",
+               "libraryName" : "C3F",
+               "type" : "FunctionRef",
+               "operand" : [ {
+                  "name" : "MedicationStatementLookBack",
+                  "libraryName" : "C3F",
+                  "type" : "FunctionRef",
+                  "operand" : [ {
+                     "dataType" : "{http://hl7.org/fhir}MedicationStatement",
+                     "codeProperty" : "medication",
+                     "type" : "Retrieve",
+                     "codes" : {
+                        "name" : "Medications for Primary Headache NSAIDs",
+                        "type" : "ValueSetRef"
+                     }
+                  }, {
+                     "name" : "InclusionMedicationsLookbackPeriod",
+                     "type" : "ParameterRef"
+                  } ]
+               } ]
+            }
+         }, {
+            "name" : "HasRecentWarfarinMedication",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "expression" : {
+               "type" : "And",
+               "operand" : [ {
+                  "type" : "Exists",
+                  "operand" : {
+                     "name" : "ActiveOrCompletedMedicationStatement",
+                     "libraryName" : "C3F",
+                     "type" : "FunctionRef",
+                     "operand" : [ {
+                        "name" : "MedicationStatementLookBack",
+                        "libraryName" : "C3F",
+                        "type" : "FunctionRef",
+                        "operand" : [ {
+                           "dataType" : "{http://hl7.org/fhir}MedicationStatement",
+                           "codeProperty" : "medication",
+                           "type" : "Retrieve",
+                           "codes" : {
+                              "name" : "Warfarin",
+                              "type" : "ValueSetRef"
+                           }
+                        }, {
+                           "name" : "InclusionMedicationsLookbackPeriod",
+                           "type" : "ParameterRef"
+                        } ]
+                     } ]
+                  }
+               }, {
+                  "type" : "Exists",
+                  "operand" : {
+                     "name" : "ActiveOrCompletedMedicationStatement",
+                     "libraryName" : "C3F",
+                     "type" : "FunctionRef",
+                     "operand" : [ {
+                        "name" : "MedicationStatementLookBack",
+                        "libraryName" : "C3F",
+                        "type" : "FunctionRef",
+                        "operand" : [ {
+                           "dataType" : "{http://hl7.org/fhir}MedicationStatement",
+                           "codeProperty" : "medication",
+                           "type" : "Retrieve",
+                           "codes" : {
+                              "name" : "Medications for Primary Headache NSAIDs",
+                              "type" : "ValueSetRef"
+                           }
+                        }, {
+                           "name" : "InclusionMedicationsLookbackPeriod",
+                           "type" : "ParameterRef"
+                        } ]
+                     } ]
+                  }
+               } ]
+            }
+         } ]
+      }
+   }
+}
+
