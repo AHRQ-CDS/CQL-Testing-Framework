@@ -177,6 +177,188 @@
                   }
                } ]
             }
+         }, {
+            "name" : "Summary",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "expression" : {
+               "type" : "Tuple",
+               "element" : [ {
+                  "name" : "Patient",
+                  "value" : {
+                     "type" : "Tuple",
+                     "element" : [ {
+                        "name" : "Name",
+                        "value" : {
+                           "type" : "Concatenate",
+                           "operand" : [ {
+                              "type" : "Concatenate",
+                              "operand" : [ {
+                                 "type" : "Combine",
+                                 "source" : {
+                                    "type" : "Query",
+                                    "source" : [ {
+                                       "alias" : "G",
+                                       "expression" : {
+                                          "type" : "Flatten",
+                                          "operand" : {
+                                             "type" : "Query",
+                                             "source" : [ {
+                                                "alias" : "$this",
+                                                "expression" : {
+                                                   "path" : "name",
+                                                   "type" : "Property",
+                                                   "source" : {
+                                                      "name" : "Patient",
+                                                      "type" : "ExpressionRef"
+                                                   }
+                                                }
+                                             } ],
+                                             "where" : {
+                                                "type" : "Not",
+                                                "operand" : {
+                                                   "type" : "IsNull",
+                                                   "operand" : {
+                                                      "path" : "given",
+                                                      "type" : "Property",
+                                                      "source" : {
+                                                         "name" : "$this",
+                                                         "type" : "AliasRef"
+                                                      }
+                                                   }
+                                                }
+                                             },
+                                             "return" : {
+                                                "expression" : {
+                                                   "path" : "given",
+                                                   "type" : "Property",
+                                                   "source" : {
+                                                      "name" : "$this",
+                                                      "type" : "AliasRef"
+                                                   }
+                                                }
+                                             }
+                                          }
+                                       }
+                                    } ],
+                                    "relationship" : [ ],
+                                    "return" : {
+                                       "expression" : {
+                                          "path" : "value",
+                                          "scope" : "G",
+                                          "type" : "Property"
+                                       }
+                                    }
+                                 },
+                                 "separator" : {
+                                    "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                                    "value" : " ",
+                                    "type" : "Literal"
+                                 }
+                              }, {
+                                 "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                                 "value" : " ",
+                                 "type" : "Literal"
+                              } ]
+                           }, {
+                              "type" : "Combine",
+                              "source" : {
+                                 "type" : "Query",
+                                 "source" : [ {
+                                    "alias" : "F",
+                                    "expression" : {
+                                       "type" : "Query",
+                                       "source" : [ {
+                                          "alias" : "$this",
+                                          "expression" : {
+                                             "path" : "name",
+                                             "type" : "Property",
+                                             "source" : {
+                                                "name" : "Patient",
+                                                "type" : "ExpressionRef"
+                                             }
+                                          }
+                                       } ],
+                                       "where" : {
+                                          "type" : "Not",
+                                          "operand" : {
+                                             "type" : "IsNull",
+                                             "operand" : {
+                                                "path" : "family",
+                                                "type" : "Property",
+                                                "source" : {
+                                                   "name" : "$this",
+                                                   "type" : "AliasRef"
+                                                }
+                                             }
+                                          }
+                                       },
+                                       "return" : {
+                                          "expression" : {
+                                             "path" : "family",
+                                             "type" : "Property",
+                                             "source" : {
+                                                "name" : "$this",
+                                                "type" : "AliasRef"
+                                             }
+                                          }
+                                       }
+                                    }
+                                 } ],
+                                 "relationship" : [ ],
+                                 "return" : {
+                                    "expression" : {
+                                       "path" : "value",
+                                       "scope" : "F",
+                                       "type" : "Property"
+                                    }
+                                 }
+                              },
+                              "separator" : {
+                                 "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                                 "value" : " ",
+                                 "type" : "Literal"
+                              }
+                           } ]
+                        }
+                     }, {
+                        "name" : "Gender",
+                        "value" : {
+                           "path" : "value",
+                           "type" : "Property",
+                           "source" : {
+                              "path" : "gender",
+                              "type" : "Property",
+                              "source" : {
+                                 "name" : "Patient",
+                                 "type" : "ExpressionRef"
+                              }
+                           }
+                        }
+                     }, {
+                        "name" : "Age",
+                        "value" : {
+                           "precision" : "Year",
+                           "type" : "CalculateAge",
+                           "operand" : {
+                              "path" : "birthDate.value",
+                              "type" : "Property",
+                              "source" : {
+                                 "name" : "Patient",
+                                 "type" : "ExpressionRef"
+                              }
+                           }
+                        }
+                     } ]
+                  }
+               }, {
+                  "name" : "ConcomitantDrugExposure",
+                  "value" : {
+                     "name" : "HasRecentWarfarinMedication",
+                     "type" : "ExpressionRef"
+                  }
+               } ]
+            }
          } ]
       }
    }

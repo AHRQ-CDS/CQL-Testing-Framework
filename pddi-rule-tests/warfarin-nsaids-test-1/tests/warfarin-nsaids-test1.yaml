@@ -17,19 +17,9 @@ data:
   effectiveDateTime: 2019-07-30
 
 results:
+  Summary:
    Patient:
      Name: Fuller Jackson
      Gender: male
      Age: 65
-   NsaidsMedicationStatements: 
-     Type: Statement
-     Name: Ibuprofen 200 MG Oral Tablet [Advil]
-     Start: '2019-08-01T00:00:00.000+00:00'
-     End: null
-     Status: active
-   WarfarinMedicationStatements: 
-     Type: Statement
-     Name: Warfarin Sodium 10 MG Oral Tablet
-     Start: '2019-07-30T00:00:00.000+00:00'
-     End: null
-     Status: active
+   ConcomitantDrugExposure: true
