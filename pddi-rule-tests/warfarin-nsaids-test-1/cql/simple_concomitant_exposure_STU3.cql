@@ -72,6 +72,25 @@ context Patient
 
 // ## Re-usable functions ##
 
+// Returns the first-found display text for a CodeableConcept, looking first at the `text` attribute, then the
+// `display` on each `coding` until it finds a non-null value.
+// @param c - a FHIR CodeableConcept to get text from
+// @returns {System.String} the display text or null if none is found
+define function ConceptText(c FHIR.CodeableConcept):
+  Coalesce(c.text.value, Coalesce((c.coding) c2 return c2.display.value))
+
+// Returns a text representation of a date associated with a MedicationStatement, preferring `effectiveDateTime`, then
+// `.start`.
+// @param m - a FHIR MedicationStatement to get the text date from
+// @returns {System.String} the text representation of a relevant date from the MedicationStatement
+define function MedicationStatementDate(s FHIR.MedicationStatement):
+  Coalesce(DateTimeText(s.effective as FHIR.dateTime), DateTimeText((s.effective as FHIR.Period)."start"))
+
+// Returns a text representation of a dateTime using the CQL `ToString` function.
+// @param d - a FHIR dateTime to get text for
+// @returns {System.String} the text representation of the dateTime
+define function DateTimeText(d FHIR.dateTime):
+  ToString(d.value)
 
 // RISK CONSIDERATIONS
 
@@ -86,6 +105,28 @@ define NsaidsMedicationStatements:
     [MedicationStatement: "Medications for Primary Headache NSAIDs"],
     InclusionMedicationsLookbackPeriod
   ))
+
+define ReportWarfarinMedicationStatements:
+  (WarfarinMedicationStatements) S
+  return {
+    Type:  'Statement',
+    Name:  ConceptText(S.medication as FHIR.CodeableConcept),
+    Start: MedicationStatementDate(S),
+    End:   DateTimeText((S.effective as FHIR.Period)."end"),
+    Status: S.status.value
+  }
+  sort by Start desc, End desc
+
+define ReportNsaidsMedicationStatements:
+  (NsaidsMedicationStatements) S
+  return {
+    Type:  'Statement',
+    Name:  ConceptText(S.medication as FHIR.CodeableConcept),
+    Start: MedicationStatementDate(S),
+    End:   DateTimeText((S.effective as FHIR.Period)."end"),
+    Status: S.status.value
+  }
+  sort by Start desc, End desc
 
 
 // ## Target population ##
@@ -118,10 +159,14 @@ define HasRecentWarfarinMedication:
 // an example of how to integrate this summary into an EHR using modern web UI technologies.
 
 define Summary: {
-    Patient: {
-	Name: Combine(Patient.name.given G return G.value, ' ') + ' ' + Combine(Patient.name.family F return F.value, ' '),
-	Gender: Patient.gender.value,
-	Age: AgeInYears()
-    },
-    ConcomitantDrugExposure: HasRecentWarfarinMedication
+  Patient: {
+    Name: Combine(Patient.name.given G return G.value, ' ') + ' ' + Combine(Patient.name.family F return F.value, ' '),
+    Gender: Patient.gender.value,
+    Age: AgeInYears()
+  },
+  ConcomitantDrugExposure: HasRecentWarfarinMedication,
+  HistoricalTreatments: {
+    WarfarinMedications: ReportWarfarinMedicationStatements,
+    NsaidsMedications: ReportNsaidsMedicationStatements
+  }
 }
