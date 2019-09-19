@@ -1,0 +1,362 @@
+{
+  "Y": {
+    "CODE": "YA",
+    "names": [
+      "yotta"
+    ],
+    "printSymbols": [
+      "Y"
+    ],
+    "values": [
+      {
+        "printable": "1 &#215; 10<sup>24</sup>",
+        "numeric": 1e+24
+      }
+    ]
+  },
+  "Z": {
+    "CODE": "ZA",
+    "names": [
+      "zetta"
+    ],
+    "printSymbols": [
+      "Z"
+    ],
+    "values": [
+      {
+        "printable": "1 &#215; 10<sup>21</sup>",
+        "numeric": 1e+21
+      }
+    ]
+  },
+  "E": {
+    "CODE": "EX",
+    "names": [
+      "exa"
+    ],
+    "printSymbols": [
+      "E"
+    ],
+    "values": [
+      {
+        "printable": "1 &#215; 10<sup>18</sup>",
+        "numeric": 1000000000000000000
+      }
+    ]
+  },
+  "P": {
+    "CODE": "PT",
+    "names": [
+      "peta"
+    ],
+    "printSymbols": [
+      "P"
+    ],
+    "values": [
+      {
+        "printable": "1 &#215; 10<sup>15</sup>",
+        "numeric": 1000000000000000
+      }
+    ]
+  },
+  "T": {
+    "CODE": "TR",
+    "names": [
+      "tera"
+    ],
+    "printSymbols": [
+      "T"
+    ],
+    "values": [
+      {
+        "printable": "1 &#215; 10<sup>12</sup>",
+        "numeric": 1000000000000
+      }
+    ]
+  },
+  "G": {
+    "CODE": "GA",
+    "names": [
+      "giga"
+    ],
+    "printSymbols": [
+      "G"
+    ],
+    "values": [
+      {
+        "printable": "1 &#215; 10<sup>9</sup>",
+        "numeric": 1000000000
+      }
+    ]
+  },
+  "M": {
+    "CODE": "MA",
+    "names": [
+      "mega"
+    ],
+    "printSymbols": [
+      "M"
+    ],
+    "values": [
+      {
+        "printable": "1 &#215; 10<sup>6</sup>",
+        "numeric": 1000000
+      }
+    ]
+  },
+  "k": {
+    "CODE": "K",
+    "names": [
+      "kilo"
+    ],
+    "printSymbols": [
+      "k"
+    ],
+    "values": [
+      {
+        "printable": "1 &#215; 10<sup>3</sup>",
+        "numeric": 1000
+      }
+    ]
+  },
+  "h": {
+    "CODE": "H",
+    "names": [
+      "hecto"
+    ],
+    "printSymbols": [
+      "h"
+    ],
+    "values": [
+      {
+        "printable": "1 &#215; 10<sup>2</sup>",
+        "numeric": 100
+      }
+    ]
+  },
+  "da": {
+    "CODE": "DA",
+    "names": [
+      "deka"
+    ],
+    "printSymbols": [
+      "da"
+    ],
+    "values": [
+      {
+        "printable": "1 &#215; 10<sup>1</sup>",
+        "numeric": 10
+      }
+    ]
+  },
+  "d": {
+    "CODE": "D",
+    "names": [
+      "deci"
+    ],
+    "printSymbols": [
+      "d"
+    ],
+    "values": [
+      {
+        "printable": "1 &#215; 10<sup>-1</sup>",
+        "numeric": 0.1
+      }
+    ]
+  },
+  "c": {
+    "CODE": "C",
+    "names": [
+      "centi"
+    ],
+    "printSymbols": [
+      "c"
+    ],
+    "values": [
+      {
+        "printable": "1 &#215; 10<sup>-2</sup>",
+        "numeric": 0.01
+      }
+    ]
+  },
+  "m": {
+    "CODE": "M",
+    "names": [
+      "milli"
+    ],
+    "printSymbols": [
+      "m"
+    ],
+    "values": [
+      {
+        "printable": "1 &#215; 10<sup>-3</sup>",
+        "numeric": 0.001
+      }
+    ]
+  },
+  "u": {
+    "CODE": "U",
+    "names": [
+      "micro"
+    ],
+    "printSymbols": [
+      "&#956;"
+    ],
+    "values": [
+      {
+        "printable": "1 &#215; 10<sup>-6</sup>",
+        "numeric": 0.000001
+      }
+    ]
+  },
+  "n": {
+    "CODE": "N",
+    "names": [
+      "nano"
+    ],
+    "printSymbols": [
+      "n"
+    ],
+    "values": [
+      {
+        "printable": "1 &#215; 10<sup>-9</sup>",
+        "numeric": 1e-9
+      }
+    ]
+  },
+  "p": {
+    "CODE": "P",
+    "names": [
+      "pico"
+    ],
+    "printSymbols": [
+      "p"
+    ],
+    "values": [
+      {
+        "printable": "1 &#215; 10<sup>-12</sup>",
+        "numeric": 1e-12
+      }
+    ]
+  },
+  "f": {
+    "CODE": "F",
+    "names": [
+      "femto"
+    ],
+    "printSymbols": [
+      "f"
+    ],
+    "values": [
+      {
+        "printable": "1 &#215; 10<sup>-15</sup>",
+        "numeric": 1e-15
+      }
+    ]
+  },
+  "a": {
+    "CODE": "A",
+    "names": [
+      "atto"
+    ],
+    "printSymbols": [
+      "a"
+    ],
+    "values": [
+      {
+        "printable": "1 &#215; 10<sup>-18</sup>",
+        "numeric": 1e-18
+      }
+    ]
+  },
+  "z": {
+    "CODE": "ZO",
+    "names": [
+      "zepto"
+    ],
+    "printSymbols": [
+      "z"
+    ],
+    "values": [
+      {
+        "printable": "1 &#215; 10<sup>-21</sup>",
+        "numeric": 1e-21
+      }
+    ]
+  },
+  "y": {
+    "CODE": "YO",
+    "names": [
+      "yocto"
+    ],
+    "printSymbols": [
+      "y"
+    ],
+    "values": [
+      {
+        "printable": "1 &#215; 10<sup>-24</sup>",
+        "numeric": 1e-24
+      }
+    ]
+  },
+  "Ki": {
+    "CODE": "KIB",
+    "names": [
+      "kibi"
+    ],
+    "printSymbols": [
+      "Ki"
+    ],
+    "values": [
+      {
+        "printable": "1024",
+        "numeric": 1024
+      }
+    ]
+  },
+  "Mi": {
+    "CODE": "MIB",
+    "names": [
+      "mebi"
+    ],
+    "printSymbols": [
+      "Mi"
+    ],
+    "values": [
+      {
+        "printable": "1048576",
+        "numeric": 1048576
+      }
+    ]
+  },
+  "Gi": {
+    "CODE": "GIB",
+    "names": [
+      "gibi"
+    ],
+    "printSymbols": [
+      "Gi"
+    ],
+    "values": [
+      {
+        "printable": "1073741824",
+        "numeric": 1073741824
+      }
+    ]
+  },
+  "Ti": {
+    "CODE": "TIB",
+    "names": [
+      "tebi"
+    ],
+    "printSymbols": [
+      "Ti"
+    ],
+    "values": [
+      {
+        "printable": "1099511627776",
+        "numeric": 1099511627776
+      }
+    ]
+  }
+}

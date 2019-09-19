@@ -1,0 +1,63 @@
+---
+name: First test of warfarin and nsaids cql
+
+data:
+-
+  resourceType: Patient
+  name: Fuller Jackson
+  gender: male
+  birthDate: 1954-02-16
+-
+  resourceType: MedicationStatement
+  code: RXNORM#855296 Warfarin Sodium 10 MG Oral Tablet
+  effectiveDateTime: 2019-07-30T00:00:00.000+00:00 
+  # effectivePeriod: 2019-07-30T00:00:00.000+00:00 - 2019-08-05T00:00:00.000+00:00
+-
+  resourceType: MedicationStatement
+  code: RXNORM#153008 Ibuprofen 200 MG Oral Tablet [Advil]
+  effectiveDateTime: 2019-08-01T00:00:00.000+00:00 
+  # effectivePeriod: 2019-08-01T00:00:00.000+00:00 - 2019-08-08T00:00:00.000+00:00
+-
+  resourceType: MedicationStatement
+  code: RXNORM#389171 Omeprazole 10 MG Oral Tablet
+  effectiveDateTime: 2019-07-28T00:00:00.000+00:00
+  # effectivePeriod: 2019-07-28T00:00:00.000+00:00 - 2019-08-02T00:00:00.000+00:00
+
+results:
+  Summary:
+    Patient:
+      Name: Fuller Jackson
+      Gender: male
+      Age: 65
+    HistoricalTreatments:
+      WarfarinMedications:
+      -
+        Type: Statement
+        Name: Warfarin Sodium 10 MG Oral Tablet
+        Start: '2019-07-30T00:00:00.000+00:00'
+        End: null
+        Status: active
+      NsaidsMedications: 
+      -
+        Type: Statement
+        Name: Ibuprofen 200 MG Oral Tablet [Advil]
+        Start: '2019-08-01T00:00:00.000+00:00'
+        End: null
+        Status: active
+      PPIsMedications:
+      -
+        Type: Statement
+        Name: Omeprazole 10 MG Oral Tablet
+        Start: '2019-07-28T00:00:00.000+00:00'
+        End: null
+        Status: active
+    OverlappingWarfarinNsaids:
+      -
+        Type: Concomitant Statements
+        Drug1Name: Warfarin Sodium 10 MG Oral Tablet
+        Drug1Start: '2019-07-30T00:00:00.000+00:00'
+        Drug1Status: active
+        Drug2Name: Ibuprofen 200 MG Oral Tablet [Advil]
+        Drug2Start: '2019-08-01T00:00:00.000+00:00'
+        Drug2Status: active
+    # HasOverlappingStatementsWithPPI: [true]

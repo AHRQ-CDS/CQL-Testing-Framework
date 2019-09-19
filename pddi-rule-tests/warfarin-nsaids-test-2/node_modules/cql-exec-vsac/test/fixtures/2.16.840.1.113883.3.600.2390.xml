@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns0:RetrieveValueSetResponse xmlns:ns0="urn:ihe:iti:svs:2008" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <ns0:ValueSet ID="2.16.840.1.113883.3.600.2390" displayName="Current Tobacco Smoker" version="20170418">
+        <ns0:ConceptList>
+            <ns0:Concept code="160603005" codeSystem="2.16.840.1.113883.6.96" codeSystemName="SNOMEDCT" codeSystemVersion="2017-03" displayName="Light cigarette smoker (1-9 cigs/day) (finding)"/>
+            <ns0:Concept code="160604004" codeSystem="2.16.840.1.113883.6.96" codeSystemName="SNOMEDCT" codeSystemVersion="2017-03" displayName="Moderate cigarette smoker (10-19 cigs/day) (finding)"/>
+            <ns0:Concept code="160605003" codeSystem="2.16.840.1.113883.6.96" codeSystemName="SNOMEDCT" codeSystemVersion="2017-03" displayName="Heavy cigarette smoker (20-39 cigs/day) (finding)"/>
+            <ns0:Concept code="160606002" codeSystem="2.16.840.1.113883.6.96" codeSystemName="SNOMEDCT" codeSystemVersion="2017-03" displayName="Very heavy cigarette smoker (40+ cigs/day) (finding)"/>
+            <ns0:Concept code="160619003" codeSystem="2.16.840.1.113883.6.96" codeSystemName="SNOMEDCT" codeSystemVersion="2017-03" displayName="Rolls own cigarettes (finding)"/>
+            <ns0:Concept code="230059006" codeSystem="2.16.840.1.113883.6.96" codeSystemName="SNOMEDCT" codeSystemVersion="2017-03" displayName="Occasional cigarette smoker (finding)"/>
+            <ns0:Concept code="230060001" codeSystem="2.16.840.1.113883.6.96" codeSystemName="SNOMEDCT" codeSystemVersion="2017-03" displayName="Light cigarette smoker (finding)"/>
+            <ns0:Concept code="230062009" codeSystem="2.16.840.1.113883.6.96" codeSystemName="SNOMEDCT" codeSystemVersion="2017-03" displayName="Moderate cigarette smoker (finding)"/>
+            <ns0:Concept code="230063004" codeSystem="2.16.840.1.113883.6.96" codeSystemName="SNOMEDCT" codeSystemVersion="2017-03" displayName="Heavy cigarette smoker (finding)"/>
+            <ns0:Concept code="230064005" codeSystem="2.16.840.1.113883.6.96" codeSystemName="SNOMEDCT" codeSystemVersion="2017-03" displayName="Very heavy cigarette smoker (finding)"/>
+            <ns0:Concept code="230065006" codeSystem="2.16.840.1.113883.6.96" codeSystemName="SNOMEDCT" codeSystemVersion="2017-03" displayName="Chain smoker (finding)"/>
+            <ns0:Concept code="266920004" codeSystem="2.16.840.1.113883.6.96" codeSystemName="SNOMEDCT" codeSystemVersion="2017-03" displayName="Trivial cigarette smoker (less than one cigarette/day) (finding)"/>
+            <ns0:Concept code="365981007" codeSystem="2.16.840.1.113883.6.96" codeSystemName="SNOMEDCT" codeSystemVersion="2017-03" displayName="Finding of tobacco smoking behavior (finding)"/>
+            <ns0:Concept code="365982000" codeSystem="2.16.840.1.113883.6.96" codeSystemName="SNOMEDCT" codeSystemVersion="2017-03" displayName="Finding of tobacco smoking consumption (finding)"/>
+            <ns0:Concept code="428041000124106" codeSystem="2.16.840.1.113883.6.96" codeSystemName="SNOMEDCT" codeSystemVersion="2017-03" displayName="Occasional tobacco smoker (finding)"/>
+            <ns0:Concept code="428061000124105" codeSystem="2.16.840.1.113883.6.96" codeSystemName="SNOMEDCT" codeSystemVersion="2017-03" displayName="Light tobacco smoker (finding)"/>
+            <ns0:Concept code="428071000124103" codeSystem="2.16.840.1.113883.6.96" codeSystemName="SNOMEDCT" codeSystemVersion="2017-03" displayName="Heavy tobacco smoker (finding)"/>
+            <ns0:Concept code="449868002" codeSystem="2.16.840.1.113883.6.96" codeSystemName="SNOMEDCT" codeSystemVersion="2017-03" displayName="Smokes tobacco daily (finding)"/>
+            <ns0:Concept code="56578002" codeSystem="2.16.840.1.113883.6.96" codeSystemName="SNOMEDCT" codeSystemVersion="2017-03" displayName="Moderate smoker (20 or less per day) (finding)"/>
+            <ns0:Concept code="56771006" codeSystem="2.16.840.1.113883.6.96" codeSystemName="SNOMEDCT" codeSystemVersion="2017-03" displayName="Heavy smoker (over 20 per day) (finding)"/>
+            <ns0:Concept code="59978006" codeSystem="2.16.840.1.113883.6.96" codeSystemName="SNOMEDCT" codeSystemVersion="2017-03" displayName="Cigar smoker (finding)"/>
+            <ns0:Concept code="65568007" codeSystem="2.16.840.1.113883.6.96" codeSystemName="SNOMEDCT" codeSystemVersion="2017-03" displayName="Cigarette smoker (finding)"/>
+            <ns0:Concept code="77176002" codeSystem="2.16.840.1.113883.6.96" codeSystemName="SNOMEDCT" codeSystemVersion="2017-03" displayName="Smoker (finding)"/>
+            <ns0:Concept code="82302008" codeSystem="2.16.840.1.113883.6.96" codeSystemName="SNOMEDCT" codeSystemVersion="2017-03" displayName="Pipe smoker (finding)"/>
+        </ns0:ConceptList>
+    </ns0:ValueSet>
+</ns0:RetrieveValueSetResponse>

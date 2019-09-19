@@ -1,0 +1,7 @@
+---
+library:
+  name: overlapping_exposure_STU3
+options:
+  date: "2019-09-16T00:00:00.0Z"
+  dumpFiles:
+    enabled: true
