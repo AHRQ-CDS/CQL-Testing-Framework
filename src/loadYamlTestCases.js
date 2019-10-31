@@ -330,6 +330,18 @@ function handleMedicationStatement(d, p, fhirVersion) {
   };
 }
 
+function handleMedication(d, p, fhirVersion) {
+  return {
+    id: getId(d.id),
+    code: getCodeableConcept(d.code),
+    status: getString(d.status, 'active'),
+    isBrand: getBoolean(d.isBrand, false),
+    isOverThecounter: getBoolean(d.isOverThecounter, false),
+    form: d.form ? d.form : undefined,
+    ingredient: d.ingredient ? d.ingredient : undefined
+  }
+}
+
 function handleObservation(d, p, fhirVersion) {
   let categoryValue;
   if (fhirVersion === '1.0.2') {
