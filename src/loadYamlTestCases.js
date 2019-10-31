@@ -186,6 +186,7 @@ function handleResource(d, p, fhirVersion, testName) {
   case 'MedicationOrder': return handleMedicationOrder(d, p, fhirVersion);
   case 'MedicationRequest': return handleMedicationRequest(d, p, fhirVersion);
   case 'MedicationStatement': return handleMedicationStatement(d, p, fhirVersion);
+  case 'Medication' : return handleMedication(d, p, fhirVersion);
   case 'Observation': return handleObservation(d, p, fhirVersion);
   case 'Procedure': return handleProcedure(d, p, fhirVersion);
   case 'ProcedureRequest': return handleProcedureRequest(d, p, fhirVersion);
