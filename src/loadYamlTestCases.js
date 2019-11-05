@@ -332,6 +332,7 @@ function handleMedicationStatement(d, p, fhirVersion) {
 
 function handleMedication(d, p, fhirVersion) {
   return {
+    resourceType: 'Medication',
     id: getId(d.id),
     code: getCodeableConcept(d.code),
     status: getString(d.status, 'active'),
