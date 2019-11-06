@@ -325,7 +325,7 @@ function handleMedicationStatement(d, p, fhirVersion) {
     [wasNotTakenKey]: wasNotTakenValue,
     effectiveDateTime: d.effectiveDateTime ? getDateTime(d.effectiveDateTime) : undefined,
     effectivePeriod: d.effectivePeriod ? getPeriod(d.effectivePeriod) : undefined,
-    medicationCodeableConcept: getCodeableConcept(d.code),
+    medicationCodeableConcept: d.code ? getCodeableConcept(d.code) : undefined,
     dosage: d.dosage ? d.dosage : undefined
   };
 }
@@ -339,7 +339,7 @@ function handleMedication(d, p, fhirVersion) {
     isBrand: getBoolean(d.isBrand, false),
     isOverThecounter: getBoolean(d.isOverThecounter, false),
     form: d.form ? d.form : undefined,
-    ingredient: d.ingredient ? d.ingredient : undefined
+    ingredient: getIngredient(d.ingredient)
   }
 }
 
@@ -577,6 +577,20 @@ function getCodeableConcept(code) {
   }
 }
 
+/*function getMedicationReference(med) {
+  if (med) {
+    return {
+      id: getId(med.id),
+      code: getCodeableConcept(med.code),
+      status: getString(med.status, 'active'),
+      isBrand: getBoolean(med.isBrand, false),
+      isOverThecounter: getBoolean(med.isOverThecounter, false),
+      form: med.form ? med.form : undefined,
+      ingredient: med.ingredient ? med.ingredient : undefined
+    }
+  }
+}*/
+
 function getCoding(code) {
   if (code) {
     const matches = /^((\S+)?\s*#\s*([^#\s]+))?\s*(.*)?$/.exec(code);
@@ -660,6 +674,22 @@ function getExtension(extension) {
     });
   }
   return extensionArray;
+}
+
+function getIngredient(ingredient) {
+  let ingredientArray = [];
+  if (ingredient != null) {
+    if (!Array.isArray(ingredient)) {
+      ingredient = [ingredient];
+    }
+    ingredient.forEach( ing => {
+      ingredientArray.push({
+        'itemCodeableConcept': getCodeableConcept(ing.code),
+        'amount': ing.amount ? ing.amount : undefined
+      });
+    });
+  }
+  return ingredientArray;
 }
 
 module.exports = loadYamlTestCases;
