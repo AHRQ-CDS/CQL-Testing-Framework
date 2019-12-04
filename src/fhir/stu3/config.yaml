@@ -1,0 +1,46 @@
+---
+resources:
+  Condition:
+    patient: subject
+    defaults:
+      clinicalStatus:
+        $if: abatementDateTime
+        $then: resolved
+        $else: active
+      verificationStatus: confirmed
+  Encounter:
+    patient: subject
+    defaults:
+      status: finished
+  FamilyMemberHistory:
+    patient: patient
+    defaults:
+      status: completed
+      name: Unknown
+  MedicationOrder:
+    patient: patient
+    defaults:
+      status: active
+  MedicationStatement:
+    patient: subject
+    defaults:
+      taken: y
+      status: active
+  Observation:
+    patient: subject
+    defaults:
+      status: final
+  Procedure:
+    notDone: false
+    defaults:
+      status: completed
+  ProcedureRequest:
+    patient: subject
+    defaults:
+      status: active
+  ReferralRequest:
+    patient: subject
+    defaults:
+      status: active
+    
+    
