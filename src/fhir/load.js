@@ -1,9 +1,14 @@
 const fs = require('fs');
+const yaml = require('js-yaml');
 
 const _cache = new Map();
 
 function load(version) {
   if (!_cache.has(version)) {
+    if (!fs.existsSync(`${__dirname}/${version}`)) {
+      return;
+    }
+
     const result = new FHIRDefinitions(version);
     // Load the base FHIR definitions
     const files = [
@@ -16,6 +21,14 @@ function load(version) {
       for (const entry of definitions.entry) {
         result.add(entry.resource);
       }
+    }
+
+    // Load the config
+    const configYaml = yaml.safeLoad(fs.readFileSync(`${__dirname}/${version}/config.yaml`, 'utf-8'));
+    if (configYaml && configYaml.resources) {
+      Object.keys(configYaml.resources).forEach(name => {
+        result.config.addResource(name, configYaml.resources[name]);
+      });
     }
 
     _cache.set(version, result);
@@ -31,6 +44,11 @@ class FHIRDefinitions {
     this._resources = new Map();
     this._types = new Map();
     this._valueSets = new Map();
+    this._config = new Config(target);
+  }
+
+  get config() {
+    return this._config;
   }
 
   findResource(key) {
@@ -68,6 +86,21 @@ class FHIRDefinitions {
       addDefinitionToMap(definition, this._valueSets);
     }
     // TODO: CodeSystems? Other things?
+  }
+}
+
+class Config {
+  constructor(target) {
+    this._target = target;
+    this._resources = new Map();
+  }
+
+  addResource(name, info) {
+    this._resources.set(name, info);
+  }
+
+  findResource(name) {
+    return this._resources.get(name);
   }
 }
 
