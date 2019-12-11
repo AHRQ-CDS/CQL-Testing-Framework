@@ -40,78 +40,87 @@ function yaml2fhir(yamlObject, patientId, fhirVersion) {
     if (element == null) {
       throw new Error(`${sd.id} does not contain the property: ${key}`);
     }
-    let type = element.type && element.type.length === 1 ? element.type[0] : undefined;
-    switch(type.code) {
-    // PRIMITIVES
-    case 'boolean':
-      result[key] = getBoolean(input[key]);
-      break;
-    case 'integer':
-    case 'unsignedInt':
-    case 'positiveInt':
-      result[key] = getInteger(input[key]);
-      break;
-    case 'decimal':
-      result[key] = getDecimal(input[key]);
-      break;
-    case 'instant':
-    case 'dateTime':
-      result[key] = getDateTime(input[key]);
-      break;
-    case 'date':
-      result[key] = getDate(input[key]);
-      break;
-    case 'time':
-      result[key] = getTime(input[key]);
-      break;
-    case 'string':
-    case 'code':
-    case 'id':
-    case 'markdown':
-    case 'uri':
-    case 'oid':
-    case 'base64Binary':
-      result[key] = getString(input[key]);
-      break;
-    // SYNTAX-SUPPORTED COMPLEX TYPES
-    case 'Annotation':
-      result[key] = getAnnotation(input[key]);
-      break;
-    case 'CodeableConcept':
-      result[key] = getCodeableConcept(input[key]);
-      break;
-    case 'Coding':
-      result[key] = getCoding(input[key]);
-      break;
-    case 'HumanName':
-      result[key] = getHumanName(input[key], fhirVersion);
-      break;
-    case 'Quantity':
-      result[key] = getQuantity(input[key]);
-      break;
-    case 'Period':
-      result[key] = getPeriod(input[key]);
-      break;
-    // COMPLEX TYPES WITH NO SPECIAL SYNTAX
-    case 'Address':
-    case 'Attachment':
-    case 'BackboneElement':
-    case 'ContactPoint':
-    case 'Element':
-    case 'Identifier':
-    case 'Range':
-    case 'Ratio':
-    case 'Repeat':
-    case 'SampledData':
-    case 'Signature':
-    case 'Timing':
-    default:
-      // Currently not supported
-      throw new Error(`Unsupported type: ${type.code}`);
-    }
+    result[key] = getValue(input[key], element, fhirVersion);
   }
 
   return result;
+}
+
+function getValue(yamlValue, element, fhirVersion, skipCardCheck = false) {
+  if (yamlValue == null) {
+    return yamlValue;
+  }
+  let type = element.type && element.type.length === 1 ? element.type[0] : undefined;
+  if (!skipCardCheck) {
+    if (element.max === '0') {
+      // Currently not supported
+      throw new Error(`Cannot set ${element.path} because its max is 0`);
+    }
+    if (element.max !== '1') {
+      // This is expecting an array -- if input is not an array, force it into an array
+      const yamlValueArray = Array.isArray(yamlValue) ? yamlValue : [yamlValue];
+      return yamlValueArray.map(v => getValue(v, element, fhirVersion, true));
+    }
+    if (Array.isArray(yamlValue)) {
+      // Input is an array, but the element is not
+      throw new Error(`${element.path} does not allow multiple values`);
+    }
+  }
+  switch(type.code) {
+  // PRIMITIVES
+  case 'boolean':
+    return getBoolean(yamlValue);
+  case 'integer':
+  case 'unsignedInt':
+  case 'positiveInt':
+    return getInteger(yamlValue);
+  case 'decimal':
+    return getDecimal(yamlValue);
+  case 'instant':
+  case 'dateTime':
+    return getDateTime(yamlValue);
+  case 'date':
+    return getDate(yamlValue);
+  case 'time':
+    return getTime(yamlValue);
+  case 'string':
+  case 'code':
+  case 'id':
+  case 'markdown':
+  case 'uri':
+  case 'oid':
+  case 'base64Binary':
+    return getString(yamlValue);
+  // SYNTAX-SUPPORTED COMPLEX TYPES
+  case 'Annotation':
+    return getAnnotation(yamlValue);
+  case 'CodeableConcept':
+    return getCodeableConcept(yamlValue);
+  case 'Coding':
+    return getCoding(yamlValue);
+  case 'HumanName':
+    return getHumanName(yamlValue, fhirVersion);
+  case 'Quantity':
+    return getQuantity(yamlValue);
+  case 'Period':
+    return getPeriod(yamlValue);
+  // COMPLEX TYPES WITH NO SPECIAL SYNTAX
+  case 'Address':
+  case 'Attachment':
+  case 'BackboneElement':
+  case 'ContactPoint':
+  case 'Element':
+  case 'Identifier':
+  case 'Range':
+  case 'Ratio':
+  case 'Repeat':
+  case 'SampledData':
+  case 'Signature':
+  case 'Timing':
+  default:
+    // Currently not supported
+    throw new Error(`Unsupported type: ${type.code}`);
+  }
 }
 
 function getId(id) {

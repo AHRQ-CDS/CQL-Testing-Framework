@@ -38,11 +38,11 @@ describe('#yaml2fhir', () => {
       });
     });
 
-    it.skip('should convert a Patient with top-level properties', () => {
+    it('should convert a Patient with top-level properties', () => {
       const data = yaml.safeLoad(`
         resourceType: Patient
         active: true
-        name: Bobby Jones
+        name: [Bobby Jones]
         gender: male
         birthDate: 2000-11-30
         maritalStatus: http://hl7.org/fhir/marital-status#U Unmarried
@@ -68,6 +68,23 @@ describe('#yaml2fhir', () => {
         }
       });
     });
+
+    it('should convert a non-array value to an array when necessary', () => {
+      const data = yaml.safeLoad(`
+        resourceType: Patient
+        name: Bobby Jones
+      `);
+      const result = yaml2fhir(data, '123', 'dstu2');
+      expect(result).to.eql({
+        resourceType: 'Patient',
+        id: '123',
+        name: [{
+          family: ['Jones'],
+          given: ['Bobby']
+        }]
+      });
+    });
+
 
     it('should convert an Observation with top-level properties', () => {
       const data = yaml.safeLoad(`
@@ -126,6 +143,15 @@ describe('#yaml2fhir', () => {
       `);
       // Note: Procedure.notDone is not in DSTU2 (it is "notPerformed" in DSTU2)
       expect(() => yaml2fhir(data, '123', 'dstu2')).to.throw('Procedure does not contain the property: notDone');
+    });
+
+    it('should throw an error when an array is provided for a non array property', () => {
+      const data = yaml.safeLoad(`
+        resourceType: Encounter
+        status: [planned, finished]
+      `);
+      // Note: Encounter.status is 1..1 (not an array)
+      expect(() => yaml2fhir(data, '123', 'dstu2')).to.throw('Encounter.status does not allow multiple values');
     });
   });
 });
