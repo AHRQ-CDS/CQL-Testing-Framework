@@ -114,6 +114,35 @@ describe('#yaml2fhir', () => {
       });
     });
 
+    it('should support choice properties like value[x]', () => {
+      const data = yaml.safeLoad(`
+        resourceType: Observation
+        id: 456
+        status: final
+        code: LOINC#12345-6 Fake LOINC Code
+        valueQuantity: 25 mg
+      `);
+      const result = yaml2fhir(data, '123', 'dstu2');
+      expect(result).to.eql({
+        resourceType: 'Observation',
+        id: '456',
+        subject: { reference: 'Patient/123'},
+        status: 'final',
+        code: {
+          coding: [{
+            system: 'http://loinc.org',
+            code: '12345-6',
+            display: 'Fake LOINC Code'
+          }],
+          text: 'Fake LOINC Code'
+        },
+        valueQuantity: {
+          value: 25,
+          unit: 'mg'
+        }
+      });
+    });
+
     it('should throw an error for an unsupported version of FHIR', () => {
       const data = yaml.safeLoad(`
         resourceType: Patient

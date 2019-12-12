@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const uuidv4 = require('uuid/v4');
 const load = require('./fhir/load');
 
@@ -36,7 +37,7 @@ function yaml2fhir(yamlObject, patientId, fhirVersion) {
     if (key === 'resourceType') {
       continue;
     }
-    const element = sd.snapshot.element.find(e => e.path === `${sd.id}.${key}`);
+    const element = findElement(sd, key);
     if (element == null) {
       throw new Error(`${sd.id} does not contain the property: ${key}`);
     }
@@ -44,6 +45,24 @@ function yaml2fhir(yamlObject, patientId, fhirVersion) {
   }
 
   return result;
+}
+
+function findElement(sd, property) {
+  const wantedPath = `${sd.id}.${property}`;
+  let element = sd.snapshot.element.find(e => e.path === wantedPath);
+  if (element == null) {
+    // This may be a choice property (e.g., valueQuantity for value[x] element).
+    // Try to find a match on choices
+    for (const choiceEl of sd.snapshot.element.filter(e => e.path.endsWith('[x]'))) {
+      const typeMatch = choiceEl.type.find(t => choiceEl.path.replace(/\[x]$/, _.upperFirst(t.code)) === wantedPath);
+      if (typeMatch) {
+        element = _.cloneDeep(choiceEl);
+        element.type = [typeMatch];
+        break;
+      }
+    }
+  }
+  return element;
 }
 
 function getValue(yamlValue, element, fhirVersion, skipCardCheck = false) {
