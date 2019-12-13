@@ -4,7 +4,7 @@ resources:
     patient: patient
     defaults:
       clinicalStatus:
-        $if: abatementDateTime
+        $if-present: abatementDateTime
         $then: resolved
         $else: active
       verificationStatus: confirmed

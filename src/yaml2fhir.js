@@ -32,10 +32,10 @@ function yaml2fhir(yamlObject, patientId, fhirVersion) {
     result[cfg.patient] = getPatientReference(patientId);
   }
 
-  return assignProperties(input, sd.snapshot.element, fhir, result);
+  return assignProperties(yamlObject, input, sd.snapshot.element, fhir, result);
 }
 
-function assignProperties(input, scopedElements, fhir, result = {}) {
+function assignProperties(yamlResource, input, scopedElements, fhir, result = {}) {
   // Loop through the input assigning into the result as appropriate
   for (const key of Object.keys(input)) {
     if (key === 'resourceType') {
@@ -45,7 +45,7 @@ function assignProperties(input, scopedElements, fhir, result = {}) {
     if (element == null) {
       throw new Error(`Path not found: ${scopedElements[0].path}.${key}`);
     }
-    result[key] = getValue(input[key], element, scopedElements, fhir);
+    result[key] = getValue(yamlResource, input[key], element, scopedElements, fhir);
   }
   return result;
 }
@@ -68,7 +68,7 @@ function findElement(scopedElements, property) {
   return element;
 }
 
-function getValue(yamlValue, element, scopedElements, fhir, skipCardCheck = false) {
+function getValue(yamlResource, yamlValue, element, scopedElements, fhir, skipCardCheck = false) {
   if (yamlValue == null) {
     return yamlValue;
   }
@@ -81,7 +81,7 @@ function getValue(yamlValue, element, scopedElements, fhir, skipCardCheck = fals
     if (element.max !== '1') {
       // This is expecting an array -- if input is not an array, force it into an array
       const yamlValueArray = Array.isArray(yamlValue) ? yamlValue : [yamlValue];
-      return yamlValueArray.map(v => getValue(v, element, scopedElements, fhir, true));
+      return yamlValueArray.map(v => getValue(yamlResource, v, element, scopedElements, fhir, true));
     }
     if (Array.isArray(yamlValue)) {
       // Input is an array, but the element is not
@@ -90,15 +90,25 @@ function getValue(yamlValue, element, scopedElements, fhir, skipCardCheck = fals
   }
 
   if (typeof yamlValue === 'object' && !(yamlValue instanceof  Date)) {
+    if (yamlValue['$if-present']) {
+      // This is a conditional construct to determine the value.
+      // Evaluate the condition and modify the value accordingly.
+      const fieldToCheck = yamlValue['$if-present'];
+      if (yamlResource[fieldToCheck] != null) {
+        return getValue(yamlResource, yamlValue['$then'], element, scopedElements, fhir, skipCardCheck);
+      } else if (yamlValue['$else']) {
+        return getValue(yamlResource, yamlValue['$else'], element, scopedElements, fhir, skipCardCheck);
+      }
+    }
     const newScopedElements = scopedElements.filter(e =>  {
       return e.path === element.path || e.path.startsWith(`${element.path}.`);
     });
     if (newScopedElements.length > 1) {
-      return assignProperties(yamlValue, newScopedElements, fhir, {});
+      return assignProperties(yamlResource, yamlValue, newScopedElements, fhir, {});
     } else {
       const typeDef = fhir.find(type.code);
       if (typeDef && typeDef.snapshot) {
-        return assignProperties(yamlValue, typeDef.snapshot.element, fhir, {});
+        return assignProperties(yamlResource, yamlValue, typeDef.snapshot.element, fhir, {});
       }
     }
   }

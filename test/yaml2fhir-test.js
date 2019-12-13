@@ -38,6 +38,34 @@ describe('#yaml2fhir', () => {
       });
     });
 
+    it('should convert a Condition whose config uses $if-present/$then/$else when target property is present', () => {
+      const data = yaml.safeLoad(`
+        resourceType: Condition
+        abatementDateTime: 2000-12-15
+      `);
+      const result = yaml2fhir(data, '123', 'dstu2');
+      idFriendlyExpectEqual(result, {
+        resourceType: 'Condition',
+        patient: { reference: 'Patient/123'},
+        abatementDateTime: '2000-12-15T00:00:00.000Z',
+        clinicalStatus: 'resolved',
+        verificationStatus: 'confirmed'
+      });
+    });
+
+    it('should convert a Condition whose config uses $if-present/$then/$else when target property is not present', () => {
+      const data = yaml.safeLoad(`
+        resourceType: Condition
+      `);
+      const result = yaml2fhir(data, '123', 'dstu2');
+      idFriendlyExpectEqual(result, {
+        resourceType: 'Condition',
+        patient: { reference: 'Patient/123'},
+        clinicalStatus: 'active',
+        verificationStatus: 'confirmed'
+      });
+    });
+
     it('should convert a Patient with top-level properties', () => {
       const data = yaml.safeLoad(`
         resourceType: Patient
