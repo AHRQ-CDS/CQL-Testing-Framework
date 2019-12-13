@@ -39,12 +39,16 @@ function load(version) {
 
 class FHIRDefinitions {
 
-  constructor(target) {
-    this._target = target;
+  constructor(version) {
+    this._version = version;
     this._resources = new Map();
     this._types = new Map();
     this._valueSets = new Map();
-    this._config = new Config(target);
+    this._config = new Config(version);
+  }
+
+  get version() {
+    return this._version;
   }
 
   get config() {
@@ -64,9 +68,9 @@ class FHIRDefinitions {
   }
 
   find(key) {
-    if (this.resources.has(key)) {
+    if (this._resources.has(key)) {
       return this.findResource(key);
-    } else if (this.types.has(key)) {
+    } else if (this._types.has(key)) {
       return this.findType(key);
     } else {
       return this.findValueSet(key);
@@ -90,8 +94,8 @@ class FHIRDefinitions {
 }
 
 class Config {
-  constructor(target) {
-    this._target = target;
+  constructor(version) {
+    this._version = version;
     this._resources = new Map();
   }
 

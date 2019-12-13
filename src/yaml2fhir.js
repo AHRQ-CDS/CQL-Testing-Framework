@@ -32,28 +32,31 @@ function yaml2fhir(yamlObject, patientId, fhirVersion) {
     result[cfg.patient] = getPatientReference(patientId);
   }
 
+  return assignProperties(input, sd.snapshot.element, fhir, result);
+}
+
+function assignProperties(input, scopedElements, fhir, result = {}) {
   // Loop through the input assigning into the result as appropriate
   for (const key of Object.keys(input)) {
     if (key === 'resourceType') {
       continue;
     }
-    const element = findElement(sd, key);
+    const element = findElement(scopedElements, key);
     if (element == null) {
-      throw new Error(`${sd.id} does not contain the property: ${key}`);
+      throw new Error(`Path not found: ${scopedElements[0].path}.${key}`);
     }
-    result[key] = getValue(input[key], element, fhirVersion);
+    result[key] = getValue(input[key], element, scopedElements, fhir);
   }
-
   return result;
 }
 
-function findElement(sd, property) {
-  const wantedPath = `${sd.id}.${property}`;
-  let element = sd.snapshot.element.find(e => e.path === wantedPath);
+function findElement(scopedElements, property) {
+  const wantedPath = `${scopedElements[0].path}.${property}`;
+  let element = scopedElements.find(e => e.path === wantedPath);
   if (element == null) {
     // This may be a choice property (e.g., valueQuantity for value[x] element).
     // Try to find a match on choices
-    for (const choiceEl of sd.snapshot.element.filter(e => e.path.endsWith('[x]'))) {
+    for (const choiceEl of scopedElements.filter(e => e.path.endsWith('[x]'))) {
       const typeMatch = choiceEl.type.find(t => choiceEl.path.replace(/\[x]$/, _.upperFirst(t.code)) === wantedPath);
       if (typeMatch) {
         element = _.cloneDeep(choiceEl);
@@ -65,7 +68,7 @@ function findElement(sd, property) {
   return element;
 }
 
-function getValue(yamlValue, element, fhirVersion, skipCardCheck = false) {
+function getValue(yamlValue, element, scopedElements, fhir, skipCardCheck = false) {
   if (yamlValue == null) {
     return yamlValue;
   }
@@ -78,11 +81,25 @@ function getValue(yamlValue, element, fhirVersion, skipCardCheck = false) {
     if (element.max !== '1') {
       // This is expecting an array -- if input is not an array, force it into an array
       const yamlValueArray = Array.isArray(yamlValue) ? yamlValue : [yamlValue];
-      return yamlValueArray.map(v => getValue(v, element, fhirVersion, true));
+      return yamlValueArray.map(v => getValue(v, element, scopedElements, fhir, true));
     }
     if (Array.isArray(yamlValue)) {
       // Input is an array, but the element is not
       throw new Error(`${element.path} does not allow multiple values`);
+    }
+  }
+
+  if (typeof yamlValue === 'object' && !(yamlValue instanceof  Date)) {
+    const newScopedElements = scopedElements.filter(e =>  {
+      return e.path === element.path || e.path.startsWith(`${element.path}.`);
+    });
+    if (newScopedElements.length > 1) {
+      return assignProperties(yamlValue, newScopedElements, fhir, {});
+    } else {
+      const typeDef = fhir.find(type.code);
+      if (typeDef && typeDef.snapshot) {
+        return assignProperties(yamlValue, typeDef.snapshot.element, fhir, {});
+      }
     }
   }
   switch(type.code) {
@@ -118,7 +135,7 @@ function getValue(yamlValue, element, fhirVersion, skipCardCheck = false) {
   case 'Coding':
     return getCoding(yamlValue);
   case 'HumanName':
-    return getHumanName(yamlValue, fhirVersion);
+    return getHumanName(yamlValue, fhir.version);
   case 'Quantity':
     return getQuantity(yamlValue);
   case 'Period':
@@ -286,7 +303,7 @@ function getQuantity(quantity) {
       const quantityObject = {
         value: parseFloat(matches[1])
       };
-      if (matches.length === 5) {
+      if (matches[4] != null && matches[4] !== '') {
         quantityObject.unit = matches[4];
       }
       return quantityObject;

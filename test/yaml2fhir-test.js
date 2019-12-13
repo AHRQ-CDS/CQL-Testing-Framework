@@ -143,6 +143,132 @@ describe('#yaml2fhir', () => {
       });
     });
 
+    it('should support nested properties for Backbone elements', () => {
+      const data = yaml.safeLoad(`
+        resourceType: Patient
+        name: Rover Pupford
+        animal:
+          species: http://hl7.org/fhir/animal-species#canislf Dog
+      `);
+      const result = yaml2fhir(data, '123', 'dstu2');
+      expect(result).to.eql({
+        resourceType: 'Patient',
+        id: '123',
+        name: [{
+          family: ['Pupford'],
+          given: ['Rover']
+        }],
+        animal: {
+          species: {
+            coding: [{
+              system: 'http://hl7.org/fhir/animal-species',
+              code: 'canislf',
+              display: 'Dog'
+            }],
+            text: 'Dog'
+          }
+        }
+      });
+    });
+
+    it('should support nested properties for complex type elements', () => {
+      const data = yaml.safeLoad(`
+        resourceType: Observation
+        id: 456
+        status: final
+        code:
+          text: Some Lab That Is Not Coded
+        valueQuantity: 25 mg
+      `);
+      const result = yaml2fhir(data, '123', 'dstu2');
+      expect(result).to.eql({
+        resourceType: 'Observation',
+        id: '456',
+        subject: { reference: 'Patient/123'},
+        status: 'final',
+        code: {
+          text: 'Some Lab That Is Not Coded'
+        },
+        valueQuantity: {
+          value: 25,
+          unit: 'mg'
+        }
+      });
+    });
+
+    it('should support nested properties for repeating Backbone elements', () => {
+      const data = yaml.safeLoad(`
+        resourceType: Observation
+        id: 456
+        status: final
+        code: LOINC#12345-6 Fake LOINC Code
+        component:
+        -
+          code: LOINC#ABCDE-1 Fake LOINC Compnent 1 Code
+          valueQuantity: 10
+        -
+          code: LOINC#ABCDE-2 Fake LOINC Compnent 2 Code
+          valueQuantity: 20
+        -
+          code: LOINC#ABCDE-3 Fake LOINC Compnent 3 Code
+          valueQuantity: 30
+      `);
+      const result = yaml2fhir(data, '123', 'dstu2');
+      expect(result).to.eql({
+        resourceType: 'Observation',
+        id: '456',
+        subject: { reference: 'Patient/123'},
+        status: 'final',
+        code: {
+          coding: [{
+            system: 'http://loinc.org',
+            code: '12345-6',
+            display: 'Fake LOINC Code'
+          }],
+          text: 'Fake LOINC Code'
+        },
+        component: [{
+          code: {
+            coding: [{
+              system: 'http://loinc.org',
+              code: 'ABCDE-1',
+              display: 'Fake LOINC Compnent 1 Code'
+            }],
+            text: 'Fake LOINC Compnent 1 Code'
+          },
+          valueQuantity: {
+            value: 10
+          }
+        },
+        {
+          code: {
+            coding: [{
+              system: 'http://loinc.org',
+              code: 'ABCDE-2',
+              display: 'Fake LOINC Compnent 2 Code'
+            }],
+            text: 'Fake LOINC Compnent 2 Code'
+          },
+          valueQuantity: {
+            value: 20
+          }
+        },
+        {
+          code: {
+            coding: [{
+              system: 'http://loinc.org',
+              code: 'ABCDE-3',
+              display: 'Fake LOINC Compnent 3 Code'
+            }],
+            text: 'Fake LOINC Compnent 3 Code'
+          },
+          valueQuantity: {
+            value: 30
+          }
+        }]
+      });
+    });
+
     it('should throw an error for an unsupported version of FHIR', () => {
       const data = yaml.safeLoad(`
         resourceType: Patient
@@ -171,7 +297,7 @@ describe('#yaml2fhir', () => {
         notDone: true
       `);
       // Note: Procedure.notDone is not in DSTU2 (it is "notPerformed" in DSTU2)
-      expect(() => yaml2fhir(data, '123', 'dstu2')).to.throw('Procedure does not contain the property: notDone');
+      expect(() => yaml2fhir(data, '123', 'dstu2')).to.throw('Path not found: Procedure.notDone');
     });
 
     it('should throw an error when an array is provided for a non array property', () => {
