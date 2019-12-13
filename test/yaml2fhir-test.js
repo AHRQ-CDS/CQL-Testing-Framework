@@ -337,6 +337,318 @@ describe('#yaml2fhir', () => {
       expect(() => yaml2fhir(data, '123', 'dstu2')).to.throw('Encounter.status does not allow multiple values');
     });
   });
+
+  describe('#stu3', () => {
+    it('should convert a simple blank Patient', () => {
+      const data = yaml.safeLoad(`
+        resourceType: Patient
+      `);
+      const result = yaml2fhir(data, null, 'stu3');
+      idFriendlyExpectEqual(result, {
+        resourceType: 'Patient',
+        id: 'assigned'
+      });
+    });
+
+    it('should convert a simple blank Patient with supplied patientId', () => {
+      const data = yaml.safeLoad(`
+        resourceType: Patient
+      `);
+      const result = yaml2fhir(data, '123', 'stu3');
+      expect(result).to.eql({
+        resourceType: 'Patient',
+        id: '123'
+      });
+    });
+
+    it('should convert a simple blank Encounter with proper defaults and reference to Patient', () => {
+      const data = yaml.safeLoad(`
+        resourceType: Encounter
+      `);
+      const result = yaml2fhir(data, '123', 'stu3');
+      idFriendlyExpectEqual(result, {
+        resourceType: 'Encounter',
+        subject: { reference: 'Patient/123'},
+        status: 'finished'
+      });
+    });
+
+    it('should convert a Condition whose config uses $if-present/$then/$else when target property is present', () => {
+      const data = yaml.safeLoad(`
+        resourceType: Condition
+        abatementDateTime: 2000-12-15
+      `);
+      const result = yaml2fhir(data, '123', 'stu3');
+      idFriendlyExpectEqual(result, {
+        resourceType: 'Condition',
+        subject: { reference: 'Patient/123'},
+        abatementDateTime: '2000-12-15T00:00:00.000Z',
+        clinicalStatus: 'resolved',
+        verificationStatus: 'confirmed'
+      });
+    });
+
+    it('should convert a Condition whose config uses $if-present/$then/$else when target property is not present', () => {
+      const data = yaml.safeLoad(`
+        resourceType: Condition
+      `);
+      const result = yaml2fhir(data, '123', 'stu3');
+      idFriendlyExpectEqual(result, {
+        resourceType: 'Condition',
+        subject: { reference: 'Patient/123'},
+        clinicalStatus: 'active',
+        verificationStatus: 'confirmed'
+      });
+    });
+
+    it('should convert a Patient with top-level properties', () => {
+      const data = yaml.safeLoad(`
+        resourceType: Patient
+        active: true
+        name: [Bobby Jones]
+        gender: male
+        birthDate: 2000-11-30
+        maritalStatus: http://hl7.org/fhir/marital-status#U Unmarried
+      `);
+      const result = yaml2fhir(data, '123', 'stu3');
+      expect(result).to.eql({
+        resourceType: 'Patient',
+        id: '123',
+        active: true,
+        name: [{
+          family: 'Jones',
+          given: ['Bobby']
+        }],
+        gender: 'male',
+        birthDate: '2000-11-30',
+        maritalStatus: {
+          coding: [{
+            system: 'http://hl7.org/fhir/marital-status',
+            code: 'U',
+            display: 'Unmarried'
+          }],
+          text: 'Unmarried'
+        }
+      });
+    });
+
+    it('should convert a non-array value to an array when necessary', () => {
+      const data = yaml.safeLoad(`
+        resourceType: Patient
+        name: Bobby Jones
+      `);
+      const result = yaml2fhir(data, '123', 'stu3');
+      expect(result).to.eql({
+        resourceType: 'Patient',
+        id: '123',
+        name: [{
+          family: 'Jones',
+          given: ['Bobby']
+        }]
+      });
+    });
+
+
+    it('should convert an Observation with top-level properties', () => {
+      const data = yaml.safeLoad(`
+        resourceType: Observation
+        id: 456
+        status: amended
+        code: LOINC#12345-6 Fake LOINC Code
+        issued: 2018-10-10
+        comment: My Comments
+      `);
+      const result = yaml2fhir(data, '123', 'stu3');
+      expect(result).to.eql({
+        resourceType: 'Observation',
+        id: '456',
+        subject: { reference: 'Patient/123'},
+        status: 'amended',
+        code: {
+          coding: [{
+            system: 'http://loinc.org',
+            code: '12345-6',
+            display: 'Fake LOINC Code'
+          }],
+          text: 'Fake LOINC Code'
+        },
+        issued: '2018-10-10T00:00:00.000Z',
+        comment: 'My Comments'
+      });
+    });
+
+    it('should support choice properties like value[x]', () => {
+      const data = yaml.safeLoad(`
+        resourceType: Observation
+        id: 456
+        status: final
+        code: LOINC#12345-6 Fake LOINC Code
+        valueQuantity: 25 mg
+      `);
+      const result = yaml2fhir(data, '123', 'stu3');
+      expect(result).to.eql({
+        resourceType: 'Observation',
+        id: '456',
+        subject: { reference: 'Patient/123'},
+        status: 'final',
+        code: {
+          coding: [{
+            system: 'http://loinc.org',
+            code: '12345-6',
+            display: 'Fake LOINC Code'
+          }],
+          text: 'Fake LOINC Code'
+        },
+        valueQuantity: {
+          value: 25,
+          unit: 'mg'
+        }
+      });
+    });
+
+    it('should support nested properties for Backbone elements', () => {
+      const data = yaml.safeLoad(`
+        resourceType: Patient
+        name: Rover Pupford
+        animal:
+          species: http://hl7.org/fhir/animal-species#canislf Dog
+      `);
+      const result = yaml2fhir(data, '123', 'stu3');
+      expect(result).to.eql({
+        resourceType: 'Patient',
+        id: '123',
+        name: [{
+          family: 'Pupford',
+          given: ['Rover']
+        }],
+        animal: {
+          species: {
+            coding: [{
+              system: 'http://hl7.org/fhir/animal-species',
+              code: 'canislf',
+              display: 'Dog'
+            }],
+            text: 'Dog'
+          }
+        }
+      });
+    });
+
+    it('should support nested properties for complex type elements', () => {
+      const data = yaml.safeLoad(`
+        resourceType: Observation
+        id: 456
+        status: final
+        code:
+          text: Some Lab That Is Not Coded
+        valueQuantity: 25 mg
+      `);
+      const result = yaml2fhir(data, '123', 'stu3');
+      expect(result).to.eql({
+        resourceType: 'Observation',
+        id: '456',
+        subject: { reference: 'Patient/123'},
+        status: 'final',
+        code: {
+          text: 'Some Lab That Is Not Coded'
+        },
+        valueQuantity: {
+          value: 25,
+          unit: 'mg'
+        }
+      });
+    });
+
+    it('should support nested properties for repeating Backbone elements', () => {
+      const data = yaml.safeLoad(`
+        resourceType: Observation
+        id: 456
+        status: final
+        code: LOINC#12345-6 Fake LOINC Code
+        component:
+        -
+          code: LOINC#ABCDE-1 Fake LOINC Compnent 1 Code
+          valueQuantity: 10
+        -
+          code: LOINC#ABCDE-2 Fake LOINC Compnent 2 Code
+          valueQuantity: 20
+        -
+          code: LOINC#ABCDE-3 Fake LOINC Compnent 3 Code
+          valueQuantity: 30
+      `);
+      const result = yaml2fhir(data, '123', 'stu3');
+      expect(result).to.eql({
+        resourceType: 'Observation',
+        id: '456',
+        subject: { reference: 'Patient/123'},
+        status: 'final',
+        code: {
+          coding: [{
+            system: 'http://loinc.org',
+            code: '12345-6',
+            display: 'Fake LOINC Code'
+          }],
+          text: 'Fake LOINC Code'
+        },
+        component: [{
+          code: {
+            coding: [{
+              system: 'http://loinc.org',
+              code: 'ABCDE-1',
+              display: 'Fake LOINC Compnent 1 Code'
+            }],
+            text: 'Fake LOINC Compnent 1 Code'
+          },
+          valueQuantity: {
+            value: 10
+          }
+        },
+        {
+          code: {
+            coding: [{
+              system: 'http://loinc.org',
+              code: 'ABCDE-2',
+              display: 'Fake LOINC Compnent 2 Code'
+            }],
+            text: 'Fake LOINC Compnent 2 Code'
+          },
+          valueQuantity: {
+            value: 20
+          }
+        },
+        {
+          code: {
+            coding: [{
+              system: 'http://loinc.org',
+              code: 'ABCDE-3',
+              display: 'Fake LOINC Compnent 3 Code'
+            }],
+            text: 'Fake LOINC Compnent 3 Code'
+          },
+          valueQuantity: {
+            value: 30
+          }
+        }]
+      });
+    });
+
+    it('should throw an error for an unsupported FHIR resource type', () => {
+      const data = yaml.safeLoad(`
+        resourceType: MedicationOrder
+      `);
+      // Note: MedicationOrder is not in STU3 (it is called MedicationRequest in STU3)
+      expect(() => yaml2fhir(data, '123', 'stu3')).to.throw('Unsupported resourceType: MedicationOrder');
+    });
+
+    it('should throw an error for an invalid property', () => {
+      const data = yaml.safeLoad(`
+        resourceType: Procedure
+        notPerformed: true
+      `);
+      // Note: Procedure.notPerformed is not in STU3 (it is "notDone" in STU3)
+      expect(() => yaml2fhir(data, '123', 'stu3')).to.throw('Path not found: Procedure.notPerformed');
+    });
+  });
 });
 
 // Checks equality, allowing for a run-time assigned id
