@@ -3,7 +3,14 @@ const uuidv4 = require('uuid/v4');
 const load = require('./fhir/load');
 
 function yaml2fhir(yamlObject, patientId, fhirVersion) {
-  const fhir = load(fhirVersion);
+  // normalize on stu version (dstu2/stu3) rather than numeric version
+  let stuVersion = fhirVersion;
+  if (/^1\.0\.\d$/.test(fhirVersion)) {
+    stuVersion = 'dstu2';
+  } else if (/^3\.0\.\d$/.test(fhirVersion)) {
+    stuVersion = 'stu3';
+  }
+  const fhir = load(stuVersion);
   if (fhir == null) {
     throw new Error(`Unsupported version of FHIR: ${fhirVersion}`);
   }
@@ -32,20 +39,26 @@ function yaml2fhir(yamlObject, patientId, fhirVersion) {
     result[cfg.patient] = getPatientReference(patientId);
   }
 
-  return assignProperties(yamlObject, input, sd.snapshot.element, fhir, result);
+
+
+  return assignProperties(yamlObject, input, sd.snapshot.element, fhir, cfg, result);
 }
 
-function assignProperties(yamlResource, input, scopedElements, fhir, result = {}) {
+function assignProperties(yamlResource, input, scopedElements, fhir, config = {}, result = {}) {
   // Loop through the input assigning into the result as appropriate
   for (const key of Object.keys(input)) {
     if (key === 'resourceType') {
       continue;
     }
-    const element = findElement(scopedElements, key);
+    let fhirKey = key;
+    if (config.aliases && config.aliases[key] != null) {
+      fhirKey = config.aliases[key];
+    }
+    const element = findElement(scopedElements, fhirKey);
     if (element == null) {
       throw new Error(`Path not found: ${scopedElements[0].path}.${key}`);
     }
-    result[key] = getValue(yamlResource, input[key], element, scopedElements, fhir);
+    result[fhirKey] = getValue(yamlResource, input[key], element, scopedElements, fhir);
   }
   return result;
 }
@@ -104,11 +117,11 @@ function getValue(yamlResource, yamlValue, element, scopedElements, fhir, skipCa
       return e.path === element.path || e.path.startsWith(`${element.path}.`);
     });
     if (newScopedElements.length > 1) {
-      return assignProperties(yamlResource, yamlValue, newScopedElements, fhir, {});
+      return assignProperties(yamlResource, yamlValue, newScopedElements, fhir);
     } else {
       const typeDef = fhir.find(type.code);
       if (typeDef && typeDef.snapshot) {
-        return assignProperties(yamlResource, yamlValue, typeDef.snapshot.element, fhir, {});
+        return assignProperties(yamlResource, yamlValue, typeDef.snapshot.element, fhir);
       }
     }
   }

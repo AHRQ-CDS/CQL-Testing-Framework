@@ -17,15 +17,19 @@ resources:
     defaults:
       status: completed
       name: Unknown
-  MedicationOrder:
+  MedicationRequest:
     patient: patient
     defaults:
       status: active
+    aliases:
+      code: medicationCodeableConcept
   MedicationStatement:
     patient: subject
     defaults:
       taken: y
       status: active
+    aliases:
+      code: medicationCodeableConcept
   Observation:
     patient: subject
     defaults:

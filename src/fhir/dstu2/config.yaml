@@ -19,6 +19,8 @@ resources:
       name: Unknown
   MedicationOrder:
     patient: patient
+    aliases:
+      code: medicationCodeableConcept
     defaults:
       status: active
   MedicationStatement:
@@ -26,6 +28,8 @@ resources:
     defaults:
       wasNotTaken: false
       status: active
+    aliases:
+      code: medicationCodeableConcept
   Observation:
     patient: subject
     defaults:
