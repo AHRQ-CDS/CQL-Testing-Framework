@@ -1,5 +1,9 @@
 ---
 resources:
+  Account:
+    patient: subject
+    defaults:
+      status: active
   AllergyIntolerance:
     patient: patient
     defaults:
@@ -9,7 +13,7 @@ resources:
   Appointment:
     #patient: participant[0].actor
     defaults:
-      status: proposed
+      status: booked
       #participant[0].required: required
   AppointmentResponse:
     patient: actor
@@ -18,9 +22,13 @@ resources:
   AuditEvent:
     #patient:
     #defaults:
+    doc:
+      status: rare
   Basic:
-    #patient:
+    patient: subject
     #defaults:
+    doc:
+      status: rare
   Binary:
     #patient:
     #defaults:
@@ -86,9 +94,6 @@ resources:
     #defaults:
     doc:
       status: rare
-  DetectedIssue:
-    patient: patient
-    #defaults:
   Coverage:
     patient: subscriber
     #defaults:
@@ -98,6 +103,9 @@ resources:
       status: active
     doc:
       status: rare
+  DetectedIssue:
+    patient: patient
+    #defaults:
   Device:
     patient: patient
     defaults:
@@ -134,6 +142,11 @@ resources:
     defaults:
       status: current
       docStatus: http://hl7.org/fhir/composition-status#final Final
+  DomainResource:
+    #patient:
+    #defaults:
+    doc:
+      status: rare
   EligibilityRequest:
     #patient:
     #defaults:
@@ -205,8 +218,6 @@ resources:
   ImmunizationRecommendation:
     patient: patient
     #defaults:
-    doc:
-      status: common
   ImplementationGuide:
     #patient:
     defaults:
@@ -349,6 +360,11 @@ resources:
   Provenance:
     #patient:
     #defaults:
+  Resource:
+    #patient:
+    #defaults:
+    doc:
+      status: rare
   Questionnaire:
     #patient:
     defaults:
@@ -404,11 +420,11 @@ resources:
     #defaults:
     doc:
       status: common
-  SupplyRequest:
+  SupplyDelivery:
     patient: patient
     defaults:
       status: completed
-  SupplyDelivery:
+  SupplyRequest:
     patient: patient
     defaults:
       status: completed

@@ -55,6 +55,10 @@ class FHIRDefinitions {
     return this._config;
   }
 
+  getResourceNames() {
+    return Array.from(this._resources.values()).map(v => v.id);
+  }
+
   findResource(key) {
     return this._resources.get(key);
   }
