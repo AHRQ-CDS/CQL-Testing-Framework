@@ -39,8 +39,6 @@ function yaml2fhir(yamlObject, patientId, fhirVersion) {
     result[cfg.patient] = getPatientReference(patientId);
   }
 
-
-
   return assignProperties(yamlObject, input, sd.snapshot.element, fhir, cfg, result);
 }
 
@@ -51,7 +49,7 @@ function assignProperties(yamlResource, input, scopedElements, fhir, config = {}
       continue;
     }
     let fhirKey = key;
-    if (config.aliases && config.aliases[key] != null) {
+    if (config && config.aliases && config.aliases[key] != null) {
       fhirKey = config.aliases[key];
     }
     const element = findElement(scopedElements, fhirKey);
