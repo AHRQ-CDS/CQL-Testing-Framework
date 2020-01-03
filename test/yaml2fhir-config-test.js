@@ -87,7 +87,7 @@ function assertValidConfig(config, fhir) {
 }
 
 function getAndAssertElement(sd, name) {
-  const ptElement = sd.snapshot.element.find(e => {
+  const element = sd.snapshot.element.find(e => {
     const targetPath = `${sd.id}.${name}`;
     if (e.path === targetPath) {
       return true;
@@ -98,6 +98,6 @@ function getAndAssertElement(sd, name) {
     }
     return false;
   });
-  expect(ptElement, `${sd.id} config refers to an invalid field: ${name}`).to.exist;
-  return ptElement;
+  expect(element, `${sd.id} config refers to an invalid field: ${name}`).to.exist;
+  return element;
 }

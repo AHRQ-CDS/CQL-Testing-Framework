@@ -171,6 +171,41 @@ describe('#yaml2fhir', () => {
       });
     });
 
+    it('should support references', () => {
+      const data = yaml.safeLoad(`
+        resourceType: Observation
+        id: 456
+        status: final
+        code: LOINC#12345-6 Fake LOINC Code
+        encounter: 123
+        performer: [http://example.org/fhir/Practitioner/456]
+        device: Device/789
+        valueQuantity: 25 mg
+      `);
+      const result = yaml2fhir(data, '123', 'dstu2');
+      expect(result).to.eql({
+        resourceType: 'Observation',
+        id: '456',
+        subject: { reference: 'Patient/123'},
+        status: 'final',
+        code: {
+          coding: [{
+            system: 'http://loinc.org',
+            code: '12345-6',
+            display: 'Fake LOINC Code'
+          }],
+          text: 'Fake LOINC Code'
+        },
+        encounter: { reference: '123' },
+        performer: [{ reference: 'http://example.org/fhir/Practitioner/456' }],
+        device: { reference: 'Device/789' },
+        valueQuantity: {
+          value: 25,
+          unit: 'mg'
+        }
+      });
+    });
+
     it('should support nested properties for Backbone elements', () => {
       const data = yaml.safeLoad(`
         resourceType: Patient

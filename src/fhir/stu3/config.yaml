@@ -148,6 +148,8 @@ resources:
     patient: patient
     defaults:
       status: active
+    doc:
+      status: common
   DeviceComponent:
     #patient:
     #defaults:
@@ -339,8 +341,6 @@ resources:
       status: completed
     aliases:
       code: medicationCodeableConcept
-    doc:
-      status: common
   MedicationRequest:
     patient: subject
     defaults:
@@ -431,6 +431,8 @@ resources:
   PractitionerRole:
     #patient:
     #defaults:
+    doc:
+      status: common
   Procedure:
     patient: subject
     defaults:
@@ -443,8 +445,6 @@ resources:
     defaults:
       status: active
       doNotPerform: false
-    doc:
-      status: common
   ProcessRequest:
     #patient:
     defaults:
@@ -464,14 +464,10 @@ resources:
     patient: subject
     defaults:
       status: completed
-    doc:
-      status: common
   ReferralRequest:
     patient: subject
     defaults:
       status: active
-    doc:
-      status: common
   RelatedPerson:
     patient: patient
     #defaults:
@@ -543,8 +539,6 @@ resources:
     #patient:
     defaults:
       status: active
-    doc:
-      status: common
   SupplyDelivery:
     patient: patient
     defaults:

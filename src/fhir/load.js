@@ -103,6 +103,10 @@ class Config {
     this._resources = new Map();
   }
 
+  getResourceNames() {
+    return Array.from(this._resources.keys());
+  }
+
   addResource(name, info) {
     this._resources.set(name, info);
   }

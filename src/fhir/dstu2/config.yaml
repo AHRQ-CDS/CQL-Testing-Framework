@@ -110,6 +110,8 @@ resources:
     patient: patient
     defaults:
       status: available
+    doc:
+      status: common
   DeviceComponent:
     #patient:
     #defaults:
@@ -256,8 +258,6 @@ resources:
       status: completed
     aliases:
       code: medicationCodeableConcept
-    doc:
-      status: common
   MedicationOrder:
     patient: patient
     defaults:
@@ -349,8 +349,6 @@ resources:
     patient: subject
     defaults:
       status: accepted
-    doc:
-      status: common
   ProcessRequest:
     #patient:
     #defaults:
@@ -373,14 +371,10 @@ resources:
     patient: subject
     defaults:
       status: completed
-    doc:
-      status: common
   ReferralRequest:
     patient: patient
     defaults:
       status: accepted
-    doc:
-      status: common
   RelatedPerson:
     patient: patient
     #defaults:
@@ -418,8 +412,6 @@ resources:
   Substance:
     #patient:
     #defaults:
-    doc:
-      status: common
   SupplyDelivery:
     patient: patient
     defaults:

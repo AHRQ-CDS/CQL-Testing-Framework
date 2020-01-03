@@ -83,7 +83,11 @@ function getValue(yamlResource, yamlValue, element, scopedElements, fhir, skipCa
   if (yamlValue == null) {
     return yamlValue;
   }
-  let type = element.type && element.type.length === 1 ? element.type[0] : undefined;
+  let typeCode;
+  // If there is only one type or there are multiple but they have the same code (e.g., Reference), then get the code
+  if (element.type && element.type.length > 0 && element.type.every(t => t.code === element.type[0].code)) {
+    typeCode = element.type[0].code;
+  }
   if (!skipCardCheck) {
     if (element.max === '0') {
       // Currently not supported
@@ -117,13 +121,13 @@ function getValue(yamlResource, yamlValue, element, scopedElements, fhir, skipCa
     if (newScopedElements.length > 1) {
       return assignProperties(yamlResource, yamlValue, newScopedElements, fhir);
     } else {
-      const typeDef = fhir.find(type.code);
+      const typeDef = fhir.find(typeCode);
       if (typeDef && typeDef.snapshot) {
         return assignProperties(yamlResource, yamlValue, typeDef.snapshot.element, fhir);
       }
     }
   }
-  switch(type.code) {
+  switch(typeCode) {
   // PRIMITIVES
   case 'boolean':
     return getBoolean(yamlValue);
@@ -149,8 +153,6 @@ function getValue(yamlResource, yamlValue, element, scopedElements, fhir, skipCa
   case 'base64Binary':
     return getString(yamlValue);
   // SYNTAX-SUPPORTED COMPLEX TYPES
-  case 'Annotation':
-    return getAnnotation(yamlValue);
   case 'CodeableConcept':
     return getCodeableConcept(yamlValue);
   case 'Coding':
@@ -161,22 +163,11 @@ function getValue(yamlResource, yamlValue, element, scopedElements, fhir, skipCa
     return getQuantity(yamlValue);
   case 'Period':
     return getPeriod(yamlValue);
-  // COMPLEX TYPES WITH NO SPECIAL SYNTAX
-  case 'Address':
-  case 'Attachment':
-  case 'BackboneElement':
-  case 'ContactPoint':
-  case 'Element':
-  case 'Identifier':
-  case 'Range':
-  case 'Ratio':
-  case 'Repeat':
-  case 'SampledData':
-  case 'Signature':
-  case 'Timing':
+  case 'Reference':
+    return getReference(yamlValue);
   default:
-    // Currently not supported
-    throw new Error(`Unsupported type: ${type.code}`);
+    // Usually this means a simple value was passed in for a complex type
+    throw new Error(`Unsupported type: ${typeCode}`);
   }
 }
 
@@ -186,7 +177,7 @@ function getId(id) {
 
 function getPatientReference(id) {
   if (id != null) {
-    return { reference: `Patient/${id}` };
+    return getReference(`Patient/${id}`);
   }
 }
 
@@ -234,16 +225,6 @@ function getString(str, defaultValue) {
     return typeof str === 'string' ? str : str.toString();
   }
   return defaultValue;
-}
-
-function getAnnotation(ann) {
-  if (ann != null) {
-    return {
-      authorString: getString(ann.author),
-      time: getDateTime(ann.time),
-      text: getString(ann.text, '')
-    };
-  }
 }
 
 function getCodeableConcept(code) {
@@ -349,6 +330,12 @@ function getPeriod(period) {
       }
       return periodObject;
     }
+  }
+}
+
+function getReference(ref) {
+  if (ref != null) {
+    return { reference: `${ref}` }; // forces it to a string
   }
 }
 
