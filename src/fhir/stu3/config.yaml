@@ -1,18 +1,26 @@
 ---
 resources:
+# ResourceName: the FHIR resource name -- we should have every available FHIR resource listed in this file
+#   patient: top-level property that serves as a reference to the Patient (usually patient or subject)
+#   defaults: default values to use for properties when they're not set (top-level properties only)
+#     propertyName1: defaultPropertyValue1
+#     propertyName2: defaultPropertyValue2
+#   aliases: aliases that allow authors to use simpler names (top-level properties only)
+#     alias1: actualPropertyName1
+#     alias2: actualPropertyName2
+#   doc: special information used when generating documentation
+#     status: indicates how common the resource is for CDS (allowed values: common, rare)
   Account:
     patient: subject
     defaults:
       status: active
   ActivityDefinition:
-    #patient:
     defaults:
       status: active
     doc:
       status: rare
   AdverseEvent:
     patient: subject
-    #defaults:
   AllergyIntolerance:
     patient: patient
     defaults:
@@ -21,35 +29,26 @@ resources:
     doc:
       status: common
   Appointment:
-    #patient: participant[0].actor
     defaults:
       status: booked
-      #participant[0].required: required
   AppointmentResponse:
     patient: actor
     defaults:
       participantStatus: accepted
   AuditEvent:
-    #patient:
-    #defaults:
     doc:
       status: rare
   Basic:
     patient: subject
-    #defaults:
     doc:
       status: rare
   Binary:
-    #patient:
-    #defaults:
+    # no patient/defaults/aliases
   BodySite:
     patient: patient
-    #defaults:
   Bundle:
-    #patient:
-    #defaults:
+    # no patient/defaults/aliases
   CapabilityStatement:
-    #patient:
     defaults:
       status: active
     doc:
@@ -82,7 +81,6 @@ resources:
     defaults:
       status: completed
   CodeSystem:
-    #patient:
     defaults:
       status: active
     doc:
@@ -96,7 +94,6 @@ resources:
     defaults:
       status: completed
   CompartmentDefinition:
-    #patient:
     defaults:
       status: active
     doc:
@@ -106,7 +103,6 @@ resources:
     defaults:
       status: final
   ConceptMap:
-    #patient:
     defaults:
       status: active
     doc:
@@ -126,8 +122,6 @@ resources:
     defaults:
       status: active
   Contract:
-    #patient:
-    #defaults:
     doc:
       status: rare
   Coverage:
@@ -135,7 +129,6 @@ resources:
     defaults:
       status: active
   DataElement:
-    #patient:
     defaults:
       status: active
     doc:
@@ -151,11 +144,9 @@ resources:
     doc:
       status: common
   DeviceComponent:
-    #patient:
-    #defaults:
+    # no patient/defaults/aliases
   DeviceMetric:
-    #patient:
-    #defaults:
+    # no patient/defaults/aliases
   DeviceRequest:
     patient: subject
     defaults:
@@ -180,8 +171,6 @@ resources:
       status: current
       docStatus: http://hl7.org/fhir/composition-status#final Final
   DomainResource:
-    #patient:
-    #defaults:
     doc:
       status: rare
   EligibilityRequest:
@@ -189,7 +178,6 @@ resources:
     defaults:
       status: active
   EligibilityResponse:
-    #patient:
     defaults:
       outcome: active
   Encounter:
@@ -199,7 +187,6 @@ resources:
     doc:
       status: common
   Endpoint:
-    #patient:
     defaults:
       status: active
     doc:
@@ -209,7 +196,6 @@ resources:
     defaults:
       status: active
   EnrollmentResponse:
-    #patient:
     defaults:
       status: active
       outcome: complete
@@ -249,27 +235,22 @@ resources:
     doc:
       status: common
   GraphDefinition:
-    #patient:
     defaults:
       status: active
     doc:
       status: rare
   Group:
-    #patient:
-    #defaults:
+    # no patient/defaults/aliases
   GuidanceResponse:
     patient: subject
     defaults:
       status: success
   HealthcareService:
-    #patient:
-    #defaults:
+    # no patient/defaults/aliases
   ImagingManifest:
     patient: patient
-    #defaults:
   ImagingStudy:
     patient: patient
-    #defaults:
   Immunization:
     patient: patient
     defaults:
@@ -280,33 +261,27 @@ resources:
       status: common
   ImmunizationRecommendation:
     patient: patient
-    #defaults:
   ImplementationGuide:
-    #patient:
     defaults:
       status: active
     doc:
       status: rare
   Library:
-    #patient:
     defaults:
       status: active
     doc:
       status: rare
   Linkage:
-    #patient:
-    #defaults:
+    # no patient/defaults/aliases
   List:
     patient: subject
     defaults:
       status: current
       mode: working
   Location:
-    #patient:
     defaults:
       status: active
   Measure:
-    #patient:
     defaults:
       status: active
     doc:
@@ -319,9 +294,7 @@ resources:
       status: rare
   Media:
     patient: subject
-    #defaults:
   Medication:
-    #patient:
     defaults:
       status: active
     doc:
@@ -359,16 +332,13 @@ resources:
     doc:
       status: common
   MessageDefinition:
-    #patient:
     defaults:
       status: active
     doc:
       status: rare
   MessageHeader:
-    #patient:
-    #defaults:
+    # no patient/defaults/aliases
   NamingSystem:
-    #patient:
     defaults:
       status: active
     doc:
@@ -384,53 +354,38 @@ resources:
     doc:
       status: common
   OperationDefinition:
-    #patient:
     defaults:
       status: active
     doc:
       status: rare
   OperationOutcome:
-    #patient:
-    #defaults:
     doc:
       status: rare
   Organization:
-    #patient:
-    #defaults:
+    # no patient/defaults/aliases
   Parameters:
-    #patient:
-    #defaults:
     doc:
       status: rare
   Patient:
-    #patient:
-    #defaults:
     doc:
       status: common
   PaymentNotice:
-    #patient:
     defaults:
       status: active
   PaymentReconciliation:
-    #patient:
     defaults:
       status: active
       outcome: complete
   Person:
-    #patient:
-    #defaults:
+    # no patient/defaults/aliases
   PlanDefinition:
-    #patient:
     defaults:
       status: active
     doc:
       status: rare
   Practitioner:
-    #patient:
-    #defaults:
+    # no patient/defaults/aliases
   PractitionerRole:
-    #patient:
-    #defaults:
     doc:
       status: common
   Procedure:
@@ -446,18 +401,14 @@ resources:
       status: active
       doNotPerform: false
   ProcessRequest:
-    #patient:
     defaults:
       status: active
   ProcessResponse:
-    #patient:
     defaults:
       status: active
   Provenance:
-    #patient:
-    #defaults:
+    # no patient/defaults/aliases
   Questionnaire:
-    #patient:
     defaults:
       status: active
   QuestionnaireResponse:
@@ -470,13 +421,11 @@ resources:
       status: active
   RelatedPerson:
     patient: patient
-    #defaults:
   RequestGroup:
     patient: subject
     defaults:
       status: active
   ResearchStudy:
-    #patient:
     defaults:
       status: active
   ResearchSubject:
@@ -484,8 +433,6 @@ resources:
     defaults:
       status: active
   Resource:
-    #patient:
-    #defaults:
     doc:
       status: rare
   RiskAssessment:
@@ -493,50 +440,41 @@ resources:
     defaults:
       status: final
   Schedule:
-    #patient:
-    #defaults:
+    # no patient/defaults/aliases
   SearchParameter:
-    #patient:
     defaults:
       status: active
     doc:
       status: rare
   Sequence:
     patient: patient
-    #defaults:
   ServiceDefinition:
-    #patient:
     defaults:
       status: active
     doc:
       status: rare
   Slot:
-    #patient:
-    #defaults:
+    # no patient/defaults/aliases
   Specimen:
     patient: subject
     defaults:
       status: available
   StructureDefinition:
-    #patient:
     defaults:
        status: active
     doc:
       status: rare
   StructureMap:
-    #patient:
     defaults:
       status: active
     doc:
       status: rare
   Subscription:
-    #patient:
     defaults:
       status: active
     doc:
       status: rare
   Substance:
-    #patient:
     defaults:
       status: active
   SupplyDelivery:
@@ -544,27 +482,22 @@ resources:
     defaults:
       status: completed
   SupplyRequest:
-    #patient:
     defaults:
       status: active
   Task:
-    #patient:
     defaults:
       status: completed
   TestScript:
-    #patient:
     defaults:
       status: active
     doc:
       status: rare
   TestReport:
-    #patient:
     defaults:
       status: completed
     doc:
       status: rare
   ValueSet:
-    #patient:
     defaults:
       status: active
     doc:

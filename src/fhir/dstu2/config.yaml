@@ -1,5 +1,15 @@
 ---
 resources:
+# ResourceName: the FHIR resource name -- we should have every available FHIR resource listed in this file
+#   patient: top-level property that serves as a reference to the Patient (usually patient or subject)
+#   defaults: default values to use for properties when they're not set (top-level properties only)
+#     propertyName1: defaultPropertyValue1
+#     propertyName2: defaultPropertyValue2
+#   aliases: aliases that allow authors to use simpler names (top-level properties only)
+#     alias1: actualPropertyName1
+#     alias2: actualPropertyName2
+#   doc: special information used when generating documentation
+#     status: indicates how common the resource is for CDS (allowed values: common, rare)
   Account:
     patient: subject
     defaults:
@@ -11,33 +21,25 @@ resources:
     doc:
       status: common
   Appointment:
-    #patient: participant[0].actor
     defaults:
       status: booked
-      #participant[0].required: required
   AppointmentResponse:
     patient: actor
     defaults:
       participantStatus: accepted
   AuditEvent:
-    #patient:
-    #defaults:
     doc:
       status: rare
   Basic:
     patient: subject
-    #defaults:
     doc:
       status: rare
   Binary:
-    #patient:
-    #defaults:
+    # no patient/defaults/aliases/doc
   BodySite:
     patient: patient
-    #defaults:
   Bundle:
-    #patient:
-    #defaults:
+    # no patient/defaults/aliases/doc
   CarePlan:
     patient: subject
     defaults:
@@ -46,9 +48,7 @@ resources:
       status: common
   Claim:
     patient: patient
-    #defaults:
   ClaimResponse:
-    #patient:
     defaults:
       outcome: complete
   ClinicalImpression:
@@ -68,7 +68,6 @@ resources:
     defaults:
       status: final
   ConceptMap:
-    #patient:
     defaults:
       status: active
     doc:
@@ -84,28 +83,22 @@ resources:
     doc:
       status: common
   Conformance:
-    #patient:
     defaults:
       status: active
     doc:
       status: rare
   Contract:
-    #patient:
-    #defaults:
     doc:
       status: rare
   Coverage:
     patient: subscriber
-    #defaults:
   DataElement:
-    #patient:
     defaults:
       status: active
     doc:
       status: rare
   DetectedIssue:
     patient: patient
-    #defaults:
   Device:
     patient: patient
     defaults:
@@ -113,18 +106,15 @@ resources:
     doc:
       status: common
   DeviceComponent:
-    #patient:
-    #defaults:
+    # no patient/defaults/aliases
   DeviceMetric:
-    #patient:
-    #defaults:
+    # no patient/defaults/aliases
   DeviceUseRequest:
     patient: subject
     defaults:
       status: accepted
   DeviceUseStatement:
     patient: subject
-    #defaults:
   DiagnosticOrder:
     patient: subject
     defaults:
@@ -145,15 +135,11 @@ resources:
       status: current
       docStatus: http://hl7.org/fhir/composition-status#final Final
   DomainResource:
-    #patient:
-    #defaults:
     doc:
       status: rare
   EligibilityRequest:
-    #patient:
-    #defaults:
+    # no patient/defaults/aliases
   EligibilityResponse:
-    #patient:
     defaults:
       outcome: complete
   Encounter:
@@ -164,9 +150,7 @@ resources:
       status: common
   EnrollmentRequest:
     patient: subject
-    #defaults:
   EnrollmentResponse:
-    #patient:
     defaults:
       outcome: complete
   EpisodeOfCare:
@@ -174,7 +158,6 @@ resources:
     defaults:
       status: finished
   ExplanationOfBenefit:
-    #patient:
     defaults:
       outcome: complete
   FamilyMemberHistory:
@@ -198,17 +181,13 @@ resources:
     doc:
       status: common
   Group:
-    #patient:
-    #defaults:
+    # no patient/defaults/aliases
   HealthcareService:
-    #patient:
-    #defaults:
+    # no patient/defaults/aliases
   ImagingObjectSelection:
     patient: patient
-    #defaults:
   ImagingStudy:
     patient: patient
-    #defaults:
   Immunization:
     patient: patient
     defaults:
@@ -219,9 +198,7 @@ resources:
       status: common
   ImmunizationRecommendation:
     patient: patient
-    #defaults:
   ImplementationGuide:
-    #patient:
     defaults:
       status: active
     doc:
@@ -232,15 +209,11 @@ resources:
       status: current
       mode: working
   Location:
-    #patient:
     defaults:
       status: active
   Media:
     patient: subject
-    #defaults:
   Medication:
-    #patient:
-    #defaults:
     doc:
       status: common
   MedicationAdministration:
@@ -276,10 +249,8 @@ resources:
     doc:
       status: common
   MessageHeader:
-    #patient:
-    #defaults:
+    # no patient/defaults/aliases
   NamingSystem:
-    #patient:
     defaults:
       status: active
     doc:
@@ -295,49 +266,36 @@ resources:
     doc:
       status: common
   OperationDefinition:
-    #patient:
     defaults:
       status: active
     doc:
       status: rare
   OperationOutcome:
-    #patient:
-    #defaults:
+    # no patient/defaults/aliases
     doc:
       status: rare
   Order:
     patient: subject
-    #defaults:
   OrderResponse:
-    #patient:
     defaults:
       orderStatus: completed
   Organization:
-    #patient:
-    #defaults:
+    # no patient/defaults/aliases
   Parameters:
-    #patient:
-    #defaults:
     doc:
       status: rare
   Patient:
-    #patient:
-    #defaults:
     doc:
       status: common
   PaymentNotice:
-    #patient:
-    #defaults:
+    # no patient/defaults/aliases
   PaymentReconciliation:
-    #patient:
     defaults:
       outcome: complete
   Person:
-    #patient:
-    #defaults:
+    # no patient/defaults/aliases
   Practitioner:
-    #patient:
-    #defaults:
+    # no patient/defaults/aliases
   Procedure:
     patient: subject
     defaults:
@@ -350,21 +308,15 @@ resources:
     defaults:
       status: accepted
   ProcessRequest:
-    #patient:
-    #defaults:
+    # no patient/defaults/aliases
   ProcessResponse:
-    #patient:
-    #defaults:
+    # no patient/defaults/aliases
   Provenance:
-    #patient:
-    #defaults:
+    # no patient/defaults/aliases
   Resource:
-    #patient:
-    #defaults:
     doc:
       status: rare
   Questionnaire:
-    #patient:
     defaults:
       status: published
   QuestionnaireResponse:
@@ -377,41 +329,33 @@ resources:
       status: accepted
   RelatedPerson:
     patient: patient
-    #defaults:
   RiskAssessment:
     patient: subject
-    #defaults:
   Schedule:
-    #patient:
-    #defaults:
+    # no patient/defaults/aliases
   SearchParameter:
-    #patient:
     defaults:
       status: active
     doc:
       status: rare
   Slot:
-    #patient:
-    #defaults:
+    # no patient/defaults/aliases
   Specimen:
     patient: subject
     defaults:
       status: available
   StructureDefinition:
-    #patient:
     defaults:
        status: active
     doc:
       status: rare
   Subscription:
-    #patient:
     defaults:
       status: active
     doc:
       status: rare
   Substance:
-    #patient:
-    #defaults:
+    # no patient/defaults/aliases
   SupplyDelivery:
     patient: patient
     defaults:
@@ -421,17 +365,14 @@ resources:
     defaults:
       status: completed
   TestScript:
-    #patient:
     defaults:
       status: active
     doc:
       status: rare
   ValueSet:
-    #patient:
     defaults:
       status: active
     doc:
       status: rare
   VisionPrescription:
     patient: patient
-    #defaults:
