@@ -1,3 +1,5 @@
+// This script is used to generate documentation from the FHIR config files
+
 const path = require('path');
 const fs = require('fs');
 const _ = require('lodash');
