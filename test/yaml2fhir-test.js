@@ -166,7 +166,9 @@ describe('#yaml2fhir', () => {
         },
         valueQuantity: {
           value: 25,
-          unit: 'mg'
+          unit: 'mg',
+          system: 'http://unitsofmeasure.org',
+          code: 'mg'
         }
       });
     });
@@ -201,7 +203,9 @@ describe('#yaml2fhir', () => {
         device: { reference: 'Device/789' },
         valueQuantity: {
           value: 25,
-          unit: 'mg'
+          unit: 'mg',
+          system: 'http://unitsofmeasure.org',
+          code: 'mg'
         }
       });
     });
@@ -254,7 +258,9 @@ describe('#yaml2fhir', () => {
         },
         valueQuantity: {
           value: 25,
-          unit: 'mg'
+          unit: 'mg',
+          system: 'http://unitsofmeasure.org',
+          code: 'mg'
         }
       });
     });
@@ -536,7 +542,9 @@ describe('#yaml2fhir', () => {
         },
         valueQuantity: {
           value: 25,
-          unit: 'mg'
+          unit: 'mg',
+          system: 'http://unitsofmeasure.org',
+          code: 'mg'
         }
       });
     });
@@ -589,7 +597,9 @@ describe('#yaml2fhir', () => {
         },
         valueQuantity: {
           value: 25,
-          unit: 'mg'
+          unit: 'mg',
+          system: 'http://unitsofmeasure.org',
+          code: 'mg'
         }
       });
     });

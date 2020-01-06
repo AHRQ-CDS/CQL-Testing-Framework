@@ -2,7 +2,22 @@ const _ = require('lodash');
 const uuidv4 = require('uuid/v4');
 const load = require('./fhir/load');
 
+/**
+ * Converts a YAML data object to its corresponding FHIR instance using the appropriate
+ * config specifications for that version of FHIR.
+ * @param {object} yamlObject - the JavaScript object representing one of the YAML data entries
+ * @param {string} patientId - the patientId to associate the instance to (if applicable)
+ * @param {string} fhirVersion - the FHIR version (dstu2, stu3, or a version number)
+ * @returns {object} a JSON-formatted FHIR instance
+ */
 function yaml2fhir(yamlObject, patientId, fhirVersion) {
+  // Re-assign yamlObject to input (which will get re-assigned again when merging default values)
+  // and ensure it has a resourceType
+  let input = yamlObject;
+  if (input.resourceType == null) {
+    throw new Error('Each data object must specify its "resourceType"');
+  }
+
   // normalize on stu version (dstu2/stu3) rather than numeric version
   let stuVersion = fhirVersion;
   if (/^1\.0\.\d$/.test(fhirVersion)) {
@@ -10,18 +25,17 @@ function yaml2fhir(yamlObject, patientId, fhirVersion) {
   } else if (/^3\.0\.\d$/.test(fhirVersion)) {
     stuVersion = 'stu3';
   }
+  // load up the FHIR definitions so we can reference them as we build the instance
   const fhir = load(stuVersion);
   if (fhir == null) {
     throw new Error(`Unsupported version of FHIR: ${fhirVersion}`);
   }
-  let input = yamlObject;
-  if (input.resourceType == null) {
-    throw new Error('Each data object must specify its "resourceType"');
-  }
+  // Get the specific FHIR definition for this resource type
   const sd = fhir.findResource(input.resourceType);
   if (sd == null) {
     throw new Error(`Unsupported resourceType: ${input.resourceType}`);
   }
+  // Get the specific configuration for this resource type
   const cfg = fhir.config.findResource(input.resourceType);
   if (cfg && cfg.defaults) {
     // Update the input to be the merge of the yaml input into the default values
@@ -39,9 +53,20 @@ function yaml2fhir(yamlObject, patientId, fhirVersion) {
     result[cfg.patient] = getPatientReference(patientId);
   }
 
-  return assignProperties(yamlObject, input, sd.snapshot.element, fhir, cfg, result);
+  // Assign all of the specified properties from the input and return the result
+  return assignProperties(input, input, sd.snapshot.element, fhir, cfg, result);
 }
 
+/**
+ * Assigns properties from the input YAML object to the result object
+ * @param {object} yamlResource - the original YAML resource object
+ * @param {object} input - the YAML object we're assigning, which may be nested somewhere in the yamlResource
+ * @param {object[]} scopedElements - the StructureDefinition elements pertaining to the specified input
+ * @param {FHIRDefinition} fhir - the FHIR definitions to allow lookup of FHIR types
+ * @param {object} config - the optional configuration for this resource
+ * @param {object} result - the optional result object to write output properties to
+ * @returns {object} the final result
+ */
 function assignProperties(yamlResource, input, scopedElements, fhir, config = {}, result = {}) {
   // Loop through the input assigning into the result as appropriate
   for (const key of Object.keys(input)) {
@@ -52,15 +77,24 @@ function assignProperties(yamlResource, input, scopedElements, fhir, config = {}
     if (config && config.aliases && config.aliases[key] != null) {
       fhirKey = config.aliases[key];
     }
+    // Find the StructureDefinition element that matches the input key
     const element = findElement(scopedElements, fhirKey);
     if (element == null) {
       throw new Error(`Path not found: ${scopedElements[0].path}.${key}`);
     }
+    // Set the value in the result object
     result[fhirKey] = getValue(yamlResource, input[key], element, scopedElements, fhir);
   }
   return result;
 }
 
+/**
+ * Searches through a set of ElementDefinitions looking for one whose property name matches
+ * the input property
+ * @param {object[]} scopedElements - the StructureDefinition elements to search through
+ * @param {string} property - the property name for the element we want to find
+ * @returns {object | undefined} the matching ElementDefinition or undefined if not found
+ */
 function findElement(scopedElements, property) {
   const wantedPath = `${scopedElements[0].path}.${property}`;
   let element = scopedElements.find(e => e.path === wantedPath);
@@ -70,6 +104,7 @@ function findElement(scopedElements, property) {
     for (const choiceEl of scopedElements.filter(e => e.path.endsWith('[x]'))) {
       const typeMatch = choiceEl.type.find(t => choiceEl.path.replace(/\[x]$/, _.upperFirst(t.code)) === wantedPath);
       if (typeMatch) {
+        // To ease the further processing, reduce the type array to only the one that matches
         element = _.cloneDeep(choiceEl);
         element.type = [typeMatch];
         break;
@@ -79,6 +114,15 @@ function findElement(scopedElements, property) {
   return element;
 }
 
+/**
+ * Gets a FHIR-formatted value for the input value from YAML, using the FHIR definitions to determine type
+ * @param {object} yamlResource - the original YAML resource object
+ * @param {*} yamlValue - the value from the YAML (may be a simple or complex value)
+ * @param {object} element - the ElementDefinition pertaining to the value, used to determine result type
+ * @param {object[]} scopedElements - the full set of ElementDefinitions from which element came
+ * @param {FHIRDefinition} fhir - the FHIR definitions to allow lookup of FHIR types
+ * @param {boolean} skipCardCheck - determines if the cardinality should be checked (defaults to false)
+ */
 function getValue(yamlResource, yamlValue, element, scopedElements, fhir, skipCardCheck = false) {
   if (yamlValue == null) {
     return yamlValue;
@@ -90,7 +134,7 @@ function getValue(yamlResource, yamlValue, element, scopedElements, fhir, skipCa
   }
   if (!skipCardCheck) {
     if (element.max === '0') {
-      // Currently not supported
+      // Don't allow a value if the FHIR definition says no value is allowed
       throw new Error(`Cannot set ${element.path} because its max is 0`);
     }
     if (element.max !== '1') {
@@ -99,12 +143,14 @@ function getValue(yamlResource, yamlValue, element, scopedElements, fhir, skipCa
       return yamlValueArray.map(v => getValue(yamlResource, v, element, scopedElements, fhir, true));
     }
     if (Array.isArray(yamlValue)) {
-      // Input is an array, but the element is not
+      // If we got here, it means the input is an array, but the element is not
       throw new Error(`${element.path} does not allow multiple values`);
     }
   }
 
+  // Support complex objects via recursion
   if (typeof yamlValue === 'object' && !(yamlValue instanceof  Date)) {
+    // Support the special $ constructs
     if (yamlValue['$if-present']) {
       // This is a conditional construct to determine the value.
       // Evaluate the condition and modify the value accordingly.
@@ -115,18 +161,24 @@ function getValue(yamlResource, yamlValue, element, scopedElements, fhir, skipCa
         return getValue(yamlResource, yamlValue['$else'], element, scopedElements, fhir, skipCardCheck);
       }
     }
+    // Get the subset of elements that includes the passed in element and its children (if applicable)
     const newScopedElements = scopedElements.filter(e =>  {
       return e.path === element.path || e.path.startsWith(`${element.path}.`);
     });
+
     if (newScopedElements.length > 1) {
+      // It's a complex type inlined in the FHIR definition, so assign properties that way
       return assignProperties(yamlResource, yamlValue, newScopedElements, fhir);
     } else {
+      // It's a complex type without its properties inlined, so look up the type and then assign properties
       const typeDef = fhir.find(typeCode);
       if (typeDef && typeDef.snapshot) {
         return assignProperties(yamlResource, yamlValue, typeDef.snapshot.element, fhir);
       }
     }
   }
+
+  // The YAML input is a simple type, so attempt to assign it based on the FHIR type
   switch(typeCode) {
   // PRIMITIVES
   case 'boolean':
@@ -165,40 +217,88 @@ function getValue(yamlResource, yamlValue, element, scopedElements, fhir, skipCa
     return getPeriod(yamlValue);
   case 'Reference':
     return getReference(yamlValue);
+  // ANYTHING ELSE
   default:
     // Usually this means a simple value was passed in for a complex type
     throw new Error(`Unsupported type: ${typeCode}`);
   }
 }
 
+/**
+ * Returns back the id passed in or generates a UUIDv4 id if not was passed in
+ * @param {string} id - the optional id to use
+ * @returns {string} an id
+ */
 function getId(id) {
   return id ? id : uuidv4();
 }
 
+/**
+ * Returns a reference object referring to the patient with the passed in id
+ * @param {string} id - the patient id
+ * @returns {object|undefined} a FHIR reference to the patient if id was passed in
+ */
 function getPatientReference(id) {
   if (id != null) {
     return getReference(`Patient/${id}`);
   }
 }
 
+/**
+ * Returns a boolean corresponding to the passed in value.  If the passed in value is a string,
+ * it will return true for 'true', false otherwise.
+ * @param {boolean|string} bool - a boolean or string value for a boolean
+ * @returns {boolean|undefined} the corresponding boolean
+ */
 function getBoolean(bool) {
   if (bool != null) {
     return typeof bool === 'boolean' ? bool : bool.toLowerCase() === 'true';
   }
 }
 
+/**
+ * Returns an integer corresponding to the passed in value.  If the passed in value is a string,
+ * it will parse it.
+ * @param {Number|string} integer - an integer or string value for an integer
+ * @returns {Number|undefined} the corresponding integer
+ * @throws {Error} if the input is a non-integer or a string that can't be parsed to an integer
+ */
 function getInteger(integer) {
   if (integer != null) {
-    return typeof integer === 'number' ? integer : parseInt(integer);
+    const number = typeof integer === 'number' ? integer : parseInt(integer);
+    if (Number.isInteger(number)) {
+      return number;
+    } else {
+      throw new Error(`Invalid integer value: ${integer}`);
+    }
   }
 }
 
+/**
+ * Returns a decimal corresponding to the passed in value.  If the passed in value is a string,
+ * it will parse it.
+ * @param {Number|string} decimal - a decimal or string value for a decimal
+ * @returns {Number|undefined} the corresponding decimal
+ * @throws {Error} if the input is a non-decimal or a string that can't be parsed to a decimal
+ */
 function getDecimal(decimal) {
   if (decimal != null) {
-    return typeof decimal === 'number' ? decimal : parseFloat(decimal);
+    const number = typeof decimal === 'number' ? decimal : parseFloat(decimal);
+    if (Number.isNaN(number)) {
+      throw new Error(`Invalid decimal value: ${decimal}`);
+    } else {
+      return number;
+    }
   }
 }
 
+/**
+ * Returns a dateTime string corresponding to the passed in value.  If the passed in value is a Date,
+ * it will return the corresponding ISO string.  If it is a string, it will return the string without
+ * doing any validation.
+ * @param {string|Date} date - a string or Date value
+ * @returns {string|undefined} the corresponding dateTime as a string
+ */
 function getDateTime(date) {
   if (date != null) {
     // TODO: Check format?
@@ -206,6 +306,13 @@ function getDateTime(date) {
   }
 }
 
+/**
+ * Returns a date string corresponding to the passed in value.  If the passed in value is a Date,
+ * it will return the corresponding ISO string truncated to date only.  If it is a string, it will
+ * return the string without doing any validation.
+ * @param {string|Date} date - a string or Date value
+ * @returns {string|undefined} the corresponding date as a string
+ */
 function getDate(date) {
   if (date != null) {
     // TODO: Check format?
@@ -213,6 +320,13 @@ function getDate(date) {
   }
 }
 
+/**
+ * Returns a time string corresponding to the passed in value.  If the passed in value is a Date,
+ * it will return the corresponding ISO string truncated to time only.  If it is a string, it will
+ * return the string without doing any validation.
+ * @param {string|Date} date - a string or Date value
+ * @returns {string|undefined} the corresponding time as a string
+ */
 function getTime(time, defaultValue) {
   if (time != null) {
     // TODO: Check format?
@@ -220,13 +334,26 @@ function getTime(time, defaultValue) {
   }
 }
 
-function getString(str, defaultValue) {
+/**
+ * Returns a string corresponding to the passed in value.  If the passed in value is not a string,
+ * it will call toString() on it.
+ * @param {*} str - a value to return as a string
+ * @returns {string|undefined} the corresponding string
+ */
+function getString(str) {
   if (str != null) {
     return typeof str === 'string' ? str : str.toString();
   }
-  return defaultValue;
 }
 
+/**
+ * Returns a CodeableConcept corresponding to the passed in string.  The string should have format:
+ * SYSTEM#code Optional Display Text
+ * The code will be the first Coding in the returned CodeableConcept and the display will be
+ * re-used as the CodeableConcept text as well.
+ * @param {string} code - the string code representation
+ * @returns {object} the CodeableConcept
+ */
 function getCodeableConcept(code) {
   if (code != null) {
     const coding = getCoding(code);
@@ -243,6 +370,12 @@ function getCodeableConcept(code) {
   }
 }
 
+/**
+ * Returns a Coding corresponding to the passed in string.  The string should have format:
+ * SYSTEM#code Optional Display Text
+ * @param {string} code - the string code representation
+ * @returns {object|undefined} the corresponding Coding
+ */
 function getCoding(code) {
   if (code != null) {
     const matches = /^((\S+)?\s*#\s*([^#\s]+))?\s*(.*)?$/.exec(code);
@@ -280,6 +413,14 @@ function getCoding(code) {
   }
 }
 
+/**
+ * Returns a HumanName corresponding to the passed in string.  If only one word is provided,
+ * it is assumed to be the first name.  If more than one word is provided, only the last word
+ * is considered to be the last name.
+ * @param {string} name - the name
+ * @param {string} fhirVersion - the FHIR version (dstu2 or stu3)
+ * @returns {object|undefined} the corresponding HumanName
+ */
 function getHumanName(name, fhirVersion) {
   if (name != null) {
     const humanName = {};
@@ -298,6 +439,12 @@ function getHumanName(name, fhirVersion) {
   }
 }
 
+/**
+ * Returns a Quantity corresponding to the passed in string.  The string format should be:
+ * NumericValue UcumUnit
+ * @param {string} quantity - the string-based quantity representation
+ * @returns {object|undefined} the corresponding Quantity
+ */
 function getQuantity(quantity) {
   if (quantity !== undefined) {
     const matches = /(\d+(\.\d+)?)(\s+(.+))?/.exec(quantity);
@@ -307,6 +454,8 @@ function getQuantity(quantity) {
       };
       if (matches[4] != null && matches[4] !== '') {
         quantityObject.unit = matches[4];
+        quantityObject.system = 'http://unitsofmeasure.org';
+        quantityObject.code = matches[4];
       }
       return quantityObject;
     }
@@ -314,6 +463,13 @@ function getQuantity(quantity) {
   }
 }
 
+/**
+ * Returns a Period corresponding to the passed in string.  The string format should be:
+ * FirstDate - SecondDate
+ * If only a single date is provided, a period will be returned with just the start date.
+ * @param {string} period - the string-based period representation
+ * @returns {object|undefined} the corresponding Period
+ */
 function getPeriod(period) {
   if (period) {
     if (Object.prototype.toString.call(period) === '[object Date]') {
@@ -333,6 +489,11 @@ function getPeriod(period) {
   }
 }
 
+/**
+ * Returns a reference object containing the passed in reference.
+ * @param {string} ref - the reference id, type/id, or url
+ * @returns {object|undefined} the corresponding Reference
+ */
 function getReference(ref) {
   if (ref != null) {
     return { reference: `${ref}` }; // forces it to a string
