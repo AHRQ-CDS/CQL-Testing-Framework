@@ -23,6 +23,15 @@ describe('#yaml2fhir-config', () => {
       );
     });
   });
+
+  describe('#r4', () => {
+    it('should be configured with valid resources, patient fields, and defaults', () => {
+      assertValidConfig(
+        yaml.safeLoad(fs.readFileSync(path.join(__dirname, '..', 'src', 'fhir', 'r4', 'config.yaml'), 'utf-8')),
+        load('r4')
+      );
+    });
+  });
 });
 
 function assertValidConfig(config, fhir) {
@@ -32,7 +41,7 @@ function assertValidConfig(config, fhir) {
 
   // Check all the resources in the config
   Object.keys(config.resources).forEach(name => {
-    // First ensure it is a valid FHIR DSTU2 resource name
+    // First ensure it is a valid FHIR resource name
     const sd = fhir.findResource(name);
     expect(sd, `Invalid resource name: ${name}`).to.exist;
     // Then ensure that the specified patient field exists and is a reference to patient
@@ -40,19 +49,30 @@ function assertValidConfig(config, fhir) {
     if (resourceCfg.patient) {
       const ptElement = getAndAssertElement(sd, resourceCfg.patient);
       let isPtRef;
-      if (fhir.version === 'dstu2') {
+      switch (fhir.version) {
+      case 'dstu2':
         isPtRef = ptElement.type.some(t =>
           t.code === 'Reference' && t.profile && t.profile.some(p =>
             p === 'http://hl7.org/fhir/StructureDefinition/Patient' || p === 'http://hl7.org/fhir/StructureDefinition/Resource'
           )
         );
-      } else {
+        break;
+      case 'stu3':
         isPtRef = ptElement.type.some(t =>
           t.code === 'Reference' && (
             t.targetProfile === 'http://hl7.org/fhir/StructureDefinition/Patient' ||
             t.targetProfile === 'http://hl7.org/fhir/StructureDefinition/Resource'
           )
         );
+        break;
+      case 'r4':
+      default:
+        isPtRef = ptElement.type.some(t =>
+          t.code === 'Reference' && t.targetProfile && t.targetProfile.some(p =>
+            p === 'http://hl7.org/fhir/StructureDefinition/Patient' || p === 'http://hl7.org/fhir/StructureDefinition/Resource'
+          )
+        );
+        break;
       }
       expect(isPtRef, `${name} config specifies patient field that is not a reference to a Patient: ${resourceCfg.patient}`).to.be.true;
     }

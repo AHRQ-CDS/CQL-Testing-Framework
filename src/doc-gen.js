@@ -7,6 +7,7 @@ const load = require('./fhir/load');
 
 generateDoc('dstu2');
 generateDoc('stu3');
+generateDoc('r4');
 
 function generateDoc(version) {
   const fhir = load(version);

@@ -7,7 +7,7 @@ const load = require('./fhir/load');
  * config specifications for that version of FHIR.
  * @param {object} yamlObject - the JavaScript object representing one of the YAML data entries
  * @param {string} patientId - the patientId to associate the instance to (if applicable)
- * @param {string} fhirVersion - the FHIR version (dstu2, stu3, or a version number)
+ * @param {string} fhirVersion - the FHIR version (dstu2, stu3, r4, or a version number)
  * @returns {object} a JSON-formatted FHIR instance
  */
 function yaml2fhir(yamlObject, patientId, fhirVersion) {
@@ -18,15 +18,17 @@ function yaml2fhir(yamlObject, patientId, fhirVersion) {
     throw new Error('Each data object must specify its "resourceType"');
   }
 
-  // normalize on stu version (dstu2/stu3) rather than numeric version
-  let stuVersion = fhirVersion;
+  // normalize on release (dstu2/stu3/r4) rather than numeric version
+  let release = fhirVersion;
   if (/^1\.0\.\d$/.test(fhirVersion)) {
-    stuVersion = 'dstu2';
+    release = 'dstu2';
   } else if (/^3\.0\.\d$/.test(fhirVersion)) {
-    stuVersion = 'stu3';
+    release = 'stu3';
+  } else if (/^4\.0\.\d$/.test(fhirVersion)) {
+    release = 'r4';
   }
   // load up the FHIR definitions so we can reference them as we build the instance
-  const fhir = load(stuVersion);
+  const fhir = load(release);
   if (fhir == null) {
     throw new Error(`Unsupported version of FHIR: ${fhirVersion}`);
   }
@@ -131,6 +133,14 @@ function getValue(yamlResource, yamlValue, element, scopedElements, fhir, skipCa
   // If there is only one type or there are multiple but they have the same code (e.g., Reference), then get the code
   if (element.type && element.type.length > 0 && element.type.every(t => t.code === element.type[0].code)) {
     typeCode = element.type[0].code;
+  }
+  if (typeCode && typeCode.startsWith('http://hl7.org/fhirpath/')) {
+    // This is one of the special "compiler magic" types.  Use the fhir-type extension to get the "real type"
+    // See: http://hl7.org/fhir/R4/extension-structuredefinition-fhir-type.html
+    const typeExt = element.type[0].extension.find(e => e.url === 'http://hl7.org/fhir/StructureDefinition/structuredefinition-fhir-type');
+    if (typeExt && typeExt.valueUrl) {
+      typeCode = typeExt.valueUrl;
+    }
   }
   if (!skipCardCheck) {
     if (element.max === '0') {
@@ -418,10 +428,10 @@ function getCoding(code) {
  * it is assumed to be the first name.  If more than one word is provided, only the last word
  * is considered to be the last name.
  * @param {string} name - the name
- * @param {string} fhirVersion - the FHIR version (dstu2 or stu3)
+ * @param {string} release - the FHIR release (dstu2, stu3, or r4)
  * @returns {object|undefined} the corresponding HumanName
  */
-function getHumanName(name, fhirVersion) {
+function getHumanName(name, release) {
   if (name != null) {
     const humanName = {};
     const parts = name.split(/\s+/);
@@ -429,7 +439,7 @@ function getHumanName(name, fhirVersion) {
       humanName.given = parts.slice(0, -1);
     }
     if (parts.length > 1) {
-      if (fhirVersion === 'dstu2') {
+      if (release === 'dstu2') {
         humanName.family = parts.slice(parts.length - 1);
       } else {
         humanName.family = parts[parts.length - 1];
