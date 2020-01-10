@@ -1,6 +1,6 @@
 {
   "name": "cql-testing",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Provides utilities for testing CQL logic",
   "license": "Apache-2.0",
   "main": "src/index.js",
@@ -9,7 +9,8 @@
     "test:watch": "npm test -- --watch",
     "test:debug": "./node_modules/.bin/mocha --inspect --inspect-brk --reporter spec --recursive",
     "lint": "./node_modules/.bin/eslint .",
-    "lint:fix": "./node_modules/.bin/eslint . --fix"
+    "lint:fix": "./node_modules/.bin/eslint . --fix",
+    "doc": "node ./src/doc-gen.js"
   },
   "dependencies": {
     "chai": "^4.2.0",
@@ -20,11 +21,12 @@
     "eslint": "^6.0.1",
     "fs-extra": "^7.0.1",
     "js-yaml": "^3.13.1",
+    "lodash": "^4.17.15",
     "mocha": "^5.2.0",
     "semver": "^5.6.0",
     "uuid": "^3.3.2"
   },
   "resolutions": {
-    "lodash": "^4.17.14"
+    "lodash": "^4.17.15"
   }
 }

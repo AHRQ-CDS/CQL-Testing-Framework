@@ -37,179 +37,19 @@ The `data` section of the YAML file contains all of the data that will be associ
 
 ### Resource Types
 
-The following FHIR resource types are supported: `Patient`, `Condition`, `Encounter`, `MedicationOrder` (DSTU2 only), `MedicationRequest` (STU3 only),`MedicationStatement`, `Observation`, `Procedure`.  Further details on each type are below.
+The CQL Testing framework now supports all FHIR DSTU2 and STU3 resource types.  It provides this support by dynamically referencing the formal FHIR definitions of each resource, ensuring that specified fields in the YAML file are valid fields for that resource.
 
-#### Resource Type: Patient
+The CQL Testing Framework assigns default patient references and _some_ default values, as well as user-friendly aliases (where applicable).  For detailed information about each supported resource, its defaults, and its aliases, see the detailed documentation linked below:
 
-FHIR doc:
-* DSTU2: [http://hl7.org/fhir/DSTU2/patient.html](http://hl7.org/fhir/DSTU2/patient.html)
-* STU3: [http://hl7.org/fhir/STU3/patient.html](http://hl7.org/fhir/STU3/patient.html)
+[FHIR DSTU2 Resources Documentation](FHIR_DSTU2.md)
 
-Supported attributes:
-
-* **resourceType** _(must be Patient)_
-* **id** _(id)_
-* **name** _(name)_
-* **gender** _(string, options: [DSTU2](http://hl7.org/fhir/DSTU2/valueset-administrative-gender.html) / [STU3](http://hl7.org/fhir/STU3/valueset-administrative-gender.html))_
-* **birthDate** _(date)_
-
-#### Resource Type: Condition
-
-FHIR doc:
-* DSTU2: [http://hl7.org/fhir/DSTU2/condition.html](http://hl7.org/fhir/DSTU2/condition.html)
-* STU3: [http://hl7.org/fhir/STU3/condition.html](http://hl7.org/fhir/STU3/condition.html)
-
-Supported attributes:
-
-* **resourceType**: _(must be Condition)_,
-* **id**: _(id)_
-* **patient (DSTU2)**: _(patient-reference, default: current patient)_
-* **subject (STU3)**: _(patient-reference, default: current patient)_
-* **code**: _(concept)_
-* **clinicalStatus**: _(string, options: [DSTU2](http://hl7.org/fhir/DSTU2/valueset-condition-clinical.html) / [STU3](http://hl7.org/fhir/STU3/valueset-condition-clinical.html), default: resolved if abatementDateTime is specified, active otherwise)_
-* **verificationStatus**: _(string, options: [DSTU2](http://hl7.org/fhir/DSTU2/valueset-condition-ver-status.html) / [STU3](http://hl7.org/fhir/STU3/valueset-condition-ver-status.html), default: confirmed)_
-* **onsetDateTime**: _(datetime)_
-* **dateRecorded (DSTU2)**: _(date)_
-* **assertedDate (STU3)**: _(dateTime)_
-* **abatementDateTime**: _(datetime)_
-
-#### Resource Type: Encounter
-
-FHIR doc:
-* DSTU2: [http://hl7.org/fhir/DSTU2/encounter.html](http://hl7.org/fhir/DSTU2/encounter.html)
-* STU3: [http://hl7.org/fhir/STU3/encounter.html](http://hl7.org/fhir/STU3/encounter.html)
-
-Supported attributes:
-
-* **resourceType**: _(must be Encounter)_
-* **id**: _(id)_
-* **status**: _(string, options: [DSTU2](http://hl7.org/fhir/DSTU2/valueset-encounter-state.html) / [STU3](http://hl7.org/fhir/STU3/valueset-encounter-status.html), default: finished)_
-* **class**: _(string (DSTU2) / concept (STU3), options: [DSTU2](http://hl7.org/fhir/DSTU2/valueset-encounter-class.html) / [STU3](http://hl7.org/fhir/STU3/v3/ActEncounterCode/vs.html))_
-* **type**: _(concept)_
-* **patient (DSTU2)**: _(patient-reference, default: current patient)_
-* **subject (STU3)**: _(patient-reference, default: current patient)_
-* **reason**: _(sequence of concepts)_
-* **period**: _(period)_
-
-#### Resource Type: MedicationOrder (DSTU2 only)
-
-FHIR doc:
-* DSTU2: [http://hl7.org/fhir/DSTU2/medicationorder.html](http://hl7.org/fhir/DSTU2/medicationorder.html)
-
-Supported attributes:
-
-* **resourceType**: _(must be MedicationOrder)_
-* **id**: _(id)_
-* **dateWritten**: _(dateTime)_
-* **status**: _(string, [options](http://hl7.org/fhir/DSTU2/valueset-medication-order-status.html), default: active)_
-* **dateEnded**: _(dateTime)_
-* **patient**: _(patient-reference, default: current patient)_
-* **medicationCodeableConcept**: _(concept)_
-
-#### Resource Type: MedicationRequest (STU3 only)
-
-FHIR doc:
-* STU3: [http://hl7.org/fhir/STU3/medicationrequest.html](http://hl7.org/fhir/STU3/medicationrequest.html)
-
-Supported attributes:
-
-* **resourceType**: _(must be MedicationRequest)_
-* **id**: _(id)_
-* **authoredOn**: _(dateTime)_
-* **status**: _(string, [options](http://hl7.org/fhir/STU3/valueset-medication-request-status.html), default: active)_
-* **subject**: _(patient-reference, default: current patient)_
-* **medicationCodeableConcept**: _(concept)_
-
-#### Resource Type: MedicationStatement
-
-FHIR doc:
-* DSTU2: [http://hl7.org/fhir/DSTU2/medicationstatement.html](http://hl7.org/fhir/DSTU2/medicationstatement.html)
-* STU3: [http://hl7.org/fhir/STU3/medicationstatement.html](http://hl7.org/fhir/STU3/medicationstatement.html)
-
-Supported attributes:
-
-* **resourceType**: _(must be MedicationStatement)_
-* **id**: _(id)_
-* **patient (DSTU2)**: _(patient-reference, default: current patient)_
-* **subject (STU3)**: _(patient-reference, default: current patient)_
-* **dateAsserted**: _(dateTime)_
-* **status**: _(string, options: [DSTU2](http://hl7.org/fhir/DSTU2/valueset-medication-statement-status.html) / [STU3](http://hl7.org/fhir/STU3/valueset-medication-statement-status.html), default: active)_
-* **wasNotTaken (DSTU2)**: _(boolean, default: false)_
-* **taken (STU3)**: _(string, [options](http://hl7.org/fhir/STU3/valueset-medication-statement-taken.html), default: y)_
-* **effectiveDateTime**: _(dateTime)_
-* **effectivePeriod**: _(period)_
-* **medicationCodeableConcept**: _(concept)_
-
-#### Resource Type: Observation
-
-FHIR doc:
-* DSTU2: [http://hl7.org/fhir/DSTU2/observation.html](http://hl7.org/fhir/DSTU2/observation.html)
-* STU3: [http://hl7.org/fhir/STU3/observation.html](http://hl7.org/fhir/STU3/observation.html)
-
-Supported attributes:
-
-* **resourceType**: _(must be Observation)_
-* **id**: _(id)_
-* **status**: _(string, options: [DSTU2](http://hl7.org/fhir/DSTU2/valueset-observation-status.html) / [STU3](http://hl7.org/fhir/STU3/valueset-observation-status.html), default: final), default: final)_
-* **category**: _(concept (DSTU2), sequence of concepts (STU3))_
-* **code**: _(concept)_
-* **subject**: _(patient-reference, default: current patient)_
-* **effectiveDateTime**: _(dateTime)_
-* **issued**: _(dateTime)_
-* **valueCodeableConcept**: _(concept, if provided then all other value[x] must be absent)_
-* **valueQuantity**: _(quantity, if provided then all other value[x] must be absent)_
-* **valueString**: _(string, if provided then all other value[x] must be absent)_
-* **interpretation**: _(concept)_
-* **method**: _(concept)_
-* **component**:
-  * **code**: _(concept)_
-  * **valueCodeableConcept**: _(concept, if provided then all other component->value[x] must be absent)_
-  * **valueQuantity**: _(quantity, if provided then all other component->value[x] must be absent)_
-
-#### Resource Type: Procedure
-
-FHIR doc:
-* DSTU2: [http://hl7.org/fhir/DSTU2/procedure.html](http://hl7.org/fhir/DSTU2/procedure.html)
-* STU3: [http://hl7.org/fhir/STU3/procedure.html](http://hl7.org/fhir/STU3/procedure.html)
-
-Supported attributes:
-
-* **resourceType**: _(must be Procedure)_
-* **id**: _(id)_
-* **subject**: _(patient-reference, default: current patient)_
-* **status**: _(string, options: [DSTU2](http://hl7.org/fhir/DSTU2/valueset-procedure-status.html) / [STU3](http://hl7.org/fhir/STU3/valueset-event-status.html), default: completed)_
-* **category**: _(concept)_
-* **code**: _(concept)_
-* **notPerformed (DSTU2)**: _(boolean, default: false)_
-* **notDone (STU3)**: _(boolean, default: false)_
-* **performedDateTime**: _(dateTime)_
-* **performedPeriod**: _(period)_
-* **outcome**: _(concept)_
+[FHIR STU3 Resources Documentation](FHIR_STU3.md)
 
 ### Attribute Types
 
-The following attribute types are supported: `string`, `boolean`, `quantity`, `date`, `datetime`, `period`, `concept`, `id`, `patient-reference`, `name`, `observation-component`.  Further details on each type are below.
+When constructing YAML test cases, standard types (such as `string`, `boolean`, `integer`) are represented via the noraml YAML representations of those types.  The CQL Testing Framework, however, also provides advanced support for the following other common FHIR data types: `Quantity`, `date`, `dateTime`, `Period`, `CodeableConcept`, `Coding`, `id`, `Reference`, `HumanName`, and arbitrary complex types.  Further details on each type are below.
 
-
-#### Attribute Type: string
-
-A simple string of text.
-
-Examples:
-
-* `confirmed`
-* `text with spaces`
-
-#### Attribute Type: boolean
-
-A boolean value.  Must be `true` or `false`.
-
-Examples:
-
-* `true`
-* `false`
-
-#### Attribute Type: quantity
+#### Attribute Type: Quantity
 
 A quantity of measurement with or without units specified.  If units are specified, then they should be valid [UCUM](http://unitsofmeasure.org) units.
 
@@ -228,7 +68,7 @@ Examples:
 
 * `2018-11-05`
 
-#### Attribute Type: datetime
+#### Attribute Type: dateTime
 
 A string formatted as an ISO 8601 compliant datetime.
 
@@ -238,7 +78,7 @@ Examples:
 * `2008-11-12T16:00:00.000Z`
 * `2008-11-12T16:00:00.000+00:00`
 
-#### Attribute Type: period
+#### Attribute Type: Period
 
 A start datetime and end datetime separated by ` - `.  If only one datetime is supplied, it is considered to be the start datetime.
 
@@ -248,7 +88,7 @@ Examples:
 * `2008-11-12T16:00:00.000Z - 2008-11-12T17:00:00.000Z`
 * `2008-11-12T16:00:00.000`
 
-#### Attribute Type: concept
+#### Attribute Type: CodeableConcept / Coding
 
 A string with the format: `SYSTEM#code Optional Display Text`.  The following system abbreviations are supported:
 
@@ -275,7 +115,7 @@ Examples:
 
 #### Attribute Type: id
 
-A string identifier.  If none is provided, it will default to a randomly generated UUIDv4 string.
+A string identifier.  If none is provided for a data instance, it will default to a randomly generated UUIDv4 string.
 
 Examples:
 
@@ -283,17 +123,17 @@ Examples:
 * `547`
 * `patient-1`
 
-#### Attribute Type: patient-reference
+#### Attribute Type: Reference
 
-A string identifier for a patient to reference.  In most cases, if none is provided, the current patient will be assumed.
+A string identifier for a reference to another instance.  May contain just the id, the type and id, or a full URL.
 
 Examples:
 
 * `2142fd65-893d-45f8-a2a3-ca9bae7f5dbc`
-* `547`
-* `patient-1`
+* `Patient/547`
+* `http://example.org/fhir/Patient/patient-1`
 
-#### Attribute Type: name
+#### Attribute Type: HumanName
 
 A human name.  If only one word is provided, it is assumed to be the first name.  If more than one word is provided, only the last word is considered to be the last name.
 
@@ -302,6 +142,22 @@ Examples:
 * `Sally`
 * `Sally Jones`
 * `Sally Jane Jones`
+
+#### Attribute Type: Complex Types
+
+A type that is a complex structure, i.e., has nested attributes and values.  These types are supported via the normal YAML mechanism of indenting nested attribute/value pairs.
+
+Example of specifying two Observation components (note: this demonstrates array notation as well):
+
+```
+  component:
+  -
+    code: LOINC#8480-6 Systolic Blood Pressure
+    valueQuantity: 109 mm[Hg]
+  -
+    code: LOINC#8462-4 Diastolic Blood Pressure
+    valueQuantity: 44 mm[Hg]
+```
 
 ## The results Section
 
