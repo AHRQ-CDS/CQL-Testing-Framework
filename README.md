@@ -17,7 +17,6 @@ Current capabilities include:
 Current limitations:
 
 * Only FHIR 1.0.2 (DSTU2) and 3.0.0 (STU3) are supported
-* Only the following resources are supported: Patient, Condition, Encounter, MedicationOrder, MedicationStatement, Observation, Procedure
 * Only VSAC value sets are supported
 
 ## Contributions
@@ -279,6 +278,14 @@ CQLT Config: /path/to/my/cql/project/test/cqlt.yaml
       -  "MeetsInclusionCriteria": true
       +  "MeetsInclusionCriteria": false
 
+```
+
+## Generating FHIR Documentation
+
+The _FHIR_DSTU2.md_ and _FHIR_STU3.md_ documentation files are generated using the FHIR specification definitions and the corresponding _config.yaml_ files (in _src/fhir/${version}/_). Developers working on the CQL Testing Framework (i.e., developing the framework itself) can regenerate the documentation using the following command:
+
+```sh
+$ yarn doc
 ```
 
 ## LICENSE

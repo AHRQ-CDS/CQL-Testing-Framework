@@ -73,6 +73,7 @@ function yamlToTestCases(yamlFilePath, fhirVersion) {
   const doc = yaml.safeLoad(docString);
   if (!doc.name) {
     if (!doc.data && !doc.results) {
+      // eslint-disable-next-line no-console
       console.log(`Ignoring potential external data file: ${yamlFilePath}`);
       return [];
     }

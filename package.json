@@ -9,7 +9,8 @@
     "test:watch": "npm test -- --watch",
     "test:debug": "./node_modules/.bin/mocha --inspect --inspect-brk --reporter spec --recursive",
     "lint": "./node_modules/.bin/eslint .",
-    "lint:fix": "./node_modules/.bin/eslint . --fix"
+    "lint:fix": "./node_modules/.bin/eslint . --fix",
+    "doc": "node ./src/doc-gen.js"
   },
   "dependencies": {
     "chai": "^4.2.0",
