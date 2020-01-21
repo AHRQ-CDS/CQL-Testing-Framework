@@ -1,6 +1,6 @@
 // # Introduction
 
-// NOTE: THIS IS AN UNTESTED FHIR STU3 PORT OF THE PAIN MANAGEMENT SUMMARY.
+// NOTE: THIS IS AN UNTESTED FHIR R4 PORT OF THE PAIN MANAGEMENT SUMMARY.
 // THIS ARTIFACT IS INTENDED FOR TESTING PURPOSES ONLY!
 
 // The Pain Management Summary artifact provides relevant information to consider when managing a patient’s pain.
@@ -15,19 +15,19 @@
 //
 // ##Source guideline: [CDC Guideline for Opioid Prescribing for Chronic Pain](https://www.cdc.gov/drugoverdose/prescribing/guideline.html)
 
-library Factors_to_Consider_in_Managing_Chronic_Pain_STU3_Test version '1.0.0'
+library Factors_to_Consider_in_Managing_Chronic_Pain_R4_Test version '1.0.0'
 
 // # Data model #
 
-// The FHIR STU3 model is used for testing purposes only.  It has not been piloted.
-using FHIR version '3.0.0'
+// The FHIR R4 model is used for testing purposes only.  It has not been piloted.
+using FHIR version '4.0.0'
 
 // # Referenced libraries #
 
-// The CDS Connect Commons for FHIRv300 library provides functions representing commonly used CDS logic and patterns.
-include CDS_Connect_Commons_for_FHIRv300 version '1.1.0' called C3F
-// The FHIRHelpers library provides common functions for simplifying interaction w/ the FHIR v300 data model.
-include FHIRHelpers version '3.0.0' called FHIRHelpers
+// The CDS Connect Commons for FHIRv400 library provides functions representing commonly used CDS logic and patterns.
+include CDS_Connect_Commons_for_FHIRv400 version '1.1.0' called C3F
+// The FHIRHelpers library provides common functions for simplifying interaction w/ the FHIR R4 data model.
+include FHIRHelpers version '4.0.0' called FHIRHelpers
 
 // # Value sets and codes #
 
@@ -308,8 +308,7 @@ define function Abatement(c FHIR.Condition):
     QuantityText(c.abatement as FHIR.Age),
     PeriodObject(c.abatement as FHIR.Period),
     RangeObject(c.abatement as FHIR.Range),
-    (c.abatement as FHIR.string).value,
-    ToString((c.abatement as FHIR.boolean).value)
+    (c.abatement as FHIR.string).value
   })
 
 // Sorts the components of a PEG Observation to be in the order P (Pain), E (Enjoyment of life), G (General activity)
@@ -402,9 +401,9 @@ define ReportConditionsAssociatedWithChronicPain:
   (ConditionsAssociatedWithChronicPain) C
   return {
     Name:  ConceptText(C.code),
-    Status:    C.clinicalStatus.value,
+    Status:    C.clinicalStatus.coding[0].code.value,
     Onset: Onset(C),
-    DateRecorded: DateTimeText(C.assertedDate)
+    DateRecorded: DateTimeText(C.recordedDate)
   }
   sort by (Onset as String) desc
 
@@ -462,20 +461,21 @@ define ConditionRiskFactorsForOpioidRelatedHarms:
 // Encounter diagnoses that are risk factors for opioid-related harms and their dates of onset. Some risk factors may
 // not exist on the problem list, and therefore may not be represented as Conditions (depending on EHR implementation).
 // For this, the logic also looks at the patient's encounters, trying to find risk factors recorded as encounter
-// diagnoses.
+// diagnosis codes. We do not look at the reasonReference field because the Conditions referred to would already be
+// reflected in the expression that queries over Conditions.
 
 define EncounterRiskFactorsForOpioidRelatedHarms:
   [Encounter] E where exists(
-    E.reason R where
-      C3F.NullSafeToConcept(R) in "Major Depression"
-      or C3F.NullSafeToConcept(R) in "Anxiety"
-      or C3F.NullSafeToConcept(R) in "Substance use disorder"
-      or C3F.NullSafeToConcept(R) in "Suicide attempt"
-      or C3F.NullSafeToConcept(R) ~ "Suicidal deliberate poisoning"
-      or C3F.NullSafeToConcept(R) in "Sleep-disordered breathing"
-      or C3F.NullSafeToConcept(R) in "Kidney Failure"
-      or C3F.NullSafeToConcept(R) in "Chronic Liver Disease"
-      or C3F.NullSafeToConcept(R) in "Liver Disease"
+    E.reasonCode R where
+      FHIRHelpers.ToConcept(R) in "Major Depression"
+      or FHIRHelpers.ToConcept(R) in "Anxiety"
+      or FHIRHelpers.ToConcept(R) in "Substance use disorder"
+      or FHIRHelpers.ToConcept(R) in "Suicide attempt"
+      or FHIRHelpers.ToConcept(R) ~ "Suicidal deliberate poisoning"
+      or FHIRHelpers.ToConcept(R) in "Sleep-disordered breathing"
+      or FHIRHelpers.ToConcept(R) in "Kidney Failure"
+      or FHIRHelpers.ToConcept(R) in "Chronic Liver Disease"
+      or FHIRHelpers.ToConcept(R) in "Liver Disease"
       // Pregnancy not considered in Encounter diagnoses because this is an unrestricted lookback.
   )
 
@@ -490,25 +490,25 @@ define ReportConditionRiskFactorsForOpioidRelatedHarms:
   (ConditionRiskFactorsForOpioidRelatedHarms) C
   return {
     Name:      ConceptText(C.code),
-    Status:    C.clinicalStatus.value,
+    Status:    C.clinicalStatus.coding[0].code.value,
     Onset:     Onset(C),
-    DateRecorded: DateTimeText(C.assertedDate),
+    DateRecorded: DateTimeText(C.recordedDate),
     Abatement: Abatement(C),
     Visit:     null as Tuple{ Start String, End String }
   }
   sort by (Onset as String) desc, (Abatement as String) desc
 
 define function GetEncounterDiagnosesRiskFactorsForOpioidRelatedHarms(enc Encounter):
-  (enc.reason) R
-    where C3F.NullSafeToConcept(R) in "Major Depression"
-      or C3F.NullSafeToConcept(R) in "Anxiety"
-      or C3F.NullSafeToConcept(R) in "Substance use disorder"
-      or C3F.NullSafeToConcept(R) in "Suicide attempt"
-      or C3F.NullSafeToConcept(R) ~ "Suicidal deliberate poisoning"
-      or C3F.NullSafeToConcept(R) in "Sleep-disordered breathing"
-      or C3F.NullSafeToConcept(R) in "Kidney Failure"
-      or C3F.NullSafeToConcept(R) in "Chronic Liver Disease"
-      or C3F.NullSafeToConcept(R) in "Liver Disease"
+  (enc.reasonCode) R
+    where FHIRHelpers.ToConcept(R) in "Major Depression"
+      or FHIRHelpers.ToConcept(R) in "Anxiety"
+      or FHIRHelpers.ToConcept(R) in "Substance use disorder"
+      or FHIRHelpers.ToConcept(R) in "Suicide attempt"
+      or FHIRHelpers.ToConcept(R) ~ "Suicidal deliberate poisoning"
+      or FHIRHelpers.ToConcept(R) in "Sleep-disordered breathing"
+      or FHIRHelpers.ToConcept(R) in "Kidney Failure"
+      or FHIRHelpers.ToConcept(R) in "Chronic Liver Disease"
+      or FHIRHelpers.ToConcept(R) in "Liver Disease"
       // Pregnancy not considered in Encounter diagnoses because this is an unrestricted lookback.
     return {
       Name:      ConceptText(R),
@@ -533,9 +533,10 @@ define ReportMostRecentPositivePregnancyObservation:
       Status: ConceptText(MostRecentPregnancyObservation.value as FHIR.CodeableConcept),
       Onset: ToString(Coalesce(
         (MostRecentPregnancyObservation.effective as FHIR.dateTime).value,
-        (MostRecentPregnancyObservation.effective as FHIR.Period)."start"
+        (MostRecentPregnancyObservation.effective as FHIR.instant).value,
+        (MostRecentPregnancyObservation.effective as FHIR.Period)."start".value
       )),
-      DateRecorded: ToString(MostRecentPregnancyObservation.issued),
+      DateRecorded: ToString(MostRecentPregnancyObservation.issued.value),
       Abatement: null as String,
       Visit: null as Tuple{ Start String, End String }
     }
@@ -582,7 +583,7 @@ define ReportNumericPainIntensityAssessments:
   return {
     Name:           ConceptTextWithRange(A.code),
     Score:          QuantityText(A.value as FHIR.Quantity),
-    Interpretation: Coalesce( ConceptText(A.interpretation),  ConceptText(A.value as FHIR.CodeableConcept) ),
+    Interpretation: Coalesce( ConceptText( First(A.interpretation) ),  ConceptText(A.value as FHIR.CodeableConcept) ),
     Date:           ObservationDate(A)
   }
   sort by Date desc
@@ -598,7 +599,7 @@ define ReportPainEnjoymentGeneralActivityAssessments:
   return {
     Name:           ConceptTextWithRange(A.code),
     Score:          QuantityText(A.value as FHIR.Quantity),
-    Interpretation: Coalesce( ConceptText(A.interpretation),  ConceptText(A.value as FHIR.CodeableConcept) ),
+    Interpretation: Coalesce( ConceptText( First(A.interpretation) ),  ConceptText(A.value as FHIR.CodeableConcept) ),
     Questions:      (SortPegComponents(A.component)) C return {
                       "Name": ConceptText(C.code),
                       "Score": QuantityText(C.value as FHIR.Quantity)
@@ -617,7 +618,7 @@ define ReportSTarTBackAssessments:
   return {
     Name:           ConceptTextWithRange(A.code),
     Score:          QuantityText(A.value as FHIR.Quantity),
-    Interpretation: Coalesce( ConceptText(A.interpretation),  ConceptText(A.value as FHIR.CodeableConcept) ),
+    Interpretation: Coalesce( ConceptText( First(A.interpretation) ),  ConceptText(A.value as FHIR.CodeableConcept) ),
     Date:           ObservationDate(A)
   }
   sort by Date desc
@@ -644,7 +645,7 @@ define ReportOpioidMedicationRequests:
     Type:  'Order',
     Name:  ConceptText(O.medication as FHIR.CodeableConcept),
     Start: DateTimeText(O.authoredOn),
-    End:   null as String, // MedicationRequest end date not supported in STU3,
+    End:   null as String, // MedicationRequest end date not supported in R4,
     Status: O.status.value
   }
   sort by Start desc, End desc
@@ -684,7 +685,7 @@ define ReportNonOpioidMedicationRequests:
     Type:  'Order',
     Name:  ConceptText(O.medication as FHIR.CodeableConcept),
     Start: DateTimeText(O.authoredOn),
-    End:   null as String, // MedicationRequest end date not supported in STU3,
+    End:   null as String, // MedicationRequest end date not supported in R4,
     Status: O.status.value
   }
   sort by Start desc, End desc
@@ -704,7 +705,7 @@ define ReportNonOpioidMedications:
   (ReportNonOpioidMedicationRequests union ReportNonOpioidMedicationStatements) M
   sort by Start desc, End desc
 
-// Non-pharmacologic treatment orders and referrals with dates (lookback 2 years)
+// Non-pharmacologic treatments, orders, and referrals with dates (lookback 2 years)
 
 define NonPharmacologicTreatmentProcedures:
   C3F.ProcedurePerformance(C3F.ProcedureLookBack([Procedure: "Non pharmacologic treatments for chronic pain"], 2 years))
@@ -718,41 +719,23 @@ define ReportNonPharmacologicTreatmentProcedures:
   }
   sort by Date desc
 
-define NonPharmacologicTreatmentProcedureRequests:
-  C3F.ProcedureRequestActiveOrCompleted(
-    C3F.ProcedureRequestLookBack([ProcedureRequest: "Non pharmacologic treatments for chronic pain"], 2 years)
+define NonPharmacologicTreatmentServiceRequests:
+  C3F.ServiceRequestActiveOrCompleted(
+    C3F.ServiceRequestLookBack([ServiceRequest: "Non pharmacologic treatments for chronic pain"], 2 years)
   )
 
-define ReportNonPharmacologicTreatmentProcedureRequests:
-  (NonPharmacologicTreatmentProcedureRequests) P
+define ReportNonPharmacologicTreatmentServiceRequests:
+  (NonPharmacologicTreatmentServiceRequests) P
   return {
-    Type: 'ProcedureRequest',
+    Type: 'ServiceRequest',
     Name: ConceptText(P.code),
-    Date: DateTimeText(P.authoredOn)
-  }
-  sort by Date desc
-
-define NonPharmacologicTreatmentReferralRequests:
-  C3F.ReferralRequestActiveOrCompleted(C3F.ReferralRequestLookBack(
-    [ReferralRequest] R where exists(
-      (R.serviceRequested) SR where SR in "Non pharmacologic treatments for chronic pain"
-    ),
-    2 years
-  ))
-
-define ReportNonPharmacologicTreatmentReferralRequests:
-  (NonPharmacologicTreatmentReferralRequests) P
-  return {
-    Type: 'Referral',
-    Name: Coalesce((P.serviceRequested) SR return ConceptText(SR)),
     Date: DateTimeText(P.authoredOn)
   }
   sort by Date desc
 
 define ReportNonPharmacologicTreatments:
   (ReportNonPharmacologicTreatmentProcedures
-    union ReportNonPharmacologicTreatmentProcedureRequests
-    union ReportNonPharmacologicTreatmentReferralRequests) M
+    union ReportNonPharmacologicTreatmentServiceRequests) M
   sort by Date desc
 
 // Stool softeners and laxatives - orders and statements with dates (lookback 6 months)
@@ -775,7 +758,7 @@ define ReportStoolSoftenersAndLaxativesOrders:
     Type:  'Order',
     Name:  ConceptText(O.medication as FHIR.CodeableConcept),
     Start: DateTimeText(O.authoredOn),
-    End:   null as String, // MedicationRequest end date not supported in STU3,
+    End:   null as String, // MedicationRequest end date not supported in R4,
     Status: O.status.value
   }
   sort by Start desc, End desc
@@ -823,7 +806,7 @@ define ReportUrineDrugScreens:
   return {
     Name:           ConceptText(S.code),
     Result:         Coalesce( QuantityText(S.value as FHIR.Quantity), (S.value as FHIR.string).value, ConceptText(S.value as FHIR.CodeableConcept) ),
-    Interpretation: Coalesce( ConceptText(S.interpretation) ),
+    Interpretation: Coalesce( ConceptText( First(S.interpretation) ) ),
     Date:           ObservationDate(S)
   }
   sort by Date desc
@@ -848,7 +831,7 @@ define ReportBenzodiazepineMedicationRequests:
     Type:  'Order',
     Name:  ConceptText(O.medication as FHIR.CodeableConcept),
     Start: DateTimeText(O.authoredOn),
-    End:   null as String, // MedicationRequest end date not supported in STU3,
+    End:   null as String, // MedicationRequest end date not supported in R4,
     Status: O.status.value
   }
   sort by Start desc, End desc
@@ -882,7 +865,7 @@ define ReportNaloxoneMedicationRequests:
     Type:  'Order',
     Name:  ConceptText(O.medication as FHIR.CodeableConcept),
     Start: DateTimeText(O.authoredOn),
-    End:   null as String, // MedicationRequest end date not supported in STU3,
+    End:   null as String, // MedicationRequest end date not supported in R4,
     Status: O.status.value
   }
   sort by Start desc, End desc
@@ -916,7 +899,7 @@ define ReportRiskScreeningsRelevantToPainManagement:
   return {
     Name:           ConceptTextWithRange(S.code),
     Score:          Coalesce( QuantityText(S.value as FHIR.Quantity), (S.value as FHIR.string).value ),
-    Interpretation: Coalesce( ConceptText(S.interpretation),  ConceptText(S.value as FHIR.CodeableConcept) ),
+    Interpretation: Coalesce( ConceptText( First(S.interpretation) ),  ConceptText(S.value as FHIR.CodeableConcept) ),
     Date:           ObservationDate(S)
   }
   sort by Date desc
