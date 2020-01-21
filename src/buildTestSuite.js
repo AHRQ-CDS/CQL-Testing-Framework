@@ -37,10 +37,10 @@ function buildTestSuite(testCases, library, codeService, fhirVersion, config) {
       switch (fhirVersion) {
       case '1.0.2': patientSource = fhir.PatientSource.FHIRv102(); break;
       case '3.0.0': patientSource = fhir.PatientSource.FHIRv300(); break;
-      // no default
+      case '4.0.0': patientSource = fhir.PatientSource.FHIRv400(); break;
       }
       if (patientSource == null) {
-        expect.fail('Failed to initialize FHIR patient source.  Only FHIR 1.0.2 or 3.0.0 are supported.');
+        expect.fail('Failed to initialize FHIR patient source.  Only FHIR 1.0.2, 3.0.0, and 4.0.0 are supported.');
       }
     });
 
