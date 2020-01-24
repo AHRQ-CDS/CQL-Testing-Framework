@@ -37,13 +37,15 @@ The `data` section of the YAML file contains all of the data that will be associ
 
 ### Resource Types
 
-The CQL Testing framework now supports all FHIR DSTU2 and STU3 resource types.  It provides this support by dynamically referencing the formal FHIR definitions of each resource, ensuring that specified fields in the YAML file are valid fields for that resource.
+The CQL Testing framework now supports all FHIR DSTU2, STU3, and R4 resource types.  It provides this support by dynamically referencing the formal FHIR definitions of each resource, ensuring that specified fields in the YAML file are valid fields for that resource.
 
 The CQL Testing Framework assigns default patient references and _some_ default values, as well as user-friendly aliases (where applicable).  For detailed information about each supported resource, its defaults, and its aliases, see the detailed documentation linked below:
 
 [FHIR DSTU2 Resources Documentation](FHIR_DSTU2.md)
 
 [FHIR STU3 Resources Documentation](FHIR_STU3.md)
+
+[FHIR R4 Resources Documentation](FHIR_R4.md)
 
 ### Attribute Types
 
