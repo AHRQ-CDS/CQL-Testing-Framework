@@ -81,6 +81,7 @@ Actual or  potential/avoided event causing unintended physical injury resulting 
 |     | Field | Description |
 | --- | ----- | ----------- |
 | Patient Reference | subject | This subject or group impacted by the event.  With a prospective adverse event, there will be no subject as the adverse event was prevented. |
+| Default Value | type | This element defines the specific type of event that occurred or that was prevented from occurring. <br /> **Default:** _actual_ |
 
 
 See the [AdverseEvent FHIR Documentation](http://hl7.org/fhir/STU3/adverseevent.html) for the full list of
@@ -267,6 +268,7 @@ A provider issued list of services and products provided, or to be provided, to 
 | --- | ----- | ----------- |
 | Patient Reference | patient | Patient Resource. |
 | Default Value | status | The status of the resource instance. <br /> **Default:** _active_ |
+| Default Value | use | Complete (Bill or Claim), Proposed (Pre-Authorization), Exploratory (Pre-determination). <br /> **Default:** _complete_ |
 
 
 See the [Claim FHIR Documentation](http://hl7.org/fhir/STU3/claim.html) for the full list of
@@ -438,6 +440,10 @@ A formal agreement between parties regarding the conduct of business, exchange o
 
 _NOTE: It is extremely rare for CDS test authors to use this resource as patient data for CDS tests._
 
+
+|     | Field | Description |
+| --- | ----- | ----------- |
+| Default Value | status | The status of the resource instance. <br /> **Default:** _executed_ |
 
 
 See the [Contract FHIR Documentation](http://hl7.org/fhir/STU3/contract.html) for the full list of
@@ -1091,6 +1097,7 @@ An order or request for both supply of the medication and the instructions for a
 | --- | ----- | ----------- |
 | Patient Reference | subject | A link to a resource representing the person or set of individuals to whom the medication will be given. |
 | Default Value | status | A code specifying the current state of the order.  Generally this will be active or completed state. <br /> **Default:** _active_ |
+| Default Value | intent | Whether the request is a proposal, plan, or an original order. <br /> **Default:** _order_ |
 | Alias | code | Alias for _medicationCodeableConcept_.|
 
 
@@ -1465,6 +1472,7 @@ A group of related requests that can be used to capture intended activities that
 | --- | ----- | ----------- |
 | Patient Reference | subject | The subject for which the request group was created. |
 | Default Value | status | The current state of the request. For request groups, the status reflects the status of all the requests in the group. <br /> **Default:** _active_ |
+| Default Value | intent | Indicates the level of authority/intentionality associated with the request and where the request fits into the workflow chain. <br /> **Default:** _order_ |
 
 
 See the [RequestGroup FHIR Documentation](http://hl7.org/fhir/STU3/requestgroup.html) for the full list of

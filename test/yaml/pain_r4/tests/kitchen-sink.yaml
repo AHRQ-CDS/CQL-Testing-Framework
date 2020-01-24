@@ -1,0 +1,276 @@
+---
+name: Has Everything But the Kitchen Sink
+
+data:
+-
+  resourceType: Patient
+  name: Fuller Jackson
+  gender: male
+  birthDate: 1954-02-16
+-
+  resourceType: Condition
+  code: SNOMED#203082005 Fibromyalgia (disorder)
+  onsetDateTime: 2012-04-05
+-
+  resourceType: Condition
+  code: SNOMED#191722009 Agoraphobia with panic attacks (disorder)
+  onsetDateTime: 2014-09-05
+-
+  resourceType: Encounter
+  status: finished
+  reasonCode: ['ICD-10-CM#T14.91XA Suicide attempt, initial encounter']
+  period: 2015-02-01
+-
+  resourceType: MedicationRequest
+  code: RXNORM#1049599 12 HR Oxycodone Hydrochloride 80 MG Extended Release Oral Tablet
+  authoredOn: 2018-10-10
+-
+  resourceType: MedicationRequest
+  code: RXNORM#104474 Aspirin 75 MG Oral Tablet
+  authoredOn: 2018-09-06
+-
+  resourceType: MedicationRequest
+  code: RXNORM#197591 Diazepam 5 MG Oral Tablet
+  authoredOn: 2018-11-05
+-
+  resourceType: MedicationRequest
+  code: RXNORM#876193 POLYETHYLENE GLYCOL 3350 17000 MG Powder for Oral Solution
+  authoredOn: 2018-11-05
+-
+  resourceType: MedicationRequest
+  code: RXNORM#1725059 Naloxone Hydrochloride 40 MG/ML Nasal Spray
+  authoredOn: 2018-12-20
+-
+  resourceType: MedicationStatement
+  code: RXNORM#199789 Pentazocine 50 MG Oral Tablet
+  effectiveDateTime: 2018-11-15
+-
+  resourceType: MedicationStatement
+  code: RXNORM#310965 Ibuprofen 200 MG Oral Tablet
+  effectiveDateTime: 2017-11-12
+-
+  resourceType: MedicationStatement
+  code: RXNORM#876193 POLYETHYLENE GLYCOL 3350 17000 MG Powder for Oral Solution
+  effectiveDateTime: 2018-12-05
+-
+  resourceType: MedicationStatement
+  code: RXNORM#197591 Diazepam 5 MG Oral Tablet
+  effectiveDateTime: 2018-12-01
+-
+  resourceType: MedicationStatement
+  code: RXNORM#1725059 Naloxone Hydrochloride 40 MG/ML Nasal Spray
+  effectiveDateTime: 2018-12-10
+-
+  resourceType: Observation
+  code: LOINC#19295-5 Opiates [Presence] in Urine by Screen method
+  valueQuantity: 2300 ng/mL
+  interpretation: [http://hl7.org/fhir/v2/0078#NEG Negative]
+  issued: 2018-10-20
+-
+  resourceType: Observation
+  code: http://cds.ahrq.gov/cdsconnect/pms#MME Morphine Milligram Equivalent (MME)
+  category: [OBS-CAT#therapy]
+  valueQuantity: 20 {MME}/d
+  issued: 2018-12-01
+-
+  resourceType: Observation
+  code: LOINC#38221-8 Pain severity Wong-Baker FACES Scale
+  category: [OBS-CAT#survey]
+  valueQuantity: 8
+  interpretation: [Hurts a whole lot]
+  issued: 2018-10-10
+-
+  resourceType: Observation
+  code: LOINC#44261-6 Patient Health Questionnaire 9 item (PHQ-9) total score [Reported]
+  category: [OBS-CAT#survey]
+  valueQuantity: 7
+  interpretation: [Mild depression]
+  issued: 2018-10-20
+-
+  resourceType: Observation
+  code: http://cds.ahrq.gov/cdsconnect/pms#PEGASSESSMENT Pain Enjoyment General Activity (PEG) Assessment
+  category: [OBS-CAT#survey]
+  valueQuantity: 5
+  issued: 2018-10-10
+  component:
+  -
+    code: http://cds.ahrq.gov/cdsconnect/pms#PEGPAIN Pain
+    valueQuantity: 7
+  -
+    code: http://cds.ahrq.gov/cdsconnect/pms#PEGENJOYMENT Enjoyment of life
+    valueQuantity: 5
+  -
+    code: http://cds.ahrq.gov/cdsconnect/pms#PEGGENERALACTIVITY General activity
+    valueQuantity: 4
+-
+  resourceType: Observation
+  code: http://cds.ahrq.gov/cdsconnect/pms#STARTBACK STarT Back Screening Tool
+  category: [OBS-CAT#survey]
+  valueQuantity: 4
+  interpretation: [Medium risk]
+  issued: 2018-10-10
+-
+  resourceType: Procedure
+  code: SNOMEDCT#182548004 Chiropraxy (regime/therapy)
+  performedDateTime: 2018-12-05
+
+results:
+  Summary:
+    Patient:
+      Name: Fuller Jackson
+      Gender: male
+      Age: 64
+      MeetsInclusionCriteria: true
+    PertinentMedicalHistory:
+      ConditionsAssociatedWithChronicPain:
+      -
+        Name: Fibromyalgia (disorder)
+        Status: active
+        Onset: '2012-04-05T00:00:00.000+00:00'
+        DateRecorded: null
+      RiskFactorsForOpioidRelatedHarms:
+      -
+        Name: Suicide attempt, initial encounter
+        Status: null
+        Onset: null
+        Abatement: null
+        DateRecorded: null
+        Visit:
+          Start: '2015-02-01T00:00:00.000+00:00'
+          End: null
+      -
+        Name: Agoraphobia with panic attacks (disorder)
+        Status: active
+        Onset: '2014-09-05T00:00:00.000+00:00'
+        DateRecorded: null
+        Abatement: null
+        Visit: null
+    PainAssessments:
+      NumericPainIntensityAssessments:
+      -
+        Name: 'Pain severity Wong-Baker FACES Scale [Range: 0-10]'
+        Score: '8'
+        Interpretation: 'Hurts a whole lot'
+        Date: '2018-10-10T00:00:00.000+00:00'
+      PainEnjoymentGeneralActivityAssessments:
+      -
+        Name: 'Pain Enjoyment General Activity (PEG) Assessment [Range: 0-10]'
+        Score: '5'
+        Interpretation: null
+        Questions:
+        -
+          Name: Pain
+          Score: '7'
+        -
+          Name: Enjoyment of life
+          Score: '5'
+        -
+          Name: General activity
+          Score: '4'
+        Date: '2018-10-10T00:00:00.000+00:00'
+      STarTBackAssessments:
+      -
+        Name: 'STarT Back Screening Tool [Range: 0-9]'
+        Score: '4'
+        Interpretation: 'Medium risk'
+        Date: '2018-10-10T00:00:00.000+00:00'
+    HistoricalTreatments:
+      OpioidMedications:
+      -
+        Type: Statement
+        Name: Pentazocine 50 MG Oral Tablet
+        Start: '2018-11-15T00:00:00.000+00:00'
+        End: null
+        Status: active
+      -
+        Type: Order
+        Name: 12 HR Oxycodone Hydrochloride 80 MG Extended Release Oral Tablet
+        Start: '2018-10-10T00:00:00.000+00:00'
+        End: null
+        Status: active
+      NonOpioidMedications:
+      -
+        Type: Statement
+        Name: Diazepam 5 MG Oral Tablet
+        Start: '2018-12-01T00:00:00.000+00:00'
+        End: null
+        Status: active
+      -
+        Type: Order
+        Name: Diazepam 5 MG Oral Tablet
+        Start: '2018-11-05T00:00:00.000+00:00'
+        End: null
+        Status: active
+      -
+        Type: Order
+        Name: Aspirin 75 MG Oral Tablet
+        Start: '2018-09-06T00:00:00.000+00:00'
+        End: null
+        Status: active
+      -
+        Type: Statement
+        Name: Ibuprofen 200 MG Oral Tablet
+        Start: '2017-11-12T00:00:00.000+00:00'
+        End: null
+        Status: active
+      NonPharmacologicTreatments:
+      -
+        Type: Procedure
+        Name: Chiropraxy (regime/therapy)
+        Date: '2018-12-05T00:00:00.000+00:00'
+      StoolSoftenersAndLaxatives:
+      -
+        Type: Statement
+        Name: POLYETHYLENE GLYCOL 3350 17000 MG Powder for Oral Solution
+        Start: '2018-12-05T00:00:00.000+00:00'
+        End: null
+        Status: active
+      -
+        Type: Order
+        Name: POLYETHYLENE GLYCOL 3350 17000 MG Powder for Oral Solution
+        Start: '2018-11-05T00:00:00.000+00:00'
+        End: null
+        Status: active
+    RiskConsiderations:
+      RiskScreeningsRelevantToPainManagement:
+      -
+        Name: 'Patient Health Questionnaire 9 item (PHQ-9) total score [Reported] [Range: 0-27]'
+        Score: '7'
+        Interpretation: 'Mild depression'
+        Date: '2018-10-20T00:00:00.000+00:00'
+      BenzodiazepineMedications:
+      -
+        Type: Statement
+        Name: Diazepam 5 MG Oral Tablet
+        Start: '2018-12-01T00:00:00.000+00:00'
+        End: null
+        Status: active
+      -
+        Type: Order
+        Name: Diazepam 5 MG Oral Tablet
+        Start: '2018-11-05T00:00:00.000+00:00'
+        End: null
+        Status: active
+      NaloxoneMedications:
+      -
+        Type: Order
+        Name: Naloxone Hydrochloride 40 MG/ML Nasal Spray
+        Start: '2018-12-20T00:00:00.000+00:00'
+        End: null
+        Status: active
+      -
+        Type: Statement
+        Name: Naloxone Hydrochloride 40 MG/ML Nasal Spray
+        Start: '2018-12-10T00:00:00.000+00:00'
+        End: null
+        Status: active
+      UrineDrugScreens:
+      -
+        Name: Opiates [Presence] in Urine by Screen method
+        Result: 2300 ng/mL
+        Interpretation: Negative
+        Date: '2018-10-20T00:00:00.000+00:00'
+      MostRecentMME:
+        Name: Morphine Milligram Equivalent (MME)
+        Result: 20 {MME}/d
+        Date: '2018-12-01T00:00:00.000+00:00'

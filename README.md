@@ -7,7 +7,7 @@ The CQL Testing Framework provides a simple mechanism for developing and maintai
 Current capabilities include:
 
 * Author test case data and expectations using [YAML](https://yaml.org/)
-* Execute test cases against CQL logic using [FHIR 1.0.2 (DSTU2)](http://hl7.org/fhir/DSTU2/resourcelist.html) or [FHIR 3.0.0 (STU3)](http://hl7.org/fhir/STU3/resourcelist.html) model and [VSAC](https://vsac.nlm.nih.gov/) value sets
+* Execute test cases against CQL logic using [FHIR 1.0.2 (DSTU2)](http://hl7.org/fhir/DSTU2/resourcelist.html) / [FHIR 3.0.0 (STU3)](http://hl7.org/fhir/STU3/resourcelist.html) / [FHIR 4.0.0 (R4)](http://hl7.org/fhir/R4/resourcelist.html) model and [VSAC](https://vsac.nlm.nih.gov/) value sets
 * Display _diff_ rendering of actual vs. expected results for test failures
 * Run standalone or integrate CQL tests into existing [Mocha](https://mochajs.org/) test suites
 * Export test data as FHIR bundles for integration into a test server
@@ -16,7 +16,6 @@ Current capabilities include:
 
 Current limitations:
 
-* Only FHIR 1.0.2 (DSTU2) and 3.0.0 (STU3) are supported
 * Only VSAC value sets are supported
 
 ## Contributions

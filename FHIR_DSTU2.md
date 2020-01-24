@@ -187,6 +187,7 @@ A provider issued list of services and products provided, or to be provided, to 
 |     | Field | Description |
 | --- | ----- | ----------- |
 | Patient Reference | patient | Patient Resource. |
+| Default Value | use | Complete (Bill or Claim), Proposed (Pre-Authorization), Exploratory (Pre-determination). <br /> **Default:** _complete_ |
 
 
 See the [Claim FHIR Documentation](http://hl7.org/fhir/DSTU2/claim.html) for the full list of

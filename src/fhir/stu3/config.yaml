@@ -21,6 +21,8 @@ resources:
       status: rare
   AdverseEvent:
     patient: subject
+    defaults:
+      type: actual
   AllergyIntolerance:
     patient: patient
     defaults:
@@ -71,6 +73,7 @@ resources:
     patient: patient
     defaults:
       status: active
+      use: complete
   ClaimResponse:
     patient: patient
     defaults:
@@ -122,6 +125,8 @@ resources:
     defaults:
       status: active
   Contract:
+    defaults:
+      status: executed
     doc:
       status: rare
   Coverage:
@@ -318,6 +323,7 @@ resources:
     patient: subject
     defaults:
       status: active
+      intent: order
     aliases:
       code: medicationCodeableConcept
     doc:
@@ -425,6 +431,7 @@ resources:
     patient: subject
     defaults:
       status: active
+      intent: order
   ResearchStudy:
     defaults:
       status: active
@@ -487,14 +494,14 @@ resources:
   Task:
     defaults:
       status: completed
-  TestScript:
-    defaults:
-      status: active
-    doc:
-      status: rare
   TestReport:
     defaults:
       status: completed
+    doc:
+      status: rare
+  TestScript:
+    defaults:
+      status: active
     doc:
       status: rare
   ValueSet:

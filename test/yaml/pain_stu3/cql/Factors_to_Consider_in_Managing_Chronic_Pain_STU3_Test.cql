@@ -24,9 +24,9 @@ using FHIR version '3.0.0'
 
 // # Referenced libraries #
 
-// The CDS Connect Commons for FHIRv102 library provides functions representing commonly used CDS logic and patterns.
+// The CDS Connect Commons for FHIRv300 library provides functions representing commonly used CDS logic and patterns.
 include CDS_Connect_Commons_for_FHIRv300 version '1.1.0' called C3F
-// The FHIRHelpers library provides common functions for simplifying interaction w/ the FHIR v102 data model.
+// The FHIRHelpers library provides common functions for simplifying interaction w/ the FHIR v300 data model.
 include FHIRHelpers version '3.0.0' called FHIRHelpers
 
 // # Value sets and codes #

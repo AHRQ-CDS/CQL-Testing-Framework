@@ -1,0 +1,587 @@
+---
+resources:
+# ResourceName: the FHIR resource name -- we should have every available FHIR resource listed in this file
+#   patient: top-level property that serves as a reference to the Patient (usually patient or subject)
+#   defaults: default values to use for properties when they're not set (top-level properties only)
+#     propertyName1: defaultPropertyValue1
+#     propertyName2: defaultPropertyValue2
+#   aliases: aliases that allow authors to use simpler names (top-level properties only)
+#     alias1: actualPropertyName1
+#     alias2: actualPropertyName2
+#   doc: special information used when generating documentation
+#     status: indicates how common the resource is for CDS (allowed values: common, rare)
+  Account:
+    patient: subject
+    defaults:
+      status: active
+  ActivityDefinition:
+    defaults:
+      status: active
+    doc:
+      status: rare
+  AdverseEvent:
+    patient: subject
+    defaults:
+      actuality: actual
+  AllergyIntolerance:
+    patient: patient
+    defaults:
+      clinicalStatus: active
+      verificationStatus: confirmed
+    doc:
+      status: common
+  Appointment:
+    defaults:
+      status: booked
+  AppointmentResponse:
+    patient: actor
+    defaults:
+      participantStatus: accepted
+  AuditEvent:
+    doc:
+      status: rare
+  Basic:
+    patient: subject
+    doc:
+      status: rare
+  Binary:
+    # no patient/defaults/aliases
+  BiologicallyDerivedProduct:
+    defaults:
+      status: available
+  BodyStructure:
+    patient: patient
+  Bundle:
+    # no patient/defaults/aliases
+  CapabilityStatement:
+    defaults:
+      status: active
+    doc:
+      status: rare
+  CarePlan:
+    patient: subject
+    defaults:
+      status: active
+    doc:
+      status: common
+  CareTeam:
+    patient: subject
+    defaults:
+      status: active
+  CatalogEntry:
+    defaults:
+      status: active
+  ChargeItem:
+    patient: subject
+    defaults:
+      status: billed
+  ChargeItemDefinition:
+    defaults:
+      status: active
+  Claim:
+    patient: patient
+    defaults:
+      status: active
+      use: claim
+  ClaimResponse:
+    patient: patient
+    defaults:
+      status: active
+      outcome: complete
+  ClinicalImpression:
+    patient: subject
+    defaults:
+      status: completed
+  CodeSystem:
+    defaults:
+      status: active
+    doc:
+      status: rare
+  Communication:
+    patient: subject
+    defaults:
+      status: completed
+  CommunicationRequest:
+    patient: subject
+    defaults:
+      status: completed
+  CompartmentDefinition:
+    defaults:
+      status: active
+    doc:
+      status: rare
+  Composition:
+    patient: subject
+    defaults:
+      status: final
+  ConceptMap:
+    defaults:
+      status: active
+    doc:
+      status: rare
+  Condition:
+    patient: subject
+    defaults:
+      clinicalStatus:
+        $if-present: abatementDateTime
+        $then: http://terminology.hl7.org/CodeSystem/condition-clinical#resolved Resolved
+        $else: http://terminology.hl7.org/CodeSystem/condition-clinical#active Active
+      verificationStatus: http://terminology.hl7.org/CodeSystem/condition-ver-status#confirmed Confirmed
+    doc:
+      status: common
+  Consent:
+    patient: patient
+    defaults:
+      status: active
+  Contract:
+    defaults:
+      status: executed
+    doc:
+      status: rare
+  Coverage:
+    patient: beneficiary
+    defaults:
+      status: active
+  CoverageEligibilityRequest:
+    patient: patient
+    defaults:
+      status: active
+  CoverageEligibilityResponse:
+    patient: patient
+    defaults:
+      status: active
+      outcome: complete
+  DetectedIssue:
+    patient: patient
+    defaults:
+      status: final
+  Device:
+    patient: patient
+    defaults:
+      status: active
+    doc:
+      status: common
+  DeviceDefinition:
+    # no patient/defaults/aliases
+  DeviceMetric:
+    # no patient/defaults/aliases
+  DeviceRequest:
+    patient: subject
+    defaults:
+      status: completed
+  DeviceUseStatement:
+    patient: subject
+    defaults:
+      status: active
+  DiagnosticReport:
+    patient: subject
+    defaults:
+      status: final
+    doc:
+      status: common
+  DocumentManifest:
+    patient: subject
+    defaults:
+      status: current
+  DocumentReference:
+    patient: subject
+    defaults:
+      status: current
+      docStatus: http://hl7.org/fhir/composition-status#final Final
+  DomainResource:
+    doc:
+      status: rare
+  EffectEvidenceSynthesis:
+    defaults:
+      status: active
+  Encounter:
+    patient: subject
+    defaults:
+      status: finished
+    doc:
+      status: common
+  Endpoint:
+    defaults:
+      status: active
+    doc:
+      status: rare
+  EnrollmentRequest:
+    patient: candidate
+    defaults:
+      status: active
+  EnrollmentResponse:
+    defaults:
+      status: active
+      outcome: complete
+  EpisodeOfCare:
+    patient: patient
+    defaults:
+      status: finished
+  EventDefinition:
+    defaults:
+      status: active
+  Evidence:
+    defaults:
+      status: active
+  EvidenceVariable:
+    defaults:
+      status: active
+  ExampleScenario:
+    defaults:
+      status: active
+  ExplanationOfBenefit:
+    patient: patient
+    defaults:
+      status: active
+      use: claim
+      outcome: complete
+  FamilyMemberHistory:
+    patient: patient
+    defaults:
+      status: completed
+      name: Unknown
+    doc:
+      status: common
+  Flag:
+    patient: subject
+    defaults:
+      status: active
+  Goal:
+    patient: subject
+    defaults:
+      lifecycleStatus:
+        $if-present: outcomeCode
+        $then: completed
+        $else: accepted
+    doc:
+      status: common
+  GraphDefinition:
+    defaults:
+      status: active
+    doc:
+      status: rare
+  Group:
+    # no patient/defaults/aliases
+  GuidanceResponse:
+    patient: subject
+    defaults:
+      status: success
+  HealthcareService:
+    # no patient/defaults/aliases
+  ImagingStudy:
+    patient: subject
+    defaults:
+      status: available
+  Immunization:
+    patient: patient
+    defaults:
+      status: completed
+      primarySource: true
+    doc:
+      status: common
+  ImmunizationEvaluation:
+    patient: patient
+    defaults:
+      status: completed
+  ImmunizationRecommendation:
+    patient: patient
+  ImplementationGuide:
+    defaults:
+      status: active
+    doc:
+      status: rare
+  InsurancePlan:
+    defaults:
+      status: active
+  Invoice:
+    patient: subject
+    defaults:
+      status: balanced
+  Library:
+    defaults:
+      status: active
+    doc:
+      status: rare
+  Linkage:
+    # no patient/defaults/aliases
+  List:
+    patient: subject
+    defaults:
+      status: current
+      mode: working
+  Location:
+    defaults:
+      status: active
+  Measure:
+    defaults:
+      status: active
+    doc:
+      status: rare
+  MeasureReport:
+    patient: subject
+    defaults:
+      status: complete
+    doc:
+      status: rare
+  Media:
+    patient: subject
+    defaults:
+      status: completed
+  Medication:
+    defaults:
+      status: active
+    doc:
+      status: common
+  MedicationAdministration:
+    patient: subject
+    defaults:
+      status: completed
+    aliases:
+      code: medicationCodeableConcept
+    doc:
+      status: common
+  MedicationDispense:
+    patient: subject
+    defaults:
+      status: completed
+    aliases:
+      code: medicationCodeableConcept
+  MedicationKnowledge:
+    defaults:
+      status: active
+  MedicationRequest:
+    patient: subject
+    defaults:
+      status: active
+      intent: order
+      doNotPerform: false
+    aliases:
+      code: medicationCodeableConcept
+    doc:
+      status: common
+  MedicationStatement:
+    patient: subject
+    defaults:
+      status: active
+    aliases:
+      code: medicationCodeableConcept
+    doc:
+      status: common
+  MedicinalProduct:
+    # no patient/defaults/aliases
+  MedicinalProductAuthorization:
+    # no patient/defaults/aliases
+  MedicinalProductContraindication:
+    # no patient/defaults/aliases
+  MedicinalProductIndication:
+    # no patient/defaults/aliases
+  MedicinalProductIngredient:
+    # no patient/defaults/aliases
+  MedicinalProductInteraction:
+    # no patient/defaults/aliases
+  MedicinalProductManufactured:
+    # no patient/defaults/aliases
+  MedicinalProductPackaged:
+    # no patient/defaults/aliases
+  MedicinalProductPharmaceutical:
+    # no patient/defaults/aliases
+  MedicinalProductUndesirableEffect:
+    # no patient/defaults/aliases
+  MessageDefinition:
+    defaults:
+      status: active
+    doc:
+      status: rare
+  MessageHeader:
+    # no patient/defaults/aliases
+  MolecularSequence:
+    patient: patient
+  NamingSystem:
+    defaults:
+      status: active
+    doc:
+      status: rare
+  NutritionOrder:
+    patient: patient
+    defaults:
+      status: active
+      intent: order
+  Observation:
+    patient: subject
+    defaults:
+      status: final
+    doc:
+      status: common
+  ObservationDefinition:
+    # no patient/defaults/aliases
+  OperationDefinition:
+    defaults:
+      status: active
+    doc:
+      status: rare
+  OperationOutcome:
+    doc:
+      status: rare
+  Organization:
+    # no patient/defaults/aliases
+  OrganizationAffiliation:
+    # no patient/defaults/aliases
+  Parameters:
+    doc:
+      status: rare
+  Patient:
+    doc:
+      status: common
+  PaymentNotice:
+    defaults:
+      status: active
+  PaymentReconciliation:
+    defaults:
+      status: active
+      outcome: complete
+  Person:
+    # no patient/defaults/aliases
+  PlanDefinition:
+    defaults:
+      status: active
+    doc:
+      status: rare
+  Practitioner:
+    # no patient/defaults/aliases
+  PractitionerRole:
+    doc:
+      status: common
+  Procedure:
+    patient: subject
+    defaults:
+      status: completed
+    doc:
+      status: common
+  Provenance:
+    # no patient/defaults/aliases
+  Questionnaire:
+    defaults:
+      status: active
+  QuestionnaireResponse:
+    patient: subject
+    defaults:
+      status: completed
+  RelatedPerson:
+    patient: patient
+  RequestGroup:
+    patient: subject
+    defaults:
+      status: active
+      intent: order
+  ResearchDefinition:
+    defaults:
+      status: active
+  ResearchElementDefinition:
+    defaults:
+      status: active
+  ResearchStudy:
+    defaults:
+      status: active
+  ResearchSubject:
+    patient: individual
+    defaults:
+      status: on-study
+  Resource:
+    doc:
+      status: rare
+  RiskAssessment:
+    patient: subject
+    defaults:
+      status: final
+  RiskEvidenceSynthesis:
+    defaults:
+      status: active
+  Schedule:
+    # no patient/defaults/aliases
+  SearchParameter:
+    defaults:
+      status: active
+    doc:
+      status: rare
+  ServiceRequest:
+    defaults:
+      status: active
+      intent: order
+      doNotPerform: false
+  Slot:
+    # no patient/defaults/aliases
+  Specimen:
+    patient: subject
+    defaults:
+      status: available
+  SpecimenDefinition:
+    # no patient/defaults/aliases
+  StructureDefinition:
+    defaults:
+       status: active
+    doc:
+      status: rare
+  StructureMap:
+    defaults:
+      status: active
+    doc:
+      status: rare
+  Subscription:
+    defaults:
+      status: active
+    doc:
+      status: rare
+  Substance:
+    defaults:
+      status: active
+  SubstanceNucleicAcid:
+    # no patient/defaults/aliases
+  SubstancePolymer:
+    # no patient/defaults/aliases
+  SubstanceProtein:
+    # no patient/defaults/aliases
+  SubstanceReferenceInformation:
+    # no patient/defaults/aliases
+  SubstanceSpecification:
+    # no patient/defaults/aliases
+  SubstanceSourceMaterial:
+    # no patient/defaults/aliases
+  SupplyDelivery:
+    patient: patient
+    defaults:
+      status: completed
+  SupplyRequest:
+    defaults:
+      status: active
+  Task:
+    defaults:
+      status: completed
+  TerminologyCapabilities:
+    defaults:
+      status: active
+    doc:
+      status: rare
+  TestReport:
+    defaults:
+      status: completed
+    doc:
+      status: rare
+  TestScript:
+    defaults:
+      status: active
+    doc:
+      status: rare
+  ValueSet:
+    defaults:
+      status: active
+    doc:
+      status: rare
+  VerificationResult:
+    defaults:
+      status: validated
+    doc:
+      status: rare
+  VisionPrescription:
+    patient: patient
+    defaults:
+      status: active

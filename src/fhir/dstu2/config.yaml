@@ -48,6 +48,8 @@ resources:
       status: common
   Claim:
     patient: patient
+    defaults:
+      use: complete
   ClaimResponse:
     defaults:
       outcome: complete
