@@ -211,6 +211,7 @@ function getValue(yamlResource, yamlValue, element, scopedElements, fhir, skipCa
   case 'id':
   case 'markdown':
   case 'uri':
+  case 'canonical':
   case 'oid':
   case 'base64Binary':
     return getString(yamlValue);
