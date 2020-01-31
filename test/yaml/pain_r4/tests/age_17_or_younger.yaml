@@ -30,7 +30,7 @@ results:
       OpioidMedications: []
       NonOpioidMedications:
       -
-        Type: Order
+        Type: Request
         Name: Diazepam 5 MG Oral Tablet
         Start: '2018-12-05T00:00:00.000+00:00'
         End: null
@@ -41,7 +41,7 @@ results:
       RiskScreeningsRelevantToPainManagement: []
       BenzodiazepineMedications:
       -
-        Type: Order
+        Type: Request
         Name: Diazepam 5 MG Oral Tablet
         Start: '2018-12-05T00:00:00.000+00:00'
         End: null

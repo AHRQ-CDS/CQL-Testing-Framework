@@ -21,17 +21,17 @@ data:
   $import: *painRelatedConditions
 # The `$iterate` keyword will cause a set of test cases to be created, each containing
 # just one of the resources in the referenced external YAML file. In the example below
-# nonOpioidMedicationOrders is contained in more_resources.yml and consists of two
-# MedicationOrder resources, from which two separate test cases are generated, each
-# with one of the MedicationOrder resources. Both test cases will include everything from
+# nonOpioidMedicationRequests is contained in more_resources.yml and consists of two
+# MedicationRequest resources, from which two separate test cases are generated, each
+# with one of the MedicationRequest resources. Both test cases will include everything from
 # painRelatedConditions.
 -
-  $iterate: *nonOpioidMedicationOrders
+  $iterate: *nonOpioidMedicationRequests
 # There can be more than one usage of the `$iterate` keyword in a single file, in which
 # case the effects are combined to generate all possible combination of resources. In the
 # example below, nonOpioidMedicationStatements is contained in more_resources.yml and consists
 # of two MedicationStatement resources. A total of 2*2=4 separate test cases are created
-# consisting of all possible combinations of resources from nonOpioidMedicationOrders and
+# consisting of all possible combinations of resources from nonOpioidMedicationRequests and
 # nonOpioidMedicationStatements. All test cases will include everything from painRelatedConditions.
 -
   $iterate: *nonOpioidMedicationStatements

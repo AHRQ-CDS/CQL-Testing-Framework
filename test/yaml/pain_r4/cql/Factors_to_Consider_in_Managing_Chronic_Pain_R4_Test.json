@@ -22,7 +22,7 @@
          "def" : [ {
             "localIdentifier" : "C3F",
             "path" : "CDS_Connect_Commons_for_FHIRv400",
-            "version" : "1.1.0"
+            "version" : "1.0.0"
          }, {
             "localIdentifier" : "FHIRHelpers",
             "path" : "FHIRHelpers",
@@ -1243,6 +1243,25 @@
                      },
                      "asTypeSpecifier" : {
                         "name" : "{http://hl7.org/fhir}dateTime",
+                        "type" : "NamedTypeSpecifier"
+                     }
+                  } ]
+               }, {
+                  "name" : "InstantText",
+                  "type" : "FunctionRef",
+                  "operand" : [ {
+                     "strict" : false,
+                     "type" : "As",
+                     "operand" : {
+                        "path" : "effective",
+                        "type" : "Property",
+                        "source" : {
+                           "name" : "o",
+                           "type" : "OperandRef"
+                        }
+                     },
+                     "asTypeSpecifier" : {
+                        "name" : "{http://hl7.org/fhir}instant",
                         "type" : "NamedTypeSpecifier"
                      }
                   } ]
@@ -4036,7 +4055,7 @@
                         "name" : "Type",
                         "value" : {
                            "valueType" : "{urn:hl7-org:elm-types:r1}String",
-                           "value" : "Order",
+                           "value" : "Request",
                            "type" : "Literal"
                         }
                      }, {
@@ -4317,7 +4336,7 @@
                         "name" : "Type",
                         "value" : {
                            "valueType" : "{urn:hl7-org:elm-types:r1}String",
-                           "value" : "Order",
+                           "value" : "Request",
                            "type" : "Literal"
                         }
                      }, {
@@ -4751,7 +4770,7 @@
                }
             }
          }, {
-            "name" : "StoolSoftenersAndLaxativesOrders",
+            "name" : "StoolSoftenersAndLaxativesRequests",
             "context" : "Patient",
             "accessLevel" : "Public",
             "expression" : {
@@ -4805,7 +4824,7 @@
                } ]
             }
          }, {
-            "name" : "ReportStoolSoftenersAndLaxativesOrders",
+            "name" : "ReportStoolSoftenersAndLaxativesRequests",
             "context" : "Patient",
             "accessLevel" : "Public",
             "expression" : {
@@ -4813,7 +4832,7 @@
                "source" : [ {
                   "alias" : "O",
                   "expression" : {
-                     "name" : "StoolSoftenersAndLaxativesOrders",
+                     "name" : "StoolSoftenersAndLaxativesRequests",
                      "type" : "ExpressionRef"
                   }
                } ],
@@ -4825,7 +4844,7 @@
                         "name" : "Type",
                         "value" : {
                            "valueType" : "{urn:hl7-org:elm-types:r1}String",
-                           "value" : "Order",
+                           "value" : "Request",
                            "type" : "Literal"
                         }
                      }, {
@@ -5010,7 +5029,7 @@
                   "expression" : {
                      "type" : "Union",
                      "operand" : [ {
-                        "name" : "ReportStoolSoftenersAndLaxativesOrders",
+                        "name" : "ReportStoolSoftenersAndLaxativesRequests",
                         "type" : "ExpressionRef"
                      }, {
                         "name" : "ReportStoolSoftenersAndLaxativesStatements",
@@ -5281,20 +5300,14 @@
                      }, {
                         "name" : "Interpretation",
                         "value" : {
-                           "type" : "Coalesce",
+                           "name" : "ConceptText",
+                           "type" : "FunctionRef",
                            "operand" : [ {
-                              "type" : "ToList",
-                              "operand" : {
-                                 "name" : "ConceptText",
-                                 "type" : "FunctionRef",
-                                 "operand" : [ {
-                                    "type" : "First",
-                                    "source" : {
-                                       "path" : "interpretation",
-                                       "scope" : "S",
-                                       "type" : "Property"
-                                    }
-                                 } ]
+                              "type" : "First",
+                              "source" : {
+                                 "path" : "interpretation",
+                                 "scope" : "S",
+                                 "type" : "Property"
                               }
                            } ]
                         }
@@ -5347,6 +5360,107 @@
                } ]
             }
          }, {
+            "name" : "MedicationStatementLookBack",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "type" : "FunctionDef",
+            "expression" : {
+               "type" : "Query",
+               "source" : [ {
+                  "alias" : "M",
+                  "expression" : {
+                     "name" : "MedList",
+                     "type" : "OperandRef"
+                  }
+               } ],
+               "let" : [ {
+                  "identifier" : "LookBackInterval",
+                  "expression" : {
+                     "lowClosed" : true,
+                     "highClosed" : true,
+                     "type" : "Interval",
+                     "low" : {
+                        "type" : "Subtract",
+                        "operand" : [ {
+                           "type" : "Now"
+                        }, {
+                           "name" : "LookBack",
+                           "type" : "OperandRef"
+                        } ]
+                     },
+                     "high" : {
+                        "type" : "Now"
+                     }
+                  }
+               } ],
+               "relationship" : [ ],
+               "where" : {
+                  "type" : "Or",
+                  "operand" : [ {
+                     "type" : "In",
+                     "operand" : [ {
+                        "path" : "value",
+                        "type" : "Property",
+                        "source" : {
+                           "strict" : false,
+                           "type" : "As",
+                           "operand" : {
+                              "path" : "effective",
+                              "scope" : "M",
+                              "type" : "Property"
+                           },
+                           "asTypeSpecifier" : {
+                              "name" : "{http://hl7.org/fhir}dateTime",
+                              "type" : "NamedTypeSpecifier"
+                           }
+                        }
+                     }, {
+                        "name" : "LookBackInterval",
+                        "type" : "QueryLetRef"
+                     } ]
+                  }, {
+                     "type" : "Overlaps",
+                     "operand" : [ {
+                        "name" : "PeriodToInterval",
+                        "libraryName" : "C3F",
+                        "type" : "FunctionRef",
+                        "operand" : [ {
+                           "strict" : false,
+                           "type" : "As",
+                           "operand" : {
+                              "path" : "effective",
+                              "scope" : "M",
+                              "type" : "Property"
+                           },
+                           "asTypeSpecifier" : {
+                              "name" : "{http://hl7.org/fhir}Period",
+                              "type" : "NamedTypeSpecifier"
+                           }
+                        } ]
+                     }, {
+                        "name" : "LookBackInterval",
+                        "type" : "QueryLetRef"
+                     } ]
+                  } ]
+               }
+            },
+            "operand" : [ {
+               "name" : "MedList",
+               "operandTypeSpecifier" : {
+                  "type" : "ListTypeSpecifier",
+                  "elementType" : {
+                     "name" : "{http://hl7.org/fhir}MedicationStatement",
+                     "type" : "NamedTypeSpecifier"
+                  }
+               }
+            }, {
+               "name" : "LookBack",
+               "operandTypeSpecifier" : {
+                  "name" : "{urn:hl7-org:elm-types:r1}Quantity",
+                  "type" : "NamedTypeSpecifier"
+               }
+            } ]
+         }, {
             "name" : "BenzodiazepineMedicationStatements",
             "context" : "Patient",
             "accessLevel" : "Public",
@@ -5394,7 +5508,7 @@
                         "name" : "Type",
                         "value" : {
                            "valueType" : "{urn:hl7-org:elm-types:r1}String",
-                           "value" : "Order",
+                           "value" : "Request",
                            "type" : "Literal"
                         }
                      }, {
@@ -5657,7 +5771,7 @@
                         "name" : "Type",
                         "value" : {
                            "valueType" : "{urn:hl7-org:elm-types:r1}String",
-                           "value" : "Order",
+                           "value" : "Request",
                            "type" : "Literal"
                         }
                      }, {
