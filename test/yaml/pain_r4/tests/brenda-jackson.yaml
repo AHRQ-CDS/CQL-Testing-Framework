@@ -370,93 +370,93 @@ results:
           Date: '2017-11-15T16:00:00.000+00:00'
     HistoricalTreatments:
       OpioidMedications:
-        - Type: Order
+        - Type: Request
           Name: 12 HR Oxycodone Hydrochloride 60 MG Extended Release Oral Tablet
           Start: '2018-10-15T16:02:00.000+00:00'
           End: null
           Status: active
-        - Type: Order
+        - Type: Request
           Name: Oxycodone Hydrochloride 10 MG Oral Capsule
           Start: '2018-10-15T16:01:00.000+00:00'
           End: null
           Status: active
-        - Type: Order
+        - Type: Request
           Name: 12 HR Oxycodone Hydrochloride 60 MG Extended Release Oral Tablet
           Start: '2018-07-15T16:02:00.000+00:00'
           End: null
           Status: active
-        - Type: Order
+        - Type: Request
           Name: Oxycodone Hydrochloride 10 MG Oral Capsule
           Start: '2018-07-15T16:01:00.000+00:00'
           End: null
           Status: active
-        - Type: Order
+        - Type: Request
           Name: 12 HR Oxycodone Hydrochloride 60 MG Extended Release Oral Tablet
           Start: '2018-04-15T16:02:00.000+00:00'
           End: null
           Status: active
-        - Type: Order
+        - Type: Request
           Name: Oxycodone Hydrochloride 10 MG Oral Capsule
           Start: '2018-04-15T16:01:00.000+00:00'
           End: null
           Status: active
-        - Type: Order
+        - Type: Request
           Name: 12 HR Oxycodone Hydrochloride 60 MG Extended Release Oral Tablet
           Start: '2018-01-15T16:02:00.000+00:00'
           End: null
           Status: active
-        - Type: Order
+        - Type: Request
           Name: Oxycodone Hydrochloride 10 MG Oral Capsule
           Start: '2018-01-15T16:01:00.000+00:00'
           End: null
           Status: active
-        - Type: Order
+        - Type: Request
           Name: 12 HR Oxycodone Hydrochloride 60 MG Extended Release Oral Tablet
           Start: '2017-10-15T16:02:00.000+00:00'
           End: null
           Status: active
-        - Type: Order
+        - Type: Request
           Name: Oxycodone Hydrochloride 10 MG Oral Capsule
           Start: '2017-10-15T16:01:00.000+00:00'
           End: null
           Status: active
-        - Type: Order
+        - Type: Request
           Name: 12 HR Oxycodone Hydrochloride 60 MG Extended Release Oral Tablet
           Start: '2017-07-15T16:02:00.000+00:00'
           End: null
           Status: active
-        - Type: Order
+        - Type: Request
           Name: Oxycodone Hydrochloride 10 MG Oral Capsule
           Start: '2017-07-15T16:01:00.000+00:00'
           End: null
           Status: active
-        - Type: Order
+        - Type: Request
           Name: 12 HR Oxycodone Hydrochloride 60 MG Extended Release Oral Tablet
           Start: '2017-04-15T16:02:00.000+00:00'
           End: null
           Status: active
-        - Type: Order
+        - Type: Request
           Name: Oxycodone Hydrochloride 10 MG Oral Capsule
           Start: '2017-04-15T16:01:00.000+00:00'
           End: null
           Status: active
-        - Type: Order
+        - Type: Request
           Name: 12 HR Oxycodone Hydrochloride 60 MG Extended Release Oral Tablet
           Start: '2017-01-15T16:02:00.000+00:00'
           End: null
           Status: active
-        - Type: Order
+        - Type: Request
           Name: Oxycodone Hydrochloride 10 MG Oral Capsule
           Start: '2017-01-15T16:01:00.000+00:00'
           End: null
           Status: active
       NonOpioidMedications:
-        - Type: Order
+        - Type: Request
           Name: Ibuprofen 600 MG Oral Tablet
           Start: '2017-11-15T16:00:00.000+00:00'
           End: null
           Status: active
-        - Type: Order
+        - Type: Request
           Name: Acetaminophen 500 MG Oral Tablet
           Start: '2017-11-15T16:00:00.000+00:00'
           End: null

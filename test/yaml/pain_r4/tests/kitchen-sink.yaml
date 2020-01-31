@@ -183,7 +183,7 @@ results:
         End: null
         Status: active
       -
-        Type: Order
+        Type: Request
         Name: 12 HR Oxycodone Hydrochloride 80 MG Extended Release Oral Tablet
         Start: '2018-10-10T00:00:00.000+00:00'
         End: null
@@ -196,13 +196,13 @@ results:
         End: null
         Status: active
       -
-        Type: Order
+        Type: Request
         Name: Diazepam 5 MG Oral Tablet
         Start: '2018-11-05T00:00:00.000+00:00'
         End: null
         Status: active
       -
-        Type: Order
+        Type: Request
         Name: Aspirin 75 MG Oral Tablet
         Start: '2018-09-06T00:00:00.000+00:00'
         End: null
@@ -226,7 +226,7 @@ results:
         End: null
         Status: active
       -
-        Type: Order
+        Type: Request
         Name: POLYETHYLENE GLYCOL 3350 17000 MG Powder for Oral Solution
         Start: '2018-11-05T00:00:00.000+00:00'
         End: null
@@ -246,14 +246,14 @@ results:
         End: null
         Status: active
       -
-        Type: Order
+        Type: Request
         Name: Diazepam 5 MG Oral Tablet
         Start: '2018-11-05T00:00:00.000+00:00'
         End: null
         Status: active
       NaloxoneMedications:
       -
-        Type: Order
+        Type: Request
         Name: Naloxone Hydrochloride 40 MG/ML Nasal Spray
         Start: '2018-12-20T00:00:00.000+00:00'
         End: null

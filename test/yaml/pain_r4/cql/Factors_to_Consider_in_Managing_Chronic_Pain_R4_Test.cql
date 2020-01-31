@@ -1,8 +1,5 @@
 // # Introduction
 
-// NOTE: THIS IS AN UNTESTED FHIR R4 PORT OF THE PAIN MANAGEMENT SUMMARY.
-// THIS ARTIFACT IS INTENDED FOR TESTING PURPOSES ONLY!
-
 // The Pain Management Summary artifact provides relevant information to consider when managing a patient’s pain.
 // This CDS logic was informed by the Centers for Disease Control and Prevention (CDC) Guideline for Opioid Prescribing
 // for Chronic Pain. The CDS is not a direct representation of any one recommendation statement within the guideline.
@@ -12,6 +9,8 @@
 // In the process of authoring the logic, certain assumptions were made and details developed when the guideline did
 // not provide enough specificity.  These decisions were made in the context of the CDS Connect Workgroup and CDC
 // stakeholders, and are documented in the logic and/or in the CDS Connect artifact metadata.
+//
+// NOTE: This is a FHIR R4 port of the original FHIR DSTU2 CQL piloted for CDS Connect. This version has not been piloted.
 //
 // ##Source guideline: [CDC Guideline for Opioid Prescribing for Chronic Pain](https://www.cdc.gov/drugoverdose/prescribing/guideline.html)
 
@@ -25,7 +24,7 @@ using FHIR version '4.0.0'
 // # Referenced libraries #
 
 // The CDS Connect Commons for FHIRv400 library provides functions representing commonly used CDS logic and patterns.
-include CDS_Connect_Commons_for_FHIRv400 version '1.1.0' called C3F
+include CDS_Connect_Commons_for_FHIRv400 version '1.0.0' called C3F
 // The FHIRHelpers library provides common functions for simplifying interaction w/ the FHIR R4 data model.
 include FHIRHelpers version '4.0.0' called FHIRHelpers
 
@@ -276,14 +275,22 @@ define function RangeObject(r FHIR.Range):
 // @param o - a FHIR Observation to get the text date from
 // @returns {System.String} the text representation of a relevant date from the Observation
 define function ObservationDate(o FHIR.Observation):
-  Coalesce(DateTimeText(o.effective as FHIR.dateTime), DateTimeText((o.effective as FHIR.Period)."start"), InstantText(o.issued))
+  Coalesce(
+    DateTimeText(o.effective as FHIR.dateTime),
+    InstantText(o.effective as FHIR.instant),
+    DateTimeText((o.effective as FHIR.Period)."start"),
+    InstantText(o.issued)
+  )
 
 // Returns a text representation of a date associated with a MedicationStatement, preferring `effectiveDateTime`, then
 // `.start`.
-// @param m - a FHIR MedicationStatement to get the text date from
+// @param s - a FHIR MedicationStatement to get the text date from
 // @returns {System.String} the text representation of a relevant date from the MedicationStatement
 define function MedicationStatementDate(s FHIR.MedicationStatement):
-  Coalesce(DateTimeText(s.effective as FHIR.dateTime), DateTimeText((s.effective as FHIR.Period)."start"))
+  Coalesce(
+    DateTimeText(s.effective as FHIR.dateTime),
+    DateTimeText((s.effective as FHIR.Period)."start")
+  )
 
 // Returns a text representation of a Condition's onset, whether represented as a dateTime, Period, Quantity (Age),
 // Range (Age), or string.
@@ -338,7 +345,7 @@ define HasConditionAssociatedWithChronicPain:
   exists(ConditionsAssociatedWithChronicPain)
 
 // Determines if the patient has any record of opioid pain medications in the lookback period
-//       - Medication Order within past 180 days (lookback can be made a parameter)
+//       - Medication Request within past 180 days (lookback can be made a parameter)
 //       - Medication Statement by patient within past 180 days (lookback can be made a parameter)
 define HasRecentOpioidPainMedication:
   exists(C3F.ActiveCompletedOrStoppedMedicationRequest(C3F.MedicationRequestLookBack(
@@ -351,7 +358,7 @@ define HasRecentOpioidPainMedication:
   ))
 
 // Determines if the patient has any record of adjuvant analgesic medications in the lookback period
-//       - Medication Order within past 180 days (lookback can be made a parameter)
+//       - Medication Request within past 180 days (lookback can be made a parameter)
 //       - Medication Statement by patient within past 180 days (lookback can be made a parameter)
 define HasRecentAdjuvantAnalgesicMedication:
   exists(C3F.ActiveCompletedOrStoppedMedicationRequest(C3F.MedicationRequestLookBack(
@@ -400,9 +407,9 @@ define MeetsInclusionCriteria:
 define ReportConditionsAssociatedWithChronicPain:
   (ConditionsAssociatedWithChronicPain) C
   return {
-    Name:  ConceptText(C.code),
-    Status:    C.clinicalStatus.coding[0].code.value,
-    Onset: Onset(C),
+    Name:   ConceptText(C.code),
+    Status: C.clinicalStatus.coding[0].code.value,
+    Onset:  Onset(C),
     DateRecorded: DateTimeText(C.recordedDate)
   }
   sort by (Onset as String) desc
@@ -583,7 +590,7 @@ define ReportNumericPainIntensityAssessments:
   return {
     Name:           ConceptTextWithRange(A.code),
     Score:          QuantityText(A.value as FHIR.Quantity),
-    Interpretation: Coalesce( ConceptText( First(A.interpretation) ),  ConceptText(A.value as FHIR.CodeableConcept) ),
+    Interpretation: Coalesce( ConceptText(First(A.interpretation)),  ConceptText(A.value as FHIR.CodeableConcept) ),
     Date:           ObservationDate(A)
   }
   sort by Date desc
@@ -599,7 +606,7 @@ define ReportPainEnjoymentGeneralActivityAssessments:
   return {
     Name:           ConceptTextWithRange(A.code),
     Score:          QuantityText(A.value as FHIR.Quantity),
-    Interpretation: Coalesce( ConceptText( First(A.interpretation) ),  ConceptText(A.value as FHIR.CodeableConcept) ),
+    Interpretation: Coalesce( ConceptText(First(A.interpretation)),  ConceptText(A.value as FHIR.CodeableConcept) ),
     Questions:      (SortPegComponents(A.component)) C return {
                       "Name": ConceptText(C.code),
                       "Score": QuantityText(C.value as FHIR.Quantity)
@@ -618,7 +625,7 @@ define ReportSTarTBackAssessments:
   return {
     Name:           ConceptTextWithRange(A.code),
     Score:          QuantityText(A.value as FHIR.Quantity),
-    Interpretation: Coalesce( ConceptText( First(A.interpretation) ),  ConceptText(A.value as FHIR.CodeableConcept) ),
+    Interpretation: Coalesce( ConceptText(First(A.interpretation)),  ConceptText(A.value as FHIR.CodeableConcept) ),
     Date:           ObservationDate(A)
   }
   sort by Date desc
@@ -642,7 +649,7 @@ define OpioidMedicationStatements:
 define ReportOpioidMedicationRequests:
   (OpioidMedicationRequests) O
   return {
-    Type:  'Order',
+    Type:  'Request',
     Name:  ConceptText(O.medication as FHIR.CodeableConcept),
     Start: DateTimeText(O.authoredOn),
     End:   null as String, // MedicationRequest end date not supported in R4,
@@ -682,7 +689,7 @@ define NonOpioidMedicationStatements:
 define ReportNonOpioidMedicationRequests:
   (NonOpioidMedicationRequests) O
   return {
-    Type:  'Order',
+    Type:  'Request',
     Name:  ConceptText(O.medication as FHIR.CodeableConcept),
     Start: DateTimeText(O.authoredOn),
     End:   null as String, // MedicationRequest end date not supported in R4,
@@ -715,7 +722,10 @@ define ReportNonPharmacologicTreatmentProcedures:
   return {
     Type: 'Procedure',
     Name: ConceptText(P.code),
-    Date: Coalesce(DateTimeText(P.performed as FHIR.dateTime), DateTimeText((P.performed as FHIR.Period)."start"))
+    Date: Coalesce(
+      DateTimeText(P.performed as FHIR.dateTime),
+      DateTimeText((P.performed as FHIR.Period)."start")
+    )
   }
   sort by Date desc
 
@@ -740,7 +750,7 @@ define ReportNonPharmacologicTreatments:
 
 // Stool softeners and laxatives - orders and statements with dates (lookback 6 months)
 
-define StoolSoftenersAndLaxativesOrders:
+define StoolSoftenersAndLaxativesRequests:
   C3F.ActiveCompletedOrStoppedMedicationRequest(C3F.MedicationRequestLookBack(
     [MedicationRequest: "Stool softeners and laxatives"],
     6 months
@@ -752,10 +762,10 @@ define StoolSoftenersAndLaxativesStatements:
     6 months
   ))
 
-define ReportStoolSoftenersAndLaxativesOrders:
-  (StoolSoftenersAndLaxativesOrders) O
+define ReportStoolSoftenersAndLaxativesRequests:
+  (StoolSoftenersAndLaxativesRequests) O
   return {
-    Type:  'Order',
+    Type:  'Request',
     Name:  ConceptText(O.medication as FHIR.CodeableConcept),
     Start: DateTimeText(O.authoredOn),
     End:   null as String, // MedicationRequest end date not supported in R4,
@@ -775,7 +785,7 @@ define ReportStoolSoftenersAndLaxativesStatements:
   sort by Start desc, End desc
 
 define ReportStoolSoftenersAndLaxatives:
-  (ReportStoolSoftenersAndLaxativesOrders union ReportStoolSoftenersAndLaxativesStatements) M
+  (ReportStoolSoftenersAndLaxativesRequests union ReportStoolSoftenersAndLaxativesStatements) M
   sort by Start desc, End desc
 
 // RISK CONSIDERATIONS
@@ -805,8 +815,12 @@ define ReportUrineDrugScreens:
   (UrineDrugScreens) S
   return {
     Name:           ConceptText(S.code),
-    Result:         Coalesce( QuantityText(S.value as FHIR.Quantity), (S.value as FHIR.string).value, ConceptText(S.value as FHIR.CodeableConcept) ),
-    Interpretation: Coalesce( ConceptText( First(S.interpretation) ) ),
+    Result:         Coalesce(
+      QuantityText(S.value as FHIR.Quantity),
+      (S.value as FHIR.string).value,
+      ConceptText(S.value as FHIR.CodeableConcept)
+    ),
+    Interpretation: ConceptText(First(S.interpretation)),
     Date:           ObservationDate(S)
   }
   sort by Date desc
@@ -819,6 +833,12 @@ define BenzodiazepineMedicationRequests:
     2 years
   ))
 
+define function MedicationStatementLookBack(MedList List<MedicationStatement>, LookBack System.Quantity):
+MedList M
+  let LookBackInterval: Interval[Now() - LookBack, Now()]
+  where (M.effective as FHIR.dateTime).value in LookBackInterval
+    or C3F.PeriodToInterval(M.effective as FHIR.Period) overlaps LookBackInterval
+
 define BenzodiazepineMedicationStatements:
   C3F.ActiveOrCompletedMedicationStatement(C3F.MedicationStatementLookBack(
     [MedicationStatement: "Benzodiazepine medications"],
@@ -828,7 +848,7 @@ define BenzodiazepineMedicationStatements:
 define ReportBenzodiazepineMedicationRequests:
   (BenzodiazepineMedicationRequests) O
   return {
-    Type:  'Order',
+    Type:  'Request',
     Name:  ConceptText(O.medication as FHIR.CodeableConcept),
     Start: DateTimeText(O.authoredOn),
     End:   null as String, // MedicationRequest end date not supported in R4,
@@ -862,7 +882,7 @@ define NaloxoneMedicationStatements:
 define ReportNaloxoneMedicationRequests:
   (NaloxoneMedicationRequests) O
   return {
-    Type:  'Order',
+    Type:  'Request',
     Name:  ConceptText(O.medication as FHIR.CodeableConcept),
     Start: DateTimeText(O.authoredOn),
     End:   null as String, // MedicationRequest end date not supported in R4,
@@ -898,8 +918,14 @@ define ReportRiskScreeningsRelevantToPainManagement:
   (RiskScreeningsRelevantToPainManagement) S
   return {
     Name:           ConceptTextWithRange(S.code),
-    Score:          Coalesce( QuantityText(S.value as FHIR.Quantity), (S.value as FHIR.string).value ),
-    Interpretation: Coalesce( ConceptText( First(S.interpretation) ),  ConceptText(S.value as FHIR.CodeableConcept) ),
+    Score:          Coalesce(
+      QuantityText(S.value as FHIR.Quantity),
+      (S.value as FHIR.string).value
+    ),
+    Interpretation: Coalesce(
+      ConceptText(First(S.interpretation)),
+      ConceptText(S.value as FHIR.CodeableConcept)
+    ),
     Date:           ObservationDate(S)
   }
   sort by Date desc

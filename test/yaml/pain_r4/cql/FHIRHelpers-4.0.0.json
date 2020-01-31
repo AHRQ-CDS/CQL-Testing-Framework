@@ -2110,7 +2110,7 @@
             "operand" : [ {
                "name" : "value",
                "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}medicationRequestStatus",
+                  "name" : "{http://hl7.org/fhir}MedicationRequestStatus",
                   "type" : "NamedTypeSpecifier"
                }
             } ]
@@ -2630,7 +2630,7 @@
             "operand" : [ {
                "name" : "value",
                "operandTypeSpecifier" : {
-                  "name" : "{http://hl7.org/fhir}medicationrequestStatus",
+                  "name" : "{http://hl7.org/fhir}MedicationRequestIntent",
                   "type" : "NamedTypeSpecifier"
                }
             } ]

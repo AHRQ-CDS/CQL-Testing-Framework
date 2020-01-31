@@ -1,4 +1,4 @@
-library CDS_Connect_Commons_for_FHIRv400 version '1.1.0'
+library CDS_Connect_Commons_for_FHIRv400 version '1.0.0'
 
 using FHIR version '4.0.0'
 
@@ -21,6 +21,36 @@ concept "Condition Confirmed": { "Condition Confirmed code" } display 'Confirmed
 concept "Condition Active": { "Condition Active code" } display 'Active'
 concept "Condition Recurrence": { "Condition Recurrence code" } display 'Recurrence'
 concept "Condition Relapse": { "Condition Relapse code" } display 'Relapse'
+
+// -------------------------------------------------- GENERAL ---------------------------------------------------------
+
+/**
+ * Converts a FHIR Period to a CQL Interval.  FHIRHelpers provides a function for this, but
+ * FHIRHelpers provides several overloads of the ToInterval function, and the JavaScript CQL
+ * Execution Framework apparently does not handle this correctly.  Creating uniquely named
+ * functions here ensures safe execution.
+ * @param period - a FHIR Period
+ * @returns {System.Interval} a CQL Interval or null if null was passed in
+ */
+define function PeriodToInterval(period FHIR.Period):
+  if period is null then
+    null
+  else
+    Interval[period."start".value, period."end".value]
+
+/**
+ * Converts a FHIR Range to a CQL Interval.  FHIRHelpers provides a function for this, but
+ * FHIRHelpers provides several overloads of the ToInterval function, and the JavaScript CQL
+ * Execution Framework apparently does not handle this correctly.  Creating uniquely named
+ * functions here ensures safe execution.
+ * @param range - a FHIR Range
+ * @returns {System.Interval} a CQL Interval or null if null was passed in
+ */
+define function RangeToInterval(range FHIR.Range):
+  if range is null then
+    null
+  else
+    Interval[FHIRHelpers.ToQuantity(range.low), FHIRHelpers.ToQuantity(range.high)]
 
 // -------------------------------------------------- OBSERVATIONS -----------------------------------------------------
 
@@ -56,19 +86,26 @@ define function ObservationLookBack(ObsList List<Observation>, LookBack System.Q
   ObsList O
     let LookBackInterval: Interval[Now() - LookBack, Now()]
     where (O.effective as FHIR.dateTime).value in LookBackInterval
-      or FHIRHelpers.ToInterval(O.effective as FHIR.Period) overlaps LookBackInterval
+      or PeriodToInterval(O.effective as FHIR.Period) overlaps LookBackInterval
       or O.issued.value in LookBackInterval
 
 /**
  * The most recent observation.  For each Observation, this algorithm will use the Coalesce function, which uses the
  * first non-null date value from these fields: effectiveDateTime, effectiveInstant, effectivePeriod.end,
  * effectivePeriod.start, issued. The found date will be used to compare Observations and determine the most recent
- * one.
+ * one.  NOTE: We can't use FindDate because it appears that the execution engine may have problems sorting by the
+ * result of a function.
  * @param ObsList - a list of Observations
  * @returns {Observation} the most recent Observation from the list, or null if null was passed in
  */
 define function MostRecent(ObsList List<Observation>):
-  Last(ObsList O sort by Coalesce((effective as FHIR.dateTime).value, (effective as FHIR.instant).value, (effective as FHIR.Period)."end".value, (effective as FHIR.Period)."start".value, issued.value))
+  Last(ObsList O sort by Coalesce(
+    (effective as FHIR.dateTime).value,
+    (effective as FHIR.instant).value,
+    (effective as FHIR.Period)."end".value,
+    (effective as FHIR.Period)."start".value,
+    issued.value)
+  )
 
 /**
  * Extracts the quantity value from an Observation, returning it as a CQL Quantity
@@ -94,7 +131,13 @@ define function ConceptValue(Obs Observation):
  * @returns {System.DateTime} the first non-null meaningful date, or null if non is found
  */
 define function FindDate(Obs Observation):
-  Coalesce((Obs.effective as FHIR.dateTime).value, (Obs.effective as FHIR.instant).value, (Obs.effective as FHIR.Period)."end".value, (Obs.effective as FHIR.Period)."start".value, Obs.issued.value)
+  Coalesce(
+    (Obs.effective as FHIR.dateTime).value,
+    (Obs.effective as FHIR.instant).value,
+    (Obs.effective as FHIR.Period)."end".value,
+    (Obs.effective as FHIR.Period)."start".value,
+    Obs.issued.value
+  )
 
 /**
  * The highest observation.
@@ -153,7 +196,7 @@ define function ConditionLookBack(CondList List<Condition>, LookBack System.Quan
   CondList C
     let LookBackInterval: Interval[Now() - LookBack, Now()]
     where (C.onset as FHIR.dateTime).value in LookBackInterval
-      or FHIRHelpers.ToInterval(C.onset as FHIR.Period) overlaps LookBackInterval
+      or PeriodToInterval(C.onset as FHIR.Period) overlaps LookBackInterval
       or C.recordedDate.value in LookBackInterval
 
 /**
@@ -164,7 +207,12 @@ define function ConditionLookBack(CondList List<Condition>, LookBack System.Quan
  * @returns {Condition} the most recent Condition from the list, or null if null was passed in
  */
 define function MostRecentCondition(CondList List<Condition>):
-  Last(CondList C sort by Coalesce((onset as FHIR.dateTime).value, (onset as FHIR.Period)."end".value, (onset as FHIR.Period)."start".value, recordedDate.value))
+  Last(CondList C sort by Coalesce(
+    (onset as FHIR.dateTime).value,
+    (onset as FHIR.Period)."end".value,
+    (onset as FHIR.Period)."start".value,
+    recordedDate.value)
+  )
 
  // -------------------------------------------------- PROCEDURES ------------------------------------------------------
 
@@ -212,7 +260,7 @@ define function ProcedureLookBack(ProcList List<Procedure>, LookBack System.Quan
   ProcList P
     let LookBackInterval: Interval[Now() - LookBack, Now()]
     where (P.performed as FHIR.dateTime).value in LookBackInterval
-      or FHIRHelpers.ToInterval(P.performed as FHIR.Period) overlaps LookBackInterval
+      or PeriodToInterval(P.performed as FHIR.Period) overlaps LookBackInterval
 
 /**
  * The most recent procedure.  For each Procedure, this algorithm will use the Coalesce function, which returns the
@@ -222,9 +270,15 @@ define function ProcedureLookBack(ProcList List<Procedure>, LookBack System.Quan
  * @returns {Procedure} the most recent Procedure from the list, or null if null was passed in
  */
 define function MostRecentProcedure(ProcList List<Procedure>):
-  Last(ProcList P sort by Coalesce((performed as FHIR.dateTime).value, (performed as FHIR.Period)."end".value, (performed as FHIR.Period)."start".value))
+  Last(ProcList P sort by Coalesce(
+    (performed as FHIR.dateTime).value,
+    (performed as FHIR.Period)."end".value,
+    (performed as FHIR.Period)."start".value)
+  )
 
 // ----------------------------------------------- SERVICEREQUESTS -----------------------------------------------------
+
+// NOTE: In FHIR R4, ProcedureRequest and ReferralRequest are replaced by ServiceRequest
 
 /**
  * ServiceRequests that are active or completed. In FHIR R4, this is reflected by the corresponding
@@ -265,7 +319,7 @@ define function ServiceRequestLookBack(ServiceRequestList List<ServiceRequest>, 
  */
 define function ActiveMedicationStatement(MedList List<MedicationStatement>):
   MedList M
-    let EffectivePeriod: FHIRHelpers.ToInterval(M.effective as FHIR.Period)
+    let EffectivePeriod: PeriodToInterval(M.effective as FHIR.Period)
     where M.status.value = 'active'
       and (end of EffectivePeriod is null or end of EffectivePeriod after Now())
 
@@ -321,7 +375,7 @@ define function ActiveOrCompletedMedicationStatement(MedList List<MedicationStat
 * reflected by MedicationRequest with status 'active', 'completed', or 'stopped'. See the note above
 * (in ActiveMedicationRequest) for more nuance regarding MedicationRequest vs. MedicationStatement.
 * @see http://hl7.org/fhir/R4/valueset-medicationrequest-status.html
-* @param MedList - a list of MedicationOrders
+* @param MedList - a list of MedicationRequests
 * @returns {List<MedicationRequestr>} a list of active medication requests, or null if null was passed in
 */
 define function ActiveCompletedOrStoppedMedicationRequest(MedList List<MedicationRequest>):
@@ -342,7 +396,7 @@ define function MedicationRequestLookBack(MedList List<MedicationRequest>, LookB
 MedList M
   let LookBackInterval: Interval[Now() - LookBack, Now()]
   where M.authoredOn.value in LookBackInterval
-  // DSTU2 also checked the dateEnded property of MedicationOrder, but this doesn't exist for MedicationRequest
+  // DSTU2 also checked the dateEnded property of MedicationRequest, but this doesn't exist for MedicationRequest
 
 /**
 * Medication Statements that are issued in the specified "look back" period.
@@ -356,7 +410,7 @@ define function MedicationStatementLookBack(MedList List<MedicationStatement>, L
 MedList M
   let LookBackInterval: Interval[Now() - LookBack, Now()]
   where (M.effective as FHIR.dateTime).value in LookBackInterval
-    or FHIRHelpers.ToInterval(M.effective as FHIR.Period) overlaps LookBackInterval
+    or PeriodToInterval(M.effective as FHIR.Period) overlaps LookBackInterval
 
 // -------------------------------------------------- ENCOUNTERS ------------------------------------------------------
 
@@ -384,3 +438,25 @@ define function ActiveOrConfirmedAllergyIntolerance(AllergyIntolList List<Allerg
   AllergyIntolList A
     where A.clinicalStatus ~ "AllergyIntolerance Active"
       or A.verificationStatus ~ "AllergyIntolerance Confirmed"
+
+// -------------------------------------------------------- GOALS ------------------------------------------------------
+
+/**
+ * Goals with a start, target, or status date in the specified "look back" period.  For example, Pain Management Goals
+ * in the last 2 years.
+ * TODO: Rename to LookBack once the execution engine supports overloaded functions.
+ * @param GoalList - a list of Goals
+ * @returns {List<Goal>} a list of Goals with a start, target, or status date in the specified lookback period, or null
+ * if null was passed in
+ */
+define function GoalLookBack(GoalList List<Goal>, LookBack System.Quantity):
+  GoalList G
+    let LookBackInterval: Interval[Now() - LookBack, Now()],
+    StartDate: (G.start as FHIR.date).value,
+    StatusDate: G.statusDate.value,
+    TargetDates: (G.target) T return (T.due as FHIR.date).value,
+    TargetQuantities: (G.target) T return FHIRHelpers.ToQuantity(T.due as FHIR.Duration)
+    where StartDate in LookBackInterval
+      or StatusDate in LookBackInterval
+      or exists(TargetDates TD where TD in LookBackInterval)
+      or exists(TargetQuantities TQ where (StartDate + TQ) in LookBackInterval)

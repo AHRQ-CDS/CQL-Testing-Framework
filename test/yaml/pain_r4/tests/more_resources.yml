@@ -1,5 +1,5 @@
 more_resources:
-- &nonOpioidMedicationOrders
+- &nonOpioidMedicationRequests
   - resourceType: MedicationRequest
     code: RXNORM#104474 Aspirin 75 MG Oral Tablet
     authoredOn: 2018-09-06

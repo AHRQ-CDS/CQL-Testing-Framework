@@ -2,7 +2,7 @@
    "library" : {
       "identifier" : {
          "id" : "CDS_Connect_Commons_for_FHIRv400",
-         "version" : "1.1.0"
+         "version" : "1.0.0"
       },
       "schemaIdentifier" : {
          "id" : "urn:hl7-org:elm",
@@ -142,6 +142,144 @@
       },
       "statements" : {
          "def" : [ {
+            "name" : "PeriodToInterval",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "type" : "FunctionDef",
+            "expression" : {
+               "type" : "If",
+               "condition" : {
+                  "asType" : "{urn:hl7-org:elm-types:r1}Boolean",
+                  "type" : "As",
+                  "operand" : {
+                     "type" : "IsNull",
+                     "operand" : {
+                        "name" : "period",
+                        "type" : "OperandRef"
+                     }
+                  }
+               },
+               "then" : {
+                  "type" : "As",
+                  "operand" : {
+                     "type" : "Null"
+                  },
+                  "asTypeSpecifier" : {
+                     "type" : "IntervalTypeSpecifier",
+                     "pointType" : {
+                        "name" : "{urn:hl7-org:elm-types:r1}DateTime",
+                        "type" : "NamedTypeSpecifier"
+                     }
+                  }
+               },
+               "else" : {
+                  "lowClosed" : true,
+                  "highClosed" : true,
+                  "type" : "Interval",
+                  "low" : {
+                     "path" : "value",
+                     "type" : "Property",
+                     "source" : {
+                        "path" : "start",
+                        "type" : "Property",
+                        "source" : {
+                           "name" : "period",
+                           "type" : "OperandRef"
+                        }
+                     }
+                  },
+                  "high" : {
+                     "path" : "value",
+                     "type" : "Property",
+                     "source" : {
+                        "path" : "end",
+                        "type" : "Property",
+                        "source" : {
+                           "name" : "period",
+                           "type" : "OperandRef"
+                        }
+                     }
+                  }
+               }
+            },
+            "operand" : [ {
+               "name" : "period",
+               "operandTypeSpecifier" : {
+                  "name" : "{http://hl7.org/fhir}Period",
+                  "type" : "NamedTypeSpecifier"
+               }
+            } ]
+         }, {
+            "name" : "RangeToInterval",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "type" : "FunctionDef",
+            "expression" : {
+               "type" : "If",
+               "condition" : {
+                  "asType" : "{urn:hl7-org:elm-types:r1}Boolean",
+                  "type" : "As",
+                  "operand" : {
+                     "type" : "IsNull",
+                     "operand" : {
+                        "name" : "range",
+                        "type" : "OperandRef"
+                     }
+                  }
+               },
+               "then" : {
+                  "type" : "As",
+                  "operand" : {
+                     "type" : "Null"
+                  },
+                  "asTypeSpecifier" : {
+                     "type" : "IntervalTypeSpecifier",
+                     "pointType" : {
+                        "name" : "{urn:hl7-org:elm-types:r1}Quantity",
+                        "type" : "NamedTypeSpecifier"
+                     }
+                  }
+               },
+               "else" : {
+                  "lowClosed" : true,
+                  "highClosed" : true,
+                  "type" : "Interval",
+                  "low" : {
+                     "name" : "ToQuantity",
+                     "libraryName" : "FHIRHelpers",
+                     "type" : "FunctionRef",
+                     "operand" : [ {
+                        "path" : "low",
+                        "type" : "Property",
+                        "source" : {
+                           "name" : "range",
+                           "type" : "OperandRef"
+                        }
+                     } ]
+                  },
+                  "high" : {
+                     "name" : "ToQuantity",
+                     "libraryName" : "FHIRHelpers",
+                     "type" : "FunctionRef",
+                     "operand" : [ {
+                        "path" : "high",
+                        "type" : "Property",
+                        "source" : {
+                           "name" : "range",
+                           "type" : "OperandRef"
+                        }
+                     } ]
+                  }
+               }
+            },
+            "operand" : [ {
+               "name" : "range",
+               "operandTypeSpecifier" : {
+                  "name" : "{http://hl7.org/fhir}Range",
+                  "type" : "NamedTypeSpecifier"
+               }
+            } ]
+         }, {
             "name" : "Verified",
             "context" : "Patient",
             "accessLevel" : "Public",
@@ -346,8 +484,7 @@
                      }, {
                         "type" : "Overlaps",
                         "operand" : [ {
-                           "name" : "ToInterval",
-                           "libraryName" : "FHIRHelpers",
+                           "name" : "PeriodToInterval",
                            "type" : "FunctionRef",
                            "operand" : [ {
                               "strict" : false,
@@ -949,8 +1086,7 @@
                      }, {
                         "type" : "Overlaps",
                         "operand" : [ {
-                           "name" : "ToInterval",
-                           "libraryName" : "FHIRHelpers",
+                           "name" : "PeriodToInterval",
                            "type" : "FunctionRef",
                            "operand" : [ {
                               "strict" : false,
@@ -1308,8 +1444,7 @@
                   }, {
                      "type" : "Overlaps",
                      "operand" : [ {
-                        "name" : "ToInterval",
-                        "libraryName" : "FHIRHelpers",
+                        "name" : "PeriodToInterval",
                         "type" : "FunctionRef",
                         "operand" : [ {
                            "strict" : false,
@@ -1565,8 +1700,7 @@
                "let" : [ {
                   "identifier" : "EffectivePeriod",
                   "expression" : {
-                     "name" : "ToInterval",
-                     "libraryName" : "FHIRHelpers",
+                     "name" : "PeriodToInterval",
                      "type" : "FunctionRef",
                      "operand" : [ {
                         "strict" : false,
@@ -2006,8 +2140,7 @@
                   }, {
                      "type" : "Overlaps",
                      "operand" : [ {
-                        "name" : "ToInterval",
-                        "libraryName" : "FHIRHelpers",
+                        "name" : "PeriodToInterval",
                         "type" : "FunctionRef",
                         "operand" : [ {
                            "strict" : false,
@@ -2145,6 +2278,247 @@
                      "name" : "{http://hl7.org/fhir}AllergyIntolerance",
                      "type" : "NamedTypeSpecifier"
                   }
+               }
+            } ]
+         }, {
+            "name" : "GoalLookBack",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "type" : "FunctionDef",
+            "expression" : {
+               "type" : "Query",
+               "source" : [ {
+                  "alias" : "G",
+                  "expression" : {
+                     "name" : "GoalList",
+                     "type" : "OperandRef"
+                  }
+               } ],
+               "let" : [ {
+                  "identifier" : "LookBackInterval",
+                  "expression" : {
+                     "lowClosed" : true,
+                     "highClosed" : true,
+                     "type" : "Interval",
+                     "low" : {
+                        "type" : "Subtract",
+                        "operand" : [ {
+                           "type" : "Now"
+                        }, {
+                           "name" : "LookBack",
+                           "type" : "OperandRef"
+                        } ]
+                     },
+                     "high" : {
+                        "type" : "Now"
+                     }
+                  }
+               }, {
+                  "identifier" : "StartDate",
+                  "expression" : {
+                     "path" : "value",
+                     "type" : "Property",
+                     "source" : {
+                        "strict" : false,
+                        "type" : "As",
+                        "operand" : {
+                           "path" : "start",
+                           "scope" : "G",
+                           "type" : "Property"
+                        },
+                        "asTypeSpecifier" : {
+                           "name" : "{http://hl7.org/fhir}date",
+                           "type" : "NamedTypeSpecifier"
+                        }
+                     }
+                  }
+               }, {
+                  "identifier" : "StatusDate",
+                  "expression" : {
+                     "path" : "value",
+                     "type" : "Property",
+                     "source" : {
+                        "path" : "statusDate",
+                        "scope" : "G",
+                        "type" : "Property"
+                     }
+                  }
+               }, {
+                  "identifier" : "TargetDates",
+                  "expression" : {
+                     "type" : "Query",
+                     "source" : [ {
+                        "alias" : "T",
+                        "expression" : {
+                           "path" : "target",
+                           "scope" : "G",
+                           "type" : "Property"
+                        }
+                     } ],
+                     "relationship" : [ ],
+                     "return" : {
+                        "expression" : {
+                           "path" : "value",
+                           "type" : "Property",
+                           "source" : {
+                              "strict" : false,
+                              "type" : "As",
+                              "operand" : {
+                                 "path" : "due",
+                                 "scope" : "T",
+                                 "type" : "Property"
+                              },
+                              "asTypeSpecifier" : {
+                                 "name" : "{http://hl7.org/fhir}date",
+                                 "type" : "NamedTypeSpecifier"
+                              }
+                           }
+                        }
+                     }
+                  }
+               }, {
+                  "identifier" : "TargetQuantities",
+                  "expression" : {
+                     "type" : "Query",
+                     "source" : [ {
+                        "alias" : "T",
+                        "expression" : {
+                           "path" : "target",
+                           "scope" : "G",
+                           "type" : "Property"
+                        }
+                     } ],
+                     "relationship" : [ ],
+                     "return" : {
+                        "expression" : {
+                           "name" : "ToQuantity",
+                           "libraryName" : "FHIRHelpers",
+                           "type" : "FunctionRef",
+                           "operand" : [ {
+                              "strict" : false,
+                              "type" : "As",
+                              "operand" : {
+                                 "path" : "due",
+                                 "scope" : "T",
+                                 "type" : "Property"
+                              },
+                              "asTypeSpecifier" : {
+                                 "name" : "{http://hl7.org/fhir}Duration",
+                                 "type" : "NamedTypeSpecifier"
+                              }
+                           } ]
+                        }
+                     }
+                  }
+               } ],
+               "relationship" : [ ],
+               "where" : {
+                  "type" : "Or",
+                  "operand" : [ {
+                     "type" : "Or",
+                     "operand" : [ {
+                        "type" : "Or",
+                        "operand" : [ {
+                           "type" : "In",
+                           "operand" : [ {
+                              "type" : "ToDateTime",
+                              "operand" : {
+                                 "name" : "StartDate",
+                                 "type" : "QueryLetRef"
+                              }
+                           }, {
+                              "name" : "LookBackInterval",
+                              "type" : "QueryLetRef"
+                           } ]
+                        }, {
+                           "type" : "In",
+                           "operand" : [ {
+                              "type" : "ToDateTime",
+                              "operand" : {
+                                 "name" : "StatusDate",
+                                 "type" : "QueryLetRef"
+                              }
+                           }, {
+                              "name" : "LookBackInterval",
+                              "type" : "QueryLetRef"
+                           } ]
+                        } ]
+                     }, {
+                        "type" : "Exists",
+                        "operand" : {
+                           "type" : "Query",
+                           "source" : [ {
+                              "alias" : "TD",
+                              "expression" : {
+                                 "name" : "TargetDates",
+                                 "type" : "QueryLetRef"
+                              }
+                           } ],
+                           "relationship" : [ ],
+                           "where" : {
+                              "type" : "In",
+                              "operand" : [ {
+                                 "type" : "ToDateTime",
+                                 "operand" : {
+                                    "name" : "TD",
+                                    "type" : "AliasRef"
+                                 }
+                              }, {
+                                 "name" : "LookBackInterval",
+                                 "type" : "QueryLetRef"
+                              } ]
+                           }
+                        }
+                     } ]
+                  }, {
+                     "type" : "Exists",
+                     "operand" : {
+                        "type" : "Query",
+                        "source" : [ {
+                           "alias" : "TQ",
+                           "expression" : {
+                              "name" : "TargetQuantities",
+                              "type" : "QueryLetRef"
+                           }
+                        } ],
+                        "relationship" : [ ],
+                        "where" : {
+                           "type" : "In",
+                           "operand" : [ {
+                              "type" : "ToDateTime",
+                              "operand" : {
+                                 "type" : "Add",
+                                 "operand" : [ {
+                                    "name" : "StartDate",
+                                    "type" : "QueryLetRef"
+                                 }, {
+                                    "name" : "TQ",
+                                    "type" : "AliasRef"
+                                 } ]
+                              }
+                           }, {
+                              "name" : "LookBackInterval",
+                              "type" : "QueryLetRef"
+                           } ]
+                        }
+                     }
+                  } ]
+               }
+            },
+            "operand" : [ {
+               "name" : "GoalList",
+               "operandTypeSpecifier" : {
+                  "type" : "ListTypeSpecifier",
+                  "elementType" : {
+                     "name" : "{http://hl7.org/fhir}Goal",
+                     "type" : "NamedTypeSpecifier"
+                  }
+               }
+            }, {
+               "name" : "LookBack",
+               "operandTypeSpecifier" : {
+                  "name" : "{urn:hl7-org:elm-types:r1}Quantity",
+                  "type" : "NamedTypeSpecifier"
                }
             } ]
          } ]

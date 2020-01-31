@@ -262,10 +262,10 @@ core-util-is@1.0.2:
   resolved "https://registry.yarnpkg.com/core-util-is/-/core-util-is-1.0.2.tgz#b5fd54220aa2bc5ab57aab7140c940754503c1a7"
   integrity sha1-tf1UIgqivFq1eqtxQMlAdUUDwac=
 
-cql-exec-fhir@^1.3.0:
-  version "1.3.0"
-  resolved "https://registry.yarnpkg.com/cql-exec-fhir/-/cql-exec-fhir-1.3.0.tgz#a3eb95784a7eed3ae62c2666f50e909e7629d292"
-  integrity sha512-fJc9hnT5Zm1TmT5T3AsfVpDjayEpQxgNPu7Mq7aXCa3U2TQ+i1frH+lqNG9kxP7vgeNX1gcofEvO8y/RHDh55A==
+cql-exec-fhir@^1.3.1:
+  version "1.3.1"
+  resolved "https://registry.yarnpkg.com/cql-exec-fhir/-/cql-exec-fhir-1.3.1.tgz#6385d15fcb8732b1560a21a1d7fe6f585ffbccb8"
+  integrity sha512-Vs9jUCCJCK8P+5DlRN/GoKVd9JQYKb8J0TnOoWVok88Oc7fGB9rWeAJgWn8xChti3afGGIaOtgTZtF1sZbxXQw==
   dependencies:
     xml2js "~0.4.19"
 
