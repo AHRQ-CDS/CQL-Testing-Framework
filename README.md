@@ -28,7 +28,7 @@ For information about contributing to this project, please see [CONTRIBUTING](CO
 
 You must [install Node.js](https://nodejs.org/en/download/) to use the CQL Testing Framework.  Node.js 8.x is confirmed to work, but more recent releases may also work.
 
-You must also [install cql-execution](https://github.com/cqframework/cql-execution), a Node.js library for executing CQL expressions, in whatever project where you are using `cql-testing`. The reason for this requirement is to allow users of `cql-testing` to select the [version of cql-execution](https://www.npmjs.com/package/cql-execution) that best suites their needs.
+You must also [install cql-execution](https://github.com/cqframework/cql-execution), a Node.js library for executing CQL expressions, in whatever project where you are using `cql-testing`. The reason for this requirement is to allow users of `cql-testing` to select the [version of cql-execution](https://www.npmjs.com/package/cql-execution) that best suits their needs.
 
 ### Integrating the CQL Testing Framework
 
