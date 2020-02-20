@@ -1021,6 +1021,67 @@ describe('#yaml2fhir', () => {
       });
     });
 
+    it('should resolve ICD-9-D to standard ICD-9 URL', () => {
+      const condition = yaml.safeLoad(`
+        resourceType: Condition
+        id: 123
+        code: ICD-9-D#12345.6 Fake ICD-9 Code
+      `);
+      const result = yaml2fhir(condition, '123', 'r4');
+      expect(result).to.eql({
+        resourceType: 'Condition',
+        id: '123',
+        subject: { reference: 'Patient/123'},
+        code: {
+          coding: [{
+            system: 'http://hl7.org/fhir/sid/icd-9-cm',
+            code: '12345.6',
+            display: 'Fake ICD-9 Code'
+          }],
+          text: 'Fake ICD-9 Code'
+        },
+        clinicalStatus: {
+          coding: [{
+            system: 'http://terminology.hl7.org/CodeSystem/condition-clinical',
+            code: 'active',
+            display: 'Active'
+          }],
+          text: 'Active'
+        },
+        verificationStatus: {
+          coding: [{
+            system: 'http://terminology.hl7.org/CodeSystem/condition-ver-status',
+            code: 'confirmed',
+            display: 'Confirmed'
+          }],
+          text: 'Confirmed'
+        }
+      });
+    });
+
+    it('should resolve ICD-9-P to standard ICD-9 URL', () => {
+      const condition = yaml.safeLoad(`
+        resourceType: Procedure
+        id: 123
+        code: ICD-9-P#12345.6 Fake ICD-9 Code
+      `);
+      const result = yaml2fhir(condition, '123', 'r4');
+      expect(result).to.eql({
+        resourceType: 'Procedure',
+        id: '123',
+        subject: { reference: 'Patient/123'},
+        code: {
+          coding: [{
+            system: 'http://hl7.org/fhir/sid/icd-9-cm',
+            code: '12345.6',
+            display: 'Fake ICD-9 Code'
+          }],
+          text: 'Fake ICD-9 Code'
+        },
+        status: 'completed'
+      });
+    });
+
     it('should throw an error for an unsupported FHIR resource type', () => {
       const data = yaml.safeLoad(`
         resourceType: DeviceComponent

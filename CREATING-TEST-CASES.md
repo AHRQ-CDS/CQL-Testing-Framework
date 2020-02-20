@@ -104,8 +104,19 @@ A string with the format: `SYSTEM#code Optional Display Text`.  The following sy
 | CVX | http://hl7.org/fhir/sid/cvx |
 | ICD-10, ICD10 | http://hl7.org/fhir/sid/icd-10 |
 | ICD-10-CM, ICD10CM | http://hl7.org/fhir/sid/icd-10-cm |
-| ICD-9, ICD9, ICD-9-CM | http://hl7.org/fhir/sid/icd-9-cm |
+| ICD-10-PCS, ICD10PCS | http://www.icd10data.com/icd10pcs |
+| ICD-9, ICD9, ICD-9-CM, ICD9CM | http://hl7.org/fhir/sid/icd-9-cm |
+| ICD-9-D, ICD9D, ICD-9-CM-D, ICD9CMD <sup>*</sup> | http://hl7.org/fhir/sid/icd-9-cm |
+| ICD-9-P, ICD9P, ICD-9-CM-P, ICD9CMP <sup>*</sup> | http://hl7.org/fhir/sid/icd-9-cm |
 | OBS-CAT, OBSCAT | http://hl7.org/fhir/observation-category |
+| V3-ROLE-CODE | http://hl7.org/fhir/v3/RoleCode |
+| V3-RACE | http://hl7.org/fhir/v3/Race |
+| V3-ETHNICITY | http://hl7.org/fhir/v3/Ethnicity |
+
+_<sup>*</sup> The specific ICD-9 diagnosis and procedure aliases are supported for
+backwards-compatibility, but have been updated to resolve to the standard ICD-9 URL.
+FHIR removed the diagnosis/procedure-specific URLs from the specification, as they
+were deemed inappropriate for use._
 
 In addition, URIs can be used directly as the system.
 
