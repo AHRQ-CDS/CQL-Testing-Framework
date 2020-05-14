@@ -42,7 +42,7 @@ data:
   authoredOn: 2018-12-20
 -
   resourceType: MedicationStatement
-  code: RXNORM#199789 Pentazocine 50 MG Oral Tablet
+  code: RXNORM#250486 Pentazocine 50 MG Oral Capsule
   effectiveDateTime: 2018-11-15
 -
   resourceType: MedicationStatement
@@ -178,7 +178,7 @@ results:
       OpioidMedications:
       -
         Type: Statement
-        Name: Pentazocine 50 MG Oral Tablet
+        Name: Pentazocine 50 MG Oral Capsule
         Start: '2018-11-15T00:00:00.000+00:00'
         End: null
         Status: active
