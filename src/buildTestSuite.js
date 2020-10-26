@@ -46,13 +46,20 @@ function buildTestSuite(testCases, library, codeService, fhirVersion, config) {
 
     before('Download value set definitions from VSAC if necessary', function(done) {
       this.timeout(30000);
-      let user, pass;
-      if (options.vsac && options.vsac.user && options.vsac.user !== '') {
+      let user, pass, key;
+      let ensureValueSets; //we're going to use a different function based on the existence of the API Key option
+      //NOTE: As of Jan 1 2021 VSAC will no longer accept accept username and password. Please use
+      //    ensureValueSetsInLibraryWithAPIKey() instead.
+      if(options.vsac && options.vsac.user && options.vsac.user !== '') {
         user = options.vsac.user;
         pass = options.vsac.password;
+        ensureValueSets = codeService.ensureValueSetsInLibrary(library,true,user,pass);
+      }else{
+        key = options.vsac.apikey;
+        ensureValueSets = codeService.ensureValueSetsInLibraryWithAPIKey(library,true,key);
       }
-      codeService.ensureValueSetsInLibrary(library, true, user, pass)
-        .then(() => done())
+
+      ensureValueSets.then(() => done())
         .catch((err) => {
           if (err instanceof Error) {
             done(err);
@@ -62,6 +69,13 @@ function buildTestSuite(testCases, library, codeService, fhirVersion, config) {
               + '- configuration: options.vsac.user & options.vsac.password\n'
               + '- environment variables: UMLS_USER_NAME & UMLS_PASSWORD\n'
               + '- arguments (commandline only): --vsac-user & --vsac-password';
+            done(new Error(message));
+          } else if(err && err.indexOf('UMLS_API_KEY') != null){
+            const message = 'Failed to download value sets. Please ensure VSAC API Key '
+              + 'is specified via one of the appropriate mechanisms, either:\n'
+              + '- configuration: options.vsac.apikey\n'
+              + '- environment variables: UMLS_API_KEY\n'
+              + '- arguments (commandline only): --vsac-apikey\n';
             done(new Error(message));
           } else {
             done(new Error(err));
