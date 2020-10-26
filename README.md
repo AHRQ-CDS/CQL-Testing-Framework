@@ -230,9 +230,9 @@ This only needs to be done once.  After this, your `node_modules` folder will be
 
 #### Downloading Value Sets
 
-If your CQL uses value sets from the Value Set Authority Center (VSAC), then the first time you run the tests, they will need to download the value set definitions from VSAC.  Downloading value sets from VSAC requires a VSAC account and an API key.  You can find your API key in your [UMLS profile](https://uts.nlm.nih.gov//uts.html#profile) and can configure your VSAC account by setting the `options->vsac->key` property in your `cqlt.yaml` file.  If you prefer not to modify the config file, you may set the `UMLS_API_KEY` environment variable instead.
+If your CQL uses value sets from the Value Set Authority Center (VSAC), then the first time you run the tests, they will need to download the value set definitions from VSAC.  Downloading value sets from VSAC requires a VSAC account and an API key.  You can find your API key in your [UMLS profile](https://uts.nlm.nih.gov//uts.html#profile) and can configure your VSAC account by setting the `options->vsac->apikey` property in your `cqlt.yaml` file.  If you prefer not to modify the config file, you may set the `UMLS_API_KEY` environment variable instead.
  
-Alternatively, support for existing username/password authentication is supported until January 1, 2021.  You may set the `options->vsac->user` and `options->vsac->password` properties in your `cqlt.yaml` file.  If you prefer not to modify the config file, you may set the`UMLS_USER_NAME` and `UMLS_PASSWORD` environment variables.
+Alternatively, existing username/password authentication is supported until January 1, 2021.  You may set the `options->vsac->user` and `options->vsac->password` properties in your `cqlt.yaml` file.  If you prefer not to modify the config file, you may set the`UMLS_USER_NAME` and `UMLS_PASSWORD` environment variables.
  
 **NOTE**: Username and password based authentication is deprecated by VSAC, and only supported until January 1, 2021.  API key based authentication is highly encouraged.
 
