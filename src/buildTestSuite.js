@@ -50,11 +50,11 @@ function buildTestSuite(testCases, library, codeService, fhirVersion, config) {
       let ensureValueSets; //we're going to use a different function based on the existence of the API Key option
       //NOTE: As of Jan 1 2021 VSAC will no longer accept accept username and password. Please use
       //    ensureValueSetsInLibraryWithAPIKey() instead.
-      if(options.vsac && options.vsac.user) {
+      if (options.vsac && options.vsac.user && options.vsac.password) {
         user = options.vsac.user ? options.vsac.user : null;
         pass = options.vsac.password ? options.vsac.password : null;
         ensureValueSets = codeService.ensureValueSetsInLibrary(library,true,user,pass);
-      }else if( options.vsac && options.vsac.apikey) {
+      } else {
         key = options.vsac.apikey ? options.vsac.apikey : null;
         ensureValueSets = codeService.ensureValueSetsInLibraryWithAPIKey(library,true,key);
       }
@@ -63,14 +63,14 @@ function buildTestSuite(testCases, library, codeService, fhirVersion, config) {
         .catch((err) => {
           if (err instanceof Error) {
             done(err);
-          } else if (err && err.indexOf('UMLS_USER_NAME') != null) {
+          } else if (err && err.indexOf('UMLS_USER_NAME') != -1) {
             const message = 'Failed to download value sets. Please ensure VSAC user and password '
               + 'is specified via one of the appropriate mechanisms, either:\n'
               + '- configuration: options.vsac.user & options.vsac.password\n'
               + '- environment variables: UMLS_USER_NAME & UMLS_PASSWORD\n'
               + '- arguments (commandline only): --vsac-user & --vsac-password';
             done(new Error(message));
-          } else if(err && err.indexOf('UMLS_API_KEY') != null) {
+          } else if(err && err.indexOf('UMLS_API_KEY') != -1) {
             const message = 'Failed to download value sets. Please ensure VSAC API Key '
               + 'is specified via one of the appropriate mechanisms, either:\n'
               + '- configuration: options.vsac.apikey\n'
