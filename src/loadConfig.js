@@ -74,15 +74,23 @@ function newConfig() {
         arg: 'date'
       },
       vsac: {
+        apikey: {
+          doc: 'The UMLS API Key to use when connecting to the VSAC',
+          format: 'String',
+          default: '',
+          sensitive: true,
+          env: 'UMLS_API_KEY', // NOTE: Inconsistent name to match existing ENV name used by cql-exec-vsac
+          arg: 'vsac-apikey'
+        },
         user: {
-          doc: 'The UMLS user name to use when connecting to the VSAC',
+          doc: '*DEPRECATED* The UMLS user name to use when connecting to the VSAC. As of Jan 1 2021 VSAC will no longer accept accept username and password, API Key MUST be used after this date',
           format: 'String',
           default: '',
           env: 'UMLS_USER_NAME', // NOTE: Inconsistent name to match existing ENV name used by cql-exec-vsac
           arg: 'vsac-user'
         },
         password: {
-          doc: 'The UMLS password to use when connecting to the VSAC',
+          doc: '*DEPRECATED* The UMLS password to use when connecting to the VSAC. As of Jan 1 2021 VSAC will no longer accept accept username and password, API Key MUST be used after this date',
           format: 'String',
           default: '',
           sensitive: true,
