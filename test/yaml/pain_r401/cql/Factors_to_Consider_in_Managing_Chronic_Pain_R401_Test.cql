@@ -14,23 +14,66 @@
 // not provide enough specificity.  These decisions were made in the context of the CDS Connect Workgroup and CDC
 // stakeholders, and are documented in the logic and/or in the CDS Connect artifact metadata.
 //
-// NOTE: This is a FHIR R4 port of the original FHIR DSTU2 CQL piloted for CDS Connect. This version has not been piloted.
+// NOTE: This is a FHIR R4 port of the original FHIR DSTU2 CQL piloted for CDS Connect.  In addition to the changes
+// to support FHIR R4, it contains the following changes from the artifact that was piloted:
+// - Added the following value sets for identifying Risk Factors for Opiod-Related Harms (in addition to existing ones)
+//   - Depression Diagnosis ICD9 (2.16.840.1.113883.3.600.143)
+//   - Anxiety Disorders ICD9 (2.16.840.1.113883.3.1240.2017.3.2.1015)
+//   - Substance Abuse (2.16.840.1.113883.3.464.1003.106.11.1010)
+//   - Pregnancy (New ICD10 codes published in 2018 and 2019)": '2.16.840.1.113762.1.4.1032.80'
+// - Changed the Suicide Attempt value set to 2.16.840.1.113762.1.4.1032.102
+// - Removed specific inclusion of SNOMED-CT 86849004 since it is now in the Suicide Attempt value set
+// - Added LOINC codes for the Pain intensity, Enjoyment of life, General activity scale [PEG]
+//   - Previous local codes are still supported (but discouraged)
+// - Added logic to normalize long LOINC display text for PEG codes to shorter names
+// - Added LOINC code for the STarT Back Screening Tool
+//   - Previous local code is still supported (but discouraged)
+// - Added logic to display range for Opioid Risk Tool (ORT)
+// - Updated QuantityText logic to not include '{score}' units (since scalar number is enough in those cases)
+//
+// In addition to the changes above, the R4 representation contains the following changes related to the movement from
+// FHIR DSTU2 to FHIR R4:
+//
+// - MedicationOrder is replaced by MedicationRequest, and as a result, the reported type has changed from
+//   "Order" to "Request"
+// - MedicationOrder dateWritten is replaced by MedicationRequest authoredOn
+// - MedicationRequest no longer supports the dateEnded property, so end dates will always be blank
+//   for MedicationRequests
+// - MedicationStatement no longer supports the wasNotTaken property
+// - Observation adds an "instant" variant of the effective time
+// - Observation's interpretation changed from single-value to multi-value, so the FHIR R4-based CQL only looks at the
+//   first interpretation value
+// - Observations now check for verificationStatus "corrected", in addition to "final" and "amended"
+// - Condition no longer supports the abatementBoolean property
+// - Condition's clinicalStatus was changed from a code to a CodeableConcept
+// - Condition's dateRecorded (Date) is replaced by recordedDate (DateTime)
+// - ActiveOrRecurring Conditions now check for clinicalStatus "recurrence" in addition to "active" and "relapse"
+// - ProcedureRequest is replaced by ServiceRequest
+// - ProcedureRequest's orderedOn is replaced by ServiceRequest's authoredOn
+// - ReferralRequest is replaced by ServiceRequest
+// - ProcedureRequest's dateSent is replaced by ServiceRequest's authoredOn
+// - NonPharmacologicTreatmentServiceRequests now queries for active or completed ServiceRequests rather than
+//   accepted, in-progress, or completed ProcedureRequests and accepted, active, or completed ReferralRequests
+// - Procedure no longer supports the notDone property
+// - ProcedurePerformance now excludes statuses: preparation, not-done, entered-in-error, and unknown
+// - Due to changes in the CQL model representation of FHIR, choices are now accessed via CQL casts rather than
+//   explicit properties
 //
 // ##Source guideline: [CDC Guideline for Opioid Prescribing for Chronic Pain](https://www.cdc.gov/drugoverdose/prescribing/guideline.html)
 
-library Factors_to_Consider_in_Managing_Chronic_Pain_R4_Test version '1.0.0'
+library Factors_to_Consider_in_Managing_Chronic_Pain_R401_Test version '1.0.0'
 
 // # Data model #
 
 // The FHIR R4 model is used for testing purposes only.  It has not been piloted.
-using FHIR version '4.0.0'
+using FHIR version '4.0.1'
 
 // # Referenced libraries #
 
-// The CDS Connect Commons for FHIRv400 library provides functions representing commonly used CDS logic and patterns.
-include CDS_Connect_Commons_for_FHIRv400 version '1.0.0' called C3F
+// The CDS Connect Commons for FHIRv401 library provides functions representing commonly used CDS logic and patterns.
+include CDS_Connect_Commons_for_FHIRv401 version '1.0.0' called C3F
 // The FHIRHelpers library provides common functions for simplifying interaction w/ the FHIR R4 data model.
-include FHIRHelpers version '4.0.0' called FHIRHelpers
+include FHIRHelpers version '4.0.1' called FHIRHelpers
 
 // # Value sets and codes #
 
@@ -62,14 +105,23 @@ valueset "Adjuvant Analgesic Medications": '2.16.840.1.113762.1.4.1032.54'
 // [See value set in VSAC](https://vsac.nlm.nih.gov/valueset/2.16.840.1.113883.3.464.1003.105.12.1007/expansion)
 valueset "Major Depression": '2.16.840.1.113883.3.464.1003.105.12.1007'
 
+// [See value set in VSAC](https://vsac.nlm.nih.gov/valueset/2.16.840.1.113883.3.600.143/expansion)
+valueset "Depression Diagnosis ICD9": '2.16.840.1.113883.3.600.143'
+
 // [See value set in VSAC](https://vsac.nlm.nih.gov/valueset/2.16.840.1.113762.1.4.1032.52/expansion)
 valueset "Anxiety": '2.16.840.1.113762.1.4.1032.52'
+
+// [See value set in VSAC](https://vsac.nlm.nih.gov/valueset/2.16.840.1.113883.3.1240.2017.3.2.1015/expansion)
+valueset "Anxiety Disorders ICD9": '2.16.840.1.113883.3.1240.2017.3.2.1015'
 
 // [See value set in VSAC](https://vsac.nlm.nih.gov/valueset/2.16.840.1.113883.3.464.1003.106.12.1004/expansion)
 valueset "Substance use disorder": '2.16.840.1.113883.3.464.1003.106.12.1004'
 
-// [See value set in VSAC](https://vsac.nlm.nih.gov/valueset/2.16.840.1.113762.1.4.1032.40/expansion)
-valueset "Suicide attempt": '2.16.840.1.113762.1.4.1032.40'
+// [See value set in VSAC](https://vsac.nlm.nih.gov/valueset/2.16.840.1.113883.3.464.1003.106.11.1010/expansion)
+valueset "Substance Abuse": '2.16.840.1.113883.3.464.1003.106.11.1010'
+
+// [See value set in VSAC](https://vsac.nlm.nih.gov/valueset/2.16.840.1.113762.1.4.1032.102/expansion)
+valueset "Suicide Attempt": '2.16.840.1.113762.1.4.1032.102'
 
 // [See value set in VSAC](https://vsac.nlm.nih.gov/valueset/2.16.840.1.113762.1.4.1032.53/expansion)
 valueset "Sleep-disordered breathing": '2.16.840.1.113762.1.4.1032.53'
@@ -85,6 +137,9 @@ valueset "Liver Disease": '2.16.840.1.113762.1.4.1047.42'
 
 // [See value set in VSAC](https://vsac.nlm.nih.gov/valueset/2.16.840.1.113883.3.526.3.378/expansion)
 valueset "Pregnancy": '2.16.840.1.113883.3.526.3.378'
+
+// [See value set in VSAC](https://vsac.nlm.nih.gov/valueset/2.16.840.1.113762.1.4.1032.80/expansion)
+valueset "Pregnancy (New ICD10 codes published in 2018 and 2019)": '2.16.840.1.113762.1.4.1032.80'
 
 // [See value set in VSAC](https://vsac.nlm.nih.gov/valueset/2.16.840.1.113762.1.4.1032.26/expansion)
 valueset "Non opiod pain medications": '2.16.840.1.113762.1.4.1032.26'
@@ -115,7 +170,6 @@ valueset "Stool softeners and laxatives": '2.16.840.1.113762.1.4.1032.44'
 
 code "Pregnancy status code": '82810-3' from "LOINC" display 'Pregnancy status'
 code "Pregnant code": '77386006' from "SNOMED-CT" display 'Patient currently pregnant (finding)'
-code "Suicidal deliberate poisoning code": '86849004' from "SNOMED-CT" display 'Suicidal deliberate poisoning'
 code "Patient Health Questionnaire 2 item (PHQ-2) total score [Reported] code":
   '55758-7' from "LOINC" display 'Patient Health Questionnaire 2 item (PHQ-2) total score [Reported]'
 code "Patient Health Questionnaire 9 item (PHQ-9) total score [Reported] code":
@@ -125,22 +179,46 @@ code "Generalized anxiety disorder 7 item (GAD-7) total score [Reported.PHQ] cod
 code "Total score [AUDIT] code": '75624-7' from "LOINC" display 'Total score [AUDIT]'
 code "Total score [AUDIT-C] code": '75626-2' from "LOINC" display 'Total score [AUDIT-C]'
 code "Total score [DAST-10] code": '82667-7' from "LOINC" display 'Total score [DAST-10]'
+code "Total score ORT code": '91392-1' from "LOINC" display 'Total score ORT'
 code "Pain severity Wong-Baker FACES Scale code": '38221-8' from "LOINC" display 'Pain severity Wong-Baker FACES Scale'
+
+// The Pain intensity, Enjoyment of life, General activity scale [PEG] now has standardized LOINC codes available.
+// These LOINC codes were not available when the initial version of the Pain Management Summary was developed.
+// New systems implementing the Pain Management Summary should use the standardized codes, but the legacy local codes
+// are also retained in order to allow existing systems to continue to function. Existing systems, however, are
+// strongly encouraged to adopt the standardized LOINC codes.
+
+code "Mean score [PEG] code": '91147-9' from "LOINC" display 'Mean score [PEG]'
+code "Pain severity in the past week - 0-10 numeric rating [Reported] code":
+  '75893-8' from "LOINC" display 'Pain severity in the past week - 0-10 numeric rating [Reported]'
+code "What number best describes how pain has interfered with your enjoyment of life during the past week code":
+  '91145-3' from "LOINC" display 'What number best describes how pain has interfered with your enjoyment of life during the past week'
+code "What number best describes how pain has interfered with your general activity during the past week code":
+  '91146-1' from "LOINC" display 'What number best describes how pain has interfered with your general activity during the past week'
+
+// Legacy local codes for the Pain intensity, Enjoyment of life, General activity scale [PEG].
+// New systems should use the LOINC codes above instead.
+
+code "Pain Enjoyment General Activity (PEG) Assessment LEGACY code":
+  'PEGASSESSMENT' from "LOCAL" display 'Pain Enjoyment General Activity (PEG) Assessment'
+code "Pain LEGACY code": 'PEGPAIN' from "LOCAL" display 'Pain'
+code "Enjoyment of life LEGACY code": 'PEGENJOYMENT' from "LOCAL" display 'Enjoyment of life'
+code "General activity LEGACY code": 'PEGGENERALACTIVITY' from "LOCAL" display 'General activity'
+
+// The STarT Back Screening Tool now has a standardized LOINC code available. This LOINC code was not available
+// when the initial version of the Pain Management Summary was developed. New systems implementing the Pain Management
+// Summary should use the standardized code, but the legacy local code is also retained in order to allow existing
+// systems to continue to function. Existing systems, however, are strongly encouraged to adopt the standardized LOINC
+// code.
+
+code "Total score [STarT Back] code": '91351-7' from "LOINC" display 'Total score [STarT Back]'
+
+// Legacy local code for the STarT Back Screening Tool. New systems should use the LOINC codes above instead.
+
+code "STarT Back Screening Tool LEGACY code": 'STARTBACK' from "LOCAL" display 'STarT Back Screening Tool'
 
 // The following codes do not yet have standardized codes associated with them so are expressed as LOCAL codes.
 // As standardized codes become available, this CDS will be updated to use standard codes rather than LOCAL codes.
-
-// Krebs et al, Development and initial validation of the PEG, a 3-item scale assessing pain intensity and interference,
-// Journal of General Internal Medicine, 2009 June, 24:733-738.
-code "Pain Enjoyment General Activity (PEG) Assessment code":
-  'PEGASSESSMENT' from "LOCAL" display 'Pain Enjoyment General Activity (PEG) Assessment'
-code "Pain code": 'PEGPAIN' from "LOCAL" display 'Pain'
-code "Enjoyment of life code": 'PEGENJOYMENT' from "LOCAL" display 'Enjoyment of life'
-code "General activity code": 'PEGGENERALACTIVITY' from "LOCAL" display 'General activity'
-
-// Hill et al, Comparison of stratified primary care management for low back pain with current best practice
-// (STarT Back): a randomised controlled trial, The Lancet , Volume 378 , Issue 9802 , 1560 - 1571.
-code "STarT Back Screening Tool code": 'STARTBACK' from "LOCAL" display 'STarT Back Screening Tool'
 
 code "Single question r/t ETOH use code": 'SQETOHUSE' from "LOCAL" display 'Single question r/t ETOH use'
 code "Single question r/t drug use code": 'SQDRUGUSE' from "LOCAL" display 'Single question r/t drug use'
@@ -150,8 +228,6 @@ code "Morphine Milligram Equivalent (MME) code": 'MME' from "LOCAL" display 'Mor
 
 concept "Pregnancy status": { "Pregnancy status code" } display 'Pregnancy status'
 concept "Pregnant": { "Pregnant code" } display 'Patient currently pregnant (finding)'
-concept "Suicidal deliberate poisoning":
-  { "Suicidal deliberate poisoning code" } display 'Suicidal deliberate poisoning'
 concept "Patient Health Questionnaire 2 item (PHQ-2) total score [Reported]":
   { "Patient Health Questionnaire 2 item (PHQ-2) total score [Reported] code" }
   display 'Patient Health Questionnaire 2 item (PHQ-2) total score [Reported]'
@@ -164,14 +240,26 @@ concept "Generalized anxiety disorder 7 item (GAD-7) total score [Reported.PHQ]"
 concept "Total score [AUDIT]": { "Total score [AUDIT] code" } display 'Total score [AUDIT]'
 concept "Total score [AUDIT-C]": { "Total score [AUDIT-C] code" } display 'Total score [AUDIT-C]'
 concept "Total score [DAST-10]": { "Total score [DAST-10] code" } display 'Total score [DAST-10]'
+concept "Total score ORT": { "Total score ORT code" } display 'Total score ORT'
 concept "Pain severity Wong-Baker FACES Scale":
   { "Pain severity Wong-Baker FACES Scale code" } display 'Pain severity Wong-Baker FACES Scale'
-concept "Pain Enjoyment General Activity (PEG) Assessment":
-  { "Pain Enjoyment General Activity (PEG) Assessment code" } display 'Pain Enjoyment General Activity (PEG) Assessment'
-concept "Pain": { "Pain code" } display 'Pain'
-concept "Enjoyment of life": { "Enjoyment of life code" } display 'Enjoyment of life'
-concept "General activity": { "General activity code" } display 'General activity'
-concept "STarT Back Screening Tool": { "STarT Back Screening Tool code" } display 'STarT Back Screening Tool'
+concept "Pain severity in the past week - 0-10 numeric rating [Reported]":
+  { "Pain severity in the past week - 0-10 numeric rating [Reported] code" }
+  display 'Pain severity in the past week - 0-10 numeric rating [Reported]'
+concept "What number best describes how pain has interfered with your enjoyment of life during the past week":
+  { "What number best describes how pain has interfered with your enjoyment of life during the past week code" }
+  display 'What number best describes how pain has interfered with your enjoyment of life during the past week'
+concept "What number best describes how pain has interfered with your general activity during the past week":
+  { "What number best describes how pain has interfered with your general activity during the past week code" }
+  display 'What number best describes how pain has interfered with your general activity during the past week'
+concept "Mean score [PEG]": { "Mean score [PEG] code" } display 'Mean score [PEG]'
+concept "Pain Enjoyment General Activity (PEG) Assessment LEGACY":
+  { "Pain Enjoyment General Activity (PEG) Assessment LEGACY code" } display 'Pain Enjoyment General Activity (PEG) Assessment'
+concept "Pain LEGACY": { "Pain LEGACY code" } display 'Pain'
+concept "Enjoyment of life LEGACY": { "Enjoyment of life LEGACY code" } display 'Enjoyment of life'
+concept "General activity LEGACY": { "General activity LEGACY code" } display 'General activity'
+concept "Total score [STarT Back]": { "Total score [STarT Back] code" } display 'Total score [STarT Back]'
+concept "STarT Back Screening Tool LEGACY": { "STarT Back Screening Tool LEGACY code" } display 'STarT Back Screening Tool'
 concept "Single question r/t ETOH use": { "Single question r/t ETOH use code" } display 'Single question r/t ETOH use'
 concept "Single question r/t drug use": { "Single question r/t drug use code" } display 'Single question r/t drug use'
 concept "Morphine Milligram Equivalent (MME)":
@@ -193,11 +281,23 @@ context Patient
 // have been developed as re-usable functions that can be invoked wherever they are needed.
 
 // Returns the first-found display text for a CodeableConcept, looking first at the `text` attribute, then the
-// `display` on each `coding` until it finds a non-null value.
+// `display` on each `coding` until it finds a non-null value.  Some PEG codes are normalized due to length.
 // @param c - a FHIR CodeableConcept to get text from
 // @returns {System.String} the display text or null if none is found
+
 define function ConceptText(c FHIR.CodeableConcept):
-  Coalesce(c.text.value, Coalesce((c.coding) c2 return c2.display.value))
+  if c ~ "Mean score [PEG]" or c ~ "Pain Enjoyment General Activity (PEG) Assessment LEGACY"
+    then 'Mean score [PEG]'
+  else if c ~ "Pain severity in the past week - 0-10 numeric rating [Reported]" or c ~ "Pain LEGACY"
+    then 'Pain'
+  else if c ~ "What number best describes how pain has interfered with your enjoyment of life during the past week"
+       or c ~ "Enjoyment of life LEGACY"
+    then 'Enjoyment of life'
+  else if c ~ "What number best describes how pain has interfered with your general activity during the past week"
+       or c ~ "General activity LEGACY"
+    then 'General activity'
+  else
+    Coalesce(c.text.value, Coalesce((c.coding) c2 return c2.display.value))
 
 // We do not reliably get ranges back from EHR data, but ranges are important to understanding assessment scores in
 // the summary.  This function adds ranges to the name for known assessments.
@@ -216,11 +316,15 @@ define function ConceptTextWithRange(c FHIR.CodeableConcept):
     then ConceptText(c) + ' [Range: 0-12]'
   else if c ~ "Total score [DAST-10]"
     then ConceptText(c) + ' [Range: 0-10]'
+  else if c ~ "Total score ORT"
+    then ConceptText(c) + ' [Range: 0-26]'
   else if c ~ "Pain severity Wong-Baker FACES Scale"
     then ConceptText(c) + ' [Range: 0-10]'
-  else if c ~ "Pain Enjoyment General Activity (PEG) Assessment"
+  else if c ~ "Mean score [PEG]"
+       or c ~ "Pain Enjoyment General Activity (PEG) Assessment LEGACY"
     then ConceptText(c) + ' [Range: 0-10]'
-  else if c ~ "STarT Back Screening Tool"
+  else if c ~ "Total score [STarT Back]"
+       or c ~ "STarT Back Screening Tool LEGACY"
     then ConceptText(c) + ' [Range: 0-9]'
   else
     ConceptText(c)
@@ -244,12 +348,13 @@ define function InstantText(i FHIR.instant):
   ToString(i.value)
 
 // Returns a text representation of a Quantity with the Quantity's value and unit.
+// If the unit is {score}, then omit it (as it is not useful to display)
 // @param q - a FHIR Quantity to get text for
 // @returns {System.String} the text representation of the Quantity
 define function QuantityText(q FHIR.Quantity):
   if (q is null) then null
-  else if (q.unit is not null) then ToString(q.value.value) + ' ' + q.unit.value
-  else if (q.code is not null) then ToString(q.value.value) + ' ' + q.code.value
+  else if (q.unit is not null and q.unit.value != '{score}') then ToString(q.value.value) + ' ' + q.unit.value
+  else if (q.code is not null and q.code.value != '{score}') then ToString(q.value.value) + ' ' + q.code.value
   else ToString(q.value.value)
 
 // Returns a tuple containing a Period's start and end as text representations.
@@ -321,16 +426,6 @@ define function Abatement(c FHIR.Condition):
     RangeObject(c.abatement as FHIR.Range),
     (c.abatement as FHIR.string).value
   })
-
-// Sorts the components of a PEG Observation to be in the order P (Pain), E (Enjoyment of life), G (General activity)
-// @param c - a list of FHIR Observation.Components to be sorted in PEG order
-// @returns {List<FHIR."Observation.Component">} the list of FHIR Observation.Components sorted in PEG order
-define function SortPegComponents(c List<FHIR."Observation.Component">):
-  flatten List{
-    c OC where OC.code ~ "Pain",
-    c OC where OC.code ~ "Enjoyment of life",
-    c OC where OC.code ~ "General activity"
-  }
 
 // ## Target population ##
 
@@ -423,16 +518,18 @@ define ReportConditionsAssociatedWithChronicPain:
 
 define DepressionConditions:
   C3F.Confirmed(C3F.ActiveOrRecurring([Condition: "Major Depression"]))
+  union C3F.Confirmed(C3F.ActiveOrRecurring([Condition: "Depression Diagnosis ICD9"]))
 
 define AnxietyConditions:
   C3F.Confirmed(C3F.ActiveOrRecurring([Condition: "Anxiety"]))
+  union C3F.Confirmed(C3F.ActiveOrRecurring([Condition: "Anxiety Disorders ICD9"]))
 
 define SubstanceUseDisorderConditions:
   C3F.Confirmed([Condition: "Substance use disorder"])
+  union C3F.Confirmed([Condition: "Substance Abuse"])
 
 define SuicideAttemptConditions:
-  C3F.Confirmed([Condition: "Suicide attempt"])
-  union C3F.Confirmed([Condition: "Suicidal deliberate poisoning"])
+  C3F.Confirmed([Condition: "Suicide Attempt"])
 
 define SleepDisorderedBreathingConditions:
   C3F.Confirmed(C3F.ActiveOrRecurring([Condition: "Sleep-disordered breathing"]))
@@ -445,7 +542,11 @@ define HepaticDysfunctionConditions:
   union C3F.Confirmed(C3F.ActiveOrRecurring([Condition: "Liver Disease"]))
 
 define PregnancyConditions:
-  C3F.Confirmed(C3F.ConditionLookBack(C3F.ActiveOrRecurring([Condition: "Pregnancy"]), 42 weeks))
+  C3F.Confirmed(C3F.ConditionLookBack(C3F.ActiveOrRecurring(
+    [Condition: "Pregnancy"])
+      union [Condition: "Pregnancy (New ICD10 codes published in 2018 and 2019)"],
+    42 weeks
+  ))
 
 define PregnancyObservations:
   C3F.Verified(C3F.ObservationLookBack([Observation: "Pregnancy status"], 42 weeks))
@@ -479,10 +580,12 @@ define EncounterRiskFactorsForOpioidRelatedHarms:
   [Encounter] E where exists(
     E.reasonCode R where
       FHIRHelpers.ToConcept(R) in "Major Depression"
+      or FHIRHelpers.ToConcept(R) in "Depression Diagnosis ICD9"
       or FHIRHelpers.ToConcept(R) in "Anxiety"
+      or FHIRHelpers.ToConcept(R) in "Anxiety Disorders ICD9"
       or FHIRHelpers.ToConcept(R) in "Substance use disorder"
-      or FHIRHelpers.ToConcept(R) in "Suicide attempt"
-      or FHIRHelpers.ToConcept(R) ~ "Suicidal deliberate poisoning"
+      or FHIRHelpers.ToConcept(R) in "Substance Abuse"
+      or FHIRHelpers.ToConcept(R) in "Suicide Attempt"
       or FHIRHelpers.ToConcept(R) in "Sleep-disordered breathing"
       or FHIRHelpers.ToConcept(R) in "Kidney Failure"
       or FHIRHelpers.ToConcept(R) in "Chronic Liver Disease"
@@ -512,10 +615,12 @@ define ReportConditionRiskFactorsForOpioidRelatedHarms:
 define function GetEncounterDiagnosesRiskFactorsForOpioidRelatedHarms(enc Encounter):
   (enc.reasonCode) R
     where FHIRHelpers.ToConcept(R) in "Major Depression"
+      or FHIRHelpers.ToConcept(R) in "Depression Diagnosis ICD9"
       or FHIRHelpers.ToConcept(R) in "Anxiety"
+      or FHIRHelpers.ToConcept(R) in "Anxiety Disorders ICD9"
       or FHIRHelpers.ToConcept(R) in "Substance use disorder"
-      or FHIRHelpers.ToConcept(R) in "Suicide attempt"
-      or FHIRHelpers.ToConcept(R) ~ "Suicidal deliberate poisoning"
+      or FHIRHelpers.ToConcept(R) in "Substance Abuse"
+      or FHIRHelpers.ToConcept(R) in "Suicide Attempt"
       or FHIRHelpers.ToConcept(R) in "Sleep-disordered breathing"
       or FHIRHelpers.ToConcept(R) in "Kidney Failure"
       or FHIRHelpers.ToConcept(R) in "Chronic Liver Disease"
@@ -599,22 +704,66 @@ define ReportNumericPainIntensityAssessments:
   }
   sort by Date desc
 
-// Pain Enjoyment General Activity (PEG) Assessment - scores and dates (OID: N/A use local codes) (lookback 2 years)
-// Note: this includes listing the response to each of the 3 questions, plus the total score
+// Pain Enjoyment General Activity (PEG) Assessment - scores and dates (lookback 2 years)
+// Note: this includes listing the response to each of the 3 questions, plus the total score.  The Pain Management
+// Sumnmary currently supports both the LOINC representations and the legacy local code representations.
+//
+// 1. Observation w/ LOINC mean score as primary code and mean score as valueQuantity
+//    * code: LOINC 91147-9 "Mean score [PEG]"
+//    * valueQuantity: (mean score)
+//    * component:
+//      -
+//        * code: LOINC 75893-8 "What number best describes your pain on average in the past week?"
+//        * valueQuantity: (pain score)
+//      -
+//        * code: LOINC 91145-3 "What number best describes how, during the past week, pain has interfered with your enjoyment of life?"
+//        * valueQuantity: (enjoyment of life score)
+//      -
+//        * code: LOINC 91146-1 "What number best describes how, during the past week, pain has interfered with your general activity?"
+//        * valueQuantity: (general activity score)
+//
+// 2. LEGACY: Observation w/ LOCAL code as primary code and mean score as valueQuantity
+//    * code: LOCAL PEGASSESSMENT "Pain Enjoyment General Activity (PEG) Assessment"
+//    * valueQuantity: (mean score)
+//    * component:
+//      -
+//        * code: LOCAL PEGPAIN "Pain"
+//        * valueQuantity: (pain score)
+//      -
+//        * code: LOCAL PEGENJOYMENT "Enjoyment of life"
+//        * valueQuantity: (enjoyment of life score)
+//      -
+//        * code: LOCAL PEGGENERALACTIVITY "General activity"
+//        * valueQuantity: (general activity score)
 
 define PainEnjoymentGeneralActivityAssessments:
-  C3F.Verified(C3F.ObservationLookBack([Observation: "Pain Enjoyment General Activity (PEG) Assessment"], 2 years))
+  C3F.Verified(C3F.ObservationLookBack(
+    [Observation: "Mean score [PEG]"]
+      union [Observation: "Pain Enjoyment General Activity (PEG) Assessment LEGACY"],
+    2 years
+  ))
 
 define ReportPainEnjoymentGeneralActivityAssessments:
   (PainEnjoymentGeneralActivityAssessments) A
+  let
+    Pain: (A.component) C
+      where C.code ~ "Pain severity in the past week - 0-10 numeric rating [Reported]"
+      or C.code ~ "Pain LEGACY",
+    Enjoyment: (A.component) C
+      where C.code ~ "What number best describes how pain has interfered with your enjoyment of life during the past week"
+      or C.code ~ "Enjoyment of life LEGACY",
+    GeneralActivity: (A.component) C
+      where C.code ~ "What number best describes how pain has interfered with your general activity during the past week"
+      or C.code ~ "General activity LEGACY"
+  where true // grammar needs a where statement to separate the "let" from the "return"
   return {
+    // NOTE: Hard-code in names because the real LOINC code displays are quite long
     Name:           ConceptTextWithRange(A.code),
     Score:          QuantityText(A.value as FHIR.Quantity),
     Interpretation: Coalesce( ConceptText(First(A.interpretation)),  ConceptText(A.value as FHIR.CodeableConcept) ),
-    Questions:      (SortPegComponents(A.component)) C return {
-                      "Name": ConceptText(C.code),
-                      "Score": QuantityText(C.value as FHIR.Quantity)
-                    },
+    Questions:      ({ First(Pain), First(Enjoyment), First(GeneralActivity) }) C
+                      where C is not null
+                      return { "Name": ConceptText(C.code), "Score": QuantityText(C.value as FHIR.Quantity) },
     Date:           ObservationDate(A)
   }
   sort by Date desc
@@ -622,7 +771,11 @@ define ReportPainEnjoymentGeneralActivityAssessments:
 // STarT Back Screening Tool - Overall score and dates (lookback 2 years)
 
 define STarTBackAssessments:
-  C3F.Verified(C3F.ObservationLookBack([Observation: "STarT Back Screening Tool"], 2 years))
+  C3F.Verified(C3F.ObservationLookBack(
+    [Observation: "Total score [STarT Back]"]
+      union [Observation: "STarT Back Screening Tool LEGACY"],
+    2 years
+  ))
 
 define ReportSTarTBackAssessments:
   (STarTBackAssessments) A
@@ -836,12 +989,6 @@ define BenzodiazepineMedicationRequests:
     [MedicationRequest: "Benzodiazepine medications"],
     2 years
   ))
-
-define function MedicationStatementLookBack(MedList List<MedicationStatement>, LookBack System.Quantity):
-MedList M
-  let LookBackInterval: Interval[Now() - LookBack, Now()]
-  where (M.effective as FHIR.dateTime).value in LookBackInterval
-    or C3F.PeriodToInterval(M.effective as FHIR.Period) overlaps LookBackInterval
 
 define BenzodiazepineMedicationStatements:
   C3F.ActiveOrCompletedMedicationStatement(C3F.MedicationStatementLookBack(

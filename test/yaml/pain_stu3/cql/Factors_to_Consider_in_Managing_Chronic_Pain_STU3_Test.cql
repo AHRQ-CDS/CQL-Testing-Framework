@@ -1,8 +1,9 @@
 // # Introduction
 
-// NOTE: THIS IS AN UNTESTED FHIR STU3 PORT OF THE PAIN MANAGEMENT SUMMARY.
-// THIS ARTIFACT IS INTENDED FOR TESTING PURPOSES ONLY!
-
+// NOTE: This version of the Pain Management Summary artifact is for testing and example purposes only. For the
+// latest official version of the artifact, please see visit it in the CDS Connect repository:
+// https://cds.ahrq.gov/cdsconnect/artifact/factors-consider-managing-chronic-pain-pain-management-summary
+//
 // The Pain Management Summary artifact provides relevant information to consider when managing a patient’s pain.
 // This CDS logic was informed by the Centers for Disease Control and Prevention (CDC) Guideline for Opioid Prescribing
 // for Chronic Pain. The CDS is not a direct representation of any one recommendation statement within the guideline.

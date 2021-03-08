@@ -1,6 +1,7 @@
 **/.vscache/*.xml
 **/dump_files/
 /.vscode
+/.gradle
 /node_modules
 yarn-error.log
 .DS_Store

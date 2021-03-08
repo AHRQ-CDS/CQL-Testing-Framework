@@ -1,0 +1,51 @@
+---
+name: Second example of using reusable resources
+
+# Referenced resources don't have to be included in the test case file. They can exist
+# in separate YAML files as long as they are named under externalData.
+externalData:
+- reusable_resources
+- more_resources
+
+data:
+-
+  resourceType: Patient
+  name: Fuller Jackson
+  gender: male
+  birthDate: 1954-02-16
+# The `$import` keyword will cause all resources in the referenced external YAML file
+# to be included in this test case. In the example below painRelatedConditions is contained
+# in reusable_resources.yml and consists of two Condition resources, both of which will be
+# imported into this test case.
+-
+  $import: *painRelatedConditions
+# The `$iterate` keyword will cause a set of test cases to be created, each containing
+# just one of the resources in the referenced external YAML file. In the example below
+# nonOpioidMedicationRequests is contained in more_resources.yml and consists of two
+# MedicationRequest resources, from which two separate test cases are generated, each
+# with one of the MedicationRequest resources. Both test cases will include everything from
+# painRelatedConditions.
+-
+  $iterate: *nonOpioidMedicationRequests
+# There can be more than one usage of the `$iterate` keyword in a single file, in which
+# case the effects are combined to generate all possible combination of resources. In the
+# example below, nonOpioidMedicationStatements is contained in more_resources.yml and consists
+# of two MedicationStatement resources. A total of 2*2=4 separate test cases are created
+# consisting of all possible combinations of resources from nonOpioidMedicationRequests and
+# nonOpioidMedicationStatements. All test cases will include everything from painRelatedConditions.
+-
+  $iterate: *nonOpioidMedicationStatements
+
+
+results:
+  # Cannot check for strict equality in this example, since each test case created by
+  # `$iterate` has a different output Summary object.
+
+  # Must verify certain output object properties by using `$should` expressions.
+  # The following indicates that the Summary object should exist.
+  Summary: $should exist
+  # The following indicates that the these outputs should be arrays of length 1
+  ReportConditionsAssociatedWithChronicPain: $should have length 1
+  ReportRiskFactorsForOpioidRelatedHarms: $should have length 1
+  # The following indicates that the this output should be an array of length 2
+  ReportNonOpioidMedications: $should have length 2
