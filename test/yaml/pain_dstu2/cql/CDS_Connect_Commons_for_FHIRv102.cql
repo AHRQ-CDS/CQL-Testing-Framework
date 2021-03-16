@@ -212,7 +212,7 @@ define function ConditionLookBack(CondList List<Condition>, LookBack System.Quan
     let LookBackInterval: Interval[Now() - LookBack, Now()]
     where C.onsetDateTime.value in LookBackInterval
       or NullSafeToInterval(C.onsetPeriod) overlaps LookBackInterval
-      or C.dateRecorded in LookBackInterval
+      or C.dateRecorded.value in LookBackInterval
       // TODO Confirm these are the correct fields to use
 
 // -------------------------------------------------- PROCEDURES -------------------------------------------------------
@@ -530,4 +530,4 @@ define function GoalLookBack(GoalList List<Goal>, LookBack System.Quantity):
     where G.startDate.value in LookBackInterval
       or G.targetDate.value in LookBackInterval
       or (G.startDate.value + NullSafeToQuantity(G.targetQuantity)) in LookBackInterval
-      or G.statusDate in LookBackInterval
+      or G.statusDate.value in LookBackInterval

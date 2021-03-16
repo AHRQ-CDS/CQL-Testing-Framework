@@ -7,7 +7,7 @@ The CQL Testing Framework provides a simple mechanism for developing and maintai
 Current capabilities include:
 
 * Author test case data and expectations using [YAML](https://yaml.org/)
-* Execute test cases against CQL logic using [FHIR 1.0.2 (DSTU2)](http://hl7.org/fhir/DSTU2/resourcelist.html) / [FHIR 3.0.0 (STU3)](http://hl7.org/fhir/STU3/resourcelist.html) / [FHIR 4.0.0 (R4)](http://hl7.org/fhir/R4/resourcelist.html) model and [VSAC](https://vsac.nlm.nih.gov/) value sets
+* Execute test cases against CQL logic using [FHIR 1.0.2 (DSTU2)](http://hl7.org/fhir/DSTU2/resourcelist.html) / [FHIR 3.0.0 (STU3)](http://hl7.org/fhir/STU3/resourcelist.html) / [FHIR 4.0.0/4.0.1 (R4)](http://hl7.org/fhir/R4/resourcelist.html) model and [VSAC](https://vsac.nlm.nih.gov/) value sets
 * Display _diff_ rendering of actual vs. expected results for test failures
 * Run standalone or integrate CQL tests into existing [Mocha](https://mochajs.org/) test suites
 * Export test data as FHIR bundles for integration into a test server
@@ -26,7 +26,7 @@ For information about contributing to this project, please see [CONTRIBUTING](CO
 
 ### Required Software
 
-You must [install Node.js](https://nodejs.org/en/download/) to use the CQL Testing Framework.  Node.js 8.x is confirmed to work, but more recent releases may also work.
+You must [install Node.js](https://nodejs.org/en/download/) to use the CQL Testing Framework.  Node.js 12.x is confirmed to work, but other releases may also work.
 
 You must also [install cql-execution](https://github.com/cqframework/cql-execution), a Node.js library for executing CQL expressions, in whatever project where you are using `cql-testing`. The reason for this requirement is to allow users of `cql-testing` to select the [version of cql-execution](https://www.npmjs.com/package/cql-execution) that best suits their needs.
 
@@ -231,9 +231,9 @@ This only needs to be done once.  After this, your `node_modules` folder will be
 #### Downloading Value Sets
 
 If your CQL uses value sets from the Value Set Authority Center (VSAC), then the first time you run the tests, they will need to download the value set definitions from VSAC.  Downloading value sets from VSAC requires a VSAC account and an API key.  You can find your API key in your [UMLS profile](https://uts.nlm.nih.gov//uts.html#profile) and can configure your VSAC account by setting the `options->vsac->apikey` property in your `cqlt.yaml` file.  If you prefer not to modify the config file, you may set the `UMLS_API_KEY` environment variable instead.
- 
+
 Alternatively, existing username/password authentication is supported until January 1, 2021.  You may set the `options->vsac->user` and `options->vsac->password` properties in your `cqlt.yaml` file.  If you prefer not to modify the config file, you may set the`UMLS_USER_NAME` and `UMLS_PASSWORD` environment variables.
- 
+
 **NOTE**: Username and password based authentication is deprecated by VSAC, and only supported until January 1, 2021.  API key based authentication is highly encouraged.
 
 Once you've run the tests the first time and downloaded the value sets, they'll be stored in a VSAC cache folder (defaulted to `/.vscache` in the same folder as the `cqlt.yaml` file).  After that, you do not need your VSAC credentials anymore since the CQL Testing Framework will just use the cache.

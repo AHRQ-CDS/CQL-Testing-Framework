@@ -1,5 +1,9 @@
 {
    "library" : {
+      "annotation" : [ {
+         "translatorOptions" : "",
+         "type" : "CqlToElmInfo"
+      } ],
       "identifier" : {
          "id" : "FHIRHelpers",
          "version" : "4.0.0"
@@ -51,30 +55,77 @@
                   }
                },
                "else" : {
-                  "lowClosed" : true,
-                  "highClosed" : true,
-                  "type" : "Interval",
-                  "low" : {
-                     "path" : "value",
-                     "type" : "Property",
-                     "source" : {
-                        "path" : "start",
-                        "type" : "Property",
-                        "source" : {
-                           "name" : "period",
-                           "type" : "OperandRef"
+                  "type" : "If",
+                  "condition" : {
+                     "asType" : "{urn:hl7-org:elm-types:r1}Boolean",
+                     "type" : "As",
+                     "operand" : {
+                        "type" : "IsNull",
+                        "operand" : {
+                           "path" : "start",
+                           "type" : "Property",
+                           "source" : {
+                              "name" : "period",
+                              "type" : "OperandRef"
+                           }
                         }
                      }
                   },
-                  "high" : {
-                     "path" : "value",
-                     "type" : "Property",
-                     "source" : {
-                        "path" : "end",
+                  "then" : {
+                     "lowClosed" : false,
+                     "highClosed" : true,
+                     "type" : "Interval",
+                     "low" : {
+                        "path" : "value",
                         "type" : "Property",
                         "source" : {
-                           "name" : "period",
-                           "type" : "OperandRef"
+                           "path" : "start",
+                           "type" : "Property",
+                           "source" : {
+                              "name" : "period",
+                              "type" : "OperandRef"
+                           }
+                        }
+                     },
+                     "high" : {
+                        "path" : "value",
+                        "type" : "Property",
+                        "source" : {
+                           "path" : "end",
+                           "type" : "Property",
+                           "source" : {
+                              "name" : "period",
+                              "type" : "OperandRef"
+                           }
+                        }
+                     }
+                  },
+                  "else" : {
+                     "lowClosed" : true,
+                     "highClosed" : true,
+                     "type" : "Interval",
+                     "low" : {
+                        "path" : "value",
+                        "type" : "Property",
+                        "source" : {
+                           "path" : "start",
+                           "type" : "Property",
+                           "source" : {
+                              "name" : "period",
+                              "type" : "OperandRef"
+                           }
+                        }
+                     },
+                     "high" : {
+                        "path" : "value",
+                        "type" : "Property",
+                        "source" : {
+                           "path" : "end",
+                           "type" : "Property",
+                           "source" : {
+                              "name" : "period",
+                              "type" : "OperandRef"
+                           }
                         }
                      }
                   }
@@ -88,7 +139,836 @@
                }
             } ]
          }, {
+            "name" : "ToCalendarUnit",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "type" : "FunctionDef",
+            "expression" : {
+               "type" : "Case",
+               "comparand" : {
+                  "name" : "unit",
+                  "type" : "OperandRef"
+               },
+               "caseItem" : [ {
+                  "when" : {
+                     "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                     "value" : "ms",
+                     "type" : "Literal"
+                  },
+                  "then" : {
+                     "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                     "value" : "millisecond",
+                     "type" : "Literal"
+                  }
+               }, {
+                  "when" : {
+                     "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                     "value" : "s",
+                     "type" : "Literal"
+                  },
+                  "then" : {
+                     "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                     "value" : "second",
+                     "type" : "Literal"
+                  }
+               }, {
+                  "when" : {
+                     "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                     "value" : "min",
+                     "type" : "Literal"
+                  },
+                  "then" : {
+                     "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                     "value" : "minute",
+                     "type" : "Literal"
+                  }
+               }, {
+                  "when" : {
+                     "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                     "value" : "h",
+                     "type" : "Literal"
+                  },
+                  "then" : {
+                     "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                     "value" : "hour",
+                     "type" : "Literal"
+                  }
+               }, {
+                  "when" : {
+                     "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                     "value" : "d",
+                     "type" : "Literal"
+                  },
+                  "then" : {
+                     "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                     "value" : "day",
+                     "type" : "Literal"
+                  }
+               }, {
+                  "when" : {
+                     "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                     "value" : "wk",
+                     "type" : "Literal"
+                  },
+                  "then" : {
+                     "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                     "value" : "week",
+                     "type" : "Literal"
+                  }
+               }, {
+                  "when" : {
+                     "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                     "value" : "mo",
+                     "type" : "Literal"
+                  },
+                  "then" : {
+                     "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                     "value" : "month",
+                     "type" : "Literal"
+                  }
+               }, {
+                  "when" : {
+                     "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                     "value" : "a",
+                     "type" : "Literal"
+                  },
+                  "then" : {
+                     "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                     "value" : "year",
+                     "type" : "Literal"
+                  }
+               } ],
+               "else" : {
+                  "name" : "unit",
+                  "type" : "OperandRef"
+               }
+            },
+            "operand" : [ {
+               "name" : "unit",
+               "operandTypeSpecifier" : {
+                  "name" : "{urn:hl7-org:elm-types:r1}String",
+                  "type" : "NamedTypeSpecifier"
+               }
+            } ]
+         }, {
             "name" : "ToQuantity",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "type" : "FunctionDef",
+            "expression" : {
+               "type" : "Case",
+               "caseItem" : [ {
+                  "when" : {
+                     "type" : "IsNull",
+                     "operand" : {
+                        "name" : "quantity",
+                        "type" : "OperandRef"
+                     }
+                  },
+                  "then" : {
+                     "asType" : "{urn:hl7-org:elm-types:r1}Quantity",
+                     "type" : "As",
+                     "operand" : {
+                        "type" : "Null"
+                     }
+                  }
+               }, {
+                  "when" : {
+                     "type" : "IsNull",
+                     "operand" : {
+                        "path" : "value",
+                        "type" : "Property",
+                        "source" : {
+                           "name" : "quantity",
+                           "type" : "OperandRef"
+                        }
+                     }
+                  },
+                  "then" : {
+                     "asType" : "{urn:hl7-org:elm-types:r1}Quantity",
+                     "type" : "As",
+                     "operand" : {
+                        "type" : "Null"
+                     }
+                  }
+               }, {
+                  "when" : {
+                     "type" : "Not",
+                     "operand" : {
+                        "type" : "IsNull",
+                        "operand" : {
+                           "path" : "comparator",
+                           "type" : "Property",
+                           "source" : {
+                              "name" : "quantity",
+                              "type" : "OperandRef"
+                           }
+                        }
+                     }
+                  },
+                  "then" : {
+                     "asType" : "{urn:hl7-org:elm-types:r1}Quantity",
+                     "type" : "As",
+                     "operand" : {
+                        "type" : "Message",
+                        "source" : {
+                           "type" : "Null"
+                        },
+                        "condition" : {
+                           "valueType" : "{urn:hl7-org:elm-types:r1}Boolean",
+                           "value" : "true",
+                           "type" : "Literal"
+                        },
+                        "code" : {
+                           "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                           "value" : "FHIRHelpers.ToQuantity.ComparatorQuantityNotSupported",
+                           "type" : "Literal"
+                        },
+                        "severity" : {
+                           "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                           "value" : "Error",
+                           "type" : "Literal"
+                        },
+                        "message" : {
+                           "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                           "value" : "FHIR Quantity value has a comparator and cannot be converted to a System.Quantity value.",
+                           "type" : "Literal"
+                        }
+                     }
+                  }
+               }, {
+                  "when" : {
+                     "type" : "Or",
+                     "operand" : [ {
+                        "type" : "Or",
+                        "operand" : [ {
+                           "type" : "IsNull",
+                           "operand" : {
+                              "path" : "system",
+                              "type" : "Property",
+                              "source" : {
+                                 "name" : "quantity",
+                                 "type" : "OperandRef"
+                              }
+                           }
+                        }, {
+                           "type" : "Equal",
+                           "operand" : [ {
+                              "path" : "value",
+                              "type" : "Property",
+                              "source" : {
+                                 "path" : "system",
+                                 "type" : "Property",
+                                 "source" : {
+                                    "name" : "quantity",
+                                    "type" : "OperandRef"
+                                 }
+                              }
+                           }, {
+                              "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                              "value" : "http://unitsofmeasure.org",
+                              "type" : "Literal"
+                           } ]
+                        } ]
+                     }, {
+                        "type" : "Equal",
+                        "operand" : [ {
+                           "path" : "value",
+                           "type" : "Property",
+                           "source" : {
+                              "path" : "system",
+                              "type" : "Property",
+                              "source" : {
+                                 "name" : "quantity",
+                                 "type" : "OperandRef"
+                              }
+                           }
+                        }, {
+                           "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                           "value" : "http://hl7.org/fhirpath/CodeSystem/calendar-units",
+                           "type" : "Literal"
+                        } ]
+                     } ]
+                  },
+                  "then" : {
+                     "classType" : "{urn:hl7-org:elm-types:r1}Quantity",
+                     "type" : "Instance",
+                     "element" : [ {
+                        "name" : "value",
+                        "value" : {
+                           "path" : "value",
+                           "type" : "Property",
+                           "source" : {
+                              "path" : "value",
+                              "type" : "Property",
+                              "source" : {
+                                 "name" : "quantity",
+                                 "type" : "OperandRef"
+                              }
+                           }
+                        }
+                     }, {
+                        "name" : "unit",
+                        "value" : {
+                           "name" : "ToCalendarUnit",
+                           "type" : "FunctionRef",
+                           "operand" : [ {
+                              "type" : "Coalesce",
+                              "operand" : [ {
+                                 "path" : "value",
+                                 "type" : "Property",
+                                 "source" : {
+                                    "path" : "code",
+                                    "type" : "Property",
+                                    "source" : {
+                                       "name" : "quantity",
+                                       "type" : "OperandRef"
+                                    }
+                                 }
+                              }, {
+                                 "path" : "value",
+                                 "type" : "Property",
+                                 "source" : {
+                                    "path" : "unit",
+                                    "type" : "Property",
+                                    "source" : {
+                                       "name" : "quantity",
+                                       "type" : "OperandRef"
+                                    }
+                                 }
+                              }, {
+                                 "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                                 "value" : "1",
+                                 "type" : "Literal"
+                              } ]
+                           } ]
+                        }
+                     } ]
+                  }
+               } ],
+               "else" : {
+                  "asType" : "{urn:hl7-org:elm-types:r1}Quantity",
+                  "type" : "As",
+                  "operand" : {
+                     "type" : "Message",
+                     "source" : {
+                        "type" : "Null"
+                     },
+                     "condition" : {
+                        "valueType" : "{urn:hl7-org:elm-types:r1}Boolean",
+                        "value" : "true",
+                        "type" : "Literal"
+                     },
+                     "code" : {
+                        "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                        "value" : "FHIRHelpers.ToQuantity.InvalidFHIRQuantity",
+                        "type" : "Literal"
+                     },
+                     "severity" : {
+                        "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                        "value" : "Error",
+                        "type" : "Literal"
+                     },
+                     "message" : {
+                        "type" : "Concatenate",
+                        "operand" : [ {
+                           "type" : "Coalesce",
+                           "operand" : [ {
+                              "type" : "Concatenate",
+                              "operand" : [ {
+                                 "type" : "Coalesce",
+                                 "operand" : [ {
+                                    "type" : "Concatenate",
+                                    "operand" : [ {
+                                       "type" : "Coalesce",
+                                       "operand" : [ {
+                                          "type" : "Concatenate",
+                                          "operand" : [ {
+                                             "type" : "Coalesce",
+                                             "operand" : [ {
+                                                "type" : "Concatenate",
+                                                "operand" : [ {
+                                                   "type" : "Coalesce",
+                                                   "operand" : [ {
+                                                      "type" : "Concatenate",
+                                                      "operand" : [ {
+                                                         "type" : "Coalesce",
+                                                         "operand" : [ {
+                                                            "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                                                            "value" : "Invalid FHIR Quantity code: ",
+                                                            "type" : "Literal"
+                                                         }, {
+                                                            "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                                                            "value" : "",
+                                                            "type" : "Literal"
+                                                         } ]
+                                                      }, {
+                                                         "type" : "Coalesce",
+                                                         "operand" : [ {
+                                                            "path" : "value",
+                                                            "type" : "Property",
+                                                            "source" : {
+                                                               "path" : "unit",
+                                                               "type" : "Property",
+                                                               "source" : {
+                                                                  "name" : "quantity",
+                                                                  "type" : "OperandRef"
+                                                               }
+                                                            }
+                                                         }, {
+                                                            "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                                                            "value" : "",
+                                                            "type" : "Literal"
+                                                         } ]
+                                                      } ]
+                                                   }, {
+                                                      "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                                                      "value" : "",
+                                                      "type" : "Literal"
+                                                   } ]
+                                                }, {
+                                                   "type" : "Coalesce",
+                                                   "operand" : [ {
+                                                      "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                                                      "value" : " (",
+                                                      "type" : "Literal"
+                                                   }, {
+                                                      "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                                                      "value" : "",
+                                                      "type" : "Literal"
+                                                   } ]
+                                                } ]
+                                             }, {
+                                                "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                                                "value" : "",
+                                                "type" : "Literal"
+                                             } ]
+                                          }, {
+                                             "type" : "Coalesce",
+                                             "operand" : [ {
+                                                "path" : "value",
+                                                "type" : "Property",
+                                                "source" : {
+                                                   "path" : "system",
+                                                   "type" : "Property",
+                                                   "source" : {
+                                                      "name" : "quantity",
+                                                      "type" : "OperandRef"
+                                                   }
+                                                }
+                                             }, {
+                                                "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                                                "value" : "",
+                                                "type" : "Literal"
+                                             } ]
+                                          } ]
+                                       }, {
+                                          "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                                          "value" : "",
+                                          "type" : "Literal"
+                                       } ]
+                                    }, {
+                                       "type" : "Coalesce",
+                                       "operand" : [ {
+                                          "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                                          "value" : "|",
+                                          "type" : "Literal"
+                                       }, {
+                                          "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                                          "value" : "",
+                                          "type" : "Literal"
+                                       } ]
+                                    } ]
+                                 }, {
+                                    "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                                    "value" : "",
+                                    "type" : "Literal"
+                                 } ]
+                              }, {
+                                 "type" : "Coalesce",
+                                 "operand" : [ {
+                                    "path" : "value",
+                                    "type" : "Property",
+                                    "source" : {
+                                       "path" : "code",
+                                       "type" : "Property",
+                                       "source" : {
+                                          "name" : "quantity",
+                                          "type" : "OperandRef"
+                                       }
+                                    }
+                                 }, {
+                                    "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                                    "value" : "",
+                                    "type" : "Literal"
+                                 } ]
+                              } ]
+                           }, {
+                              "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                              "value" : "",
+                              "type" : "Literal"
+                           } ]
+                        }, {
+                           "type" : "Coalesce",
+                           "operand" : [ {
+                              "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                              "value" : ")",
+                              "type" : "Literal"
+                           }, {
+                              "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                              "value" : "",
+                              "type" : "Literal"
+                           } ]
+                        } ]
+                     }
+                  }
+               }
+            },
+            "operand" : [ {
+               "name" : "quantity",
+               "operandTypeSpecifier" : {
+                  "name" : "{http://hl7.org/fhir}Quantity",
+                  "type" : "NamedTypeSpecifier"
+               }
+            } ]
+         }, {
+            "name" : "ToQuantityIgnoringComparator",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "type" : "FunctionDef",
+            "expression" : {
+               "type" : "Case",
+               "caseItem" : [ {
+                  "when" : {
+                     "type" : "IsNull",
+                     "operand" : {
+                        "name" : "quantity",
+                        "type" : "OperandRef"
+                     }
+                  },
+                  "then" : {
+                     "asType" : "{urn:hl7-org:elm-types:r1}Quantity",
+                     "type" : "As",
+                     "operand" : {
+                        "type" : "Null"
+                     }
+                  }
+               }, {
+                  "when" : {
+                     "type" : "IsNull",
+                     "operand" : {
+                        "path" : "value",
+                        "type" : "Property",
+                        "source" : {
+                           "name" : "quantity",
+                           "type" : "OperandRef"
+                        }
+                     }
+                  },
+                  "then" : {
+                     "asType" : "{urn:hl7-org:elm-types:r1}Quantity",
+                     "type" : "As",
+                     "operand" : {
+                        "type" : "Null"
+                     }
+                  }
+               }, {
+                  "when" : {
+                     "type" : "Or",
+                     "operand" : [ {
+                        "type" : "Or",
+                        "operand" : [ {
+                           "type" : "IsNull",
+                           "operand" : {
+                              "path" : "system",
+                              "type" : "Property",
+                              "source" : {
+                                 "name" : "quantity",
+                                 "type" : "OperandRef"
+                              }
+                           }
+                        }, {
+                           "type" : "Equal",
+                           "operand" : [ {
+                              "path" : "value",
+                              "type" : "Property",
+                              "source" : {
+                                 "path" : "system",
+                                 "type" : "Property",
+                                 "source" : {
+                                    "name" : "quantity",
+                                    "type" : "OperandRef"
+                                 }
+                              }
+                           }, {
+                              "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                              "value" : "http://unitsofmeasure.org",
+                              "type" : "Literal"
+                           } ]
+                        } ]
+                     }, {
+                        "type" : "Equal",
+                        "operand" : [ {
+                           "path" : "value",
+                           "type" : "Property",
+                           "source" : {
+                              "path" : "system",
+                              "type" : "Property",
+                              "source" : {
+                                 "name" : "quantity",
+                                 "type" : "OperandRef"
+                              }
+                           }
+                        }, {
+                           "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                           "value" : "http://hl7.org/fhirpath/CodeSystem/calendar-units",
+                           "type" : "Literal"
+                        } ]
+                     } ]
+                  },
+                  "then" : {
+                     "classType" : "{urn:hl7-org:elm-types:r1}Quantity",
+                     "type" : "Instance",
+                     "element" : [ {
+                        "name" : "value",
+                        "value" : {
+                           "path" : "value",
+                           "type" : "Property",
+                           "source" : {
+                              "path" : "value",
+                              "type" : "Property",
+                              "source" : {
+                                 "name" : "quantity",
+                                 "type" : "OperandRef"
+                              }
+                           }
+                        }
+                     }, {
+                        "name" : "unit",
+                        "value" : {
+                           "name" : "ToCalendarUnit",
+                           "type" : "FunctionRef",
+                           "operand" : [ {
+                              "type" : "Coalesce",
+                              "operand" : [ {
+                                 "path" : "value",
+                                 "type" : "Property",
+                                 "source" : {
+                                    "path" : "code",
+                                    "type" : "Property",
+                                    "source" : {
+                                       "name" : "quantity",
+                                       "type" : "OperandRef"
+                                    }
+                                 }
+                              }, {
+                                 "path" : "value",
+                                 "type" : "Property",
+                                 "source" : {
+                                    "path" : "unit",
+                                    "type" : "Property",
+                                    "source" : {
+                                       "name" : "quantity",
+                                       "type" : "OperandRef"
+                                    }
+                                 }
+                              }, {
+                                 "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                                 "value" : "1",
+                                 "type" : "Literal"
+                              } ]
+                           } ]
+                        }
+                     } ]
+                  }
+               } ],
+               "else" : {
+                  "asType" : "{urn:hl7-org:elm-types:r1}Quantity",
+                  "type" : "As",
+                  "operand" : {
+                     "type" : "Message",
+                     "source" : {
+                        "type" : "Null"
+                     },
+                     "condition" : {
+                        "valueType" : "{urn:hl7-org:elm-types:r1}Boolean",
+                        "value" : "true",
+                        "type" : "Literal"
+                     },
+                     "code" : {
+                        "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                        "value" : "FHIRHelpers.ToQuantity.InvalidFHIRQuantity",
+                        "type" : "Literal"
+                     },
+                     "severity" : {
+                        "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                        "value" : "Error",
+                        "type" : "Literal"
+                     },
+                     "message" : {
+                        "type" : "Concatenate",
+                        "operand" : [ {
+                           "type" : "Coalesce",
+                           "operand" : [ {
+                              "type" : "Concatenate",
+                              "operand" : [ {
+                                 "type" : "Coalesce",
+                                 "operand" : [ {
+                                    "type" : "Concatenate",
+                                    "operand" : [ {
+                                       "type" : "Coalesce",
+                                       "operand" : [ {
+                                          "type" : "Concatenate",
+                                          "operand" : [ {
+                                             "type" : "Coalesce",
+                                             "operand" : [ {
+                                                "type" : "Concatenate",
+                                                "operand" : [ {
+                                                   "type" : "Coalesce",
+                                                   "operand" : [ {
+                                                      "type" : "Concatenate",
+                                                      "operand" : [ {
+                                                         "type" : "Coalesce",
+                                                         "operand" : [ {
+                                                            "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                                                            "value" : "Invalid FHIR Quantity code: ",
+                                                            "type" : "Literal"
+                                                         }, {
+                                                            "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                                                            "value" : "",
+                                                            "type" : "Literal"
+                                                         } ]
+                                                      }, {
+                                                         "type" : "Coalesce",
+                                                         "operand" : [ {
+                                                            "path" : "value",
+                                                            "type" : "Property",
+                                                            "source" : {
+                                                               "path" : "unit",
+                                                               "type" : "Property",
+                                                               "source" : {
+                                                                  "name" : "quantity",
+                                                                  "type" : "OperandRef"
+                                                               }
+                                                            }
+                                                         }, {
+                                                            "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                                                            "value" : "",
+                                                            "type" : "Literal"
+                                                         } ]
+                                                      } ]
+                                                   }, {
+                                                      "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                                                      "value" : "",
+                                                      "type" : "Literal"
+                                                   } ]
+                                                }, {
+                                                   "type" : "Coalesce",
+                                                   "operand" : [ {
+                                                      "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                                                      "value" : " (",
+                                                      "type" : "Literal"
+                                                   }, {
+                                                      "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                                                      "value" : "",
+                                                      "type" : "Literal"
+                                                   } ]
+                                                } ]
+                                             }, {
+                                                "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                                                "value" : "",
+                                                "type" : "Literal"
+                                             } ]
+                                          }, {
+                                             "type" : "Coalesce",
+                                             "operand" : [ {
+                                                "path" : "value",
+                                                "type" : "Property",
+                                                "source" : {
+                                                   "path" : "system",
+                                                   "type" : "Property",
+                                                   "source" : {
+                                                      "name" : "quantity",
+                                                      "type" : "OperandRef"
+                                                   }
+                                                }
+                                             }, {
+                                                "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                                                "value" : "",
+                                                "type" : "Literal"
+                                             } ]
+                                          } ]
+                                       }, {
+                                          "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                                          "value" : "",
+                                          "type" : "Literal"
+                                       } ]
+                                    }, {
+                                       "type" : "Coalesce",
+                                       "operand" : [ {
+                                          "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                                          "value" : "|",
+                                          "type" : "Literal"
+                                       }, {
+                                          "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                                          "value" : "",
+                                          "type" : "Literal"
+                                       } ]
+                                    } ]
+                                 }, {
+                                    "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                                    "value" : "",
+                                    "type" : "Literal"
+                                 } ]
+                              }, {
+                                 "type" : "Coalesce",
+                                 "operand" : [ {
+                                    "path" : "value",
+                                    "type" : "Property",
+                                    "source" : {
+                                       "path" : "code",
+                                       "type" : "Property",
+                                       "source" : {
+                                          "name" : "quantity",
+                                          "type" : "OperandRef"
+                                       }
+                                    }
+                                 }, {
+                                    "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                                    "value" : "",
+                                    "type" : "Literal"
+                                 } ]
+                              } ]
+                           }, {
+                              "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                              "value" : "",
+                              "type" : "Literal"
+                           } ]
+                        }, {
+                           "type" : "Coalesce",
+                           "operand" : [ {
+                              "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                              "value" : ")",
+                              "type" : "Literal"
+                           }, {
+                              "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                              "value" : "",
+                              "type" : "Literal"
+                           } ]
+                        } ]
+                     }
+                  }
+               }
+            },
+            "operand" : [ {
+               "name" : "quantity",
+               "operandTypeSpecifier" : {
+                  "name" : "{http://hl7.org/fhir}Quantity",
+                  "type" : "NamedTypeSpecifier"
+               }
+            } ]
+         }, {
+            "name" : "ToInterval",
             "context" : "Patient",
             "accessLevel" : "Public",
             "type" : "FunctionDef",
@@ -106,50 +986,230 @@
                   }
                },
                "then" : {
-                  "asType" : "{urn:hl7-org:elm-types:r1}Quantity",
                   "type" : "As",
                   "operand" : {
                      "type" : "Null"
+                  },
+                  "asTypeSpecifier" : {
+                     "type" : "IntervalTypeSpecifier",
+                     "pointType" : {
+                        "name" : "{urn:hl7-org:elm-types:r1}Quantity",
+                        "type" : "NamedTypeSpecifier"
+                     }
                   }
                },
                "else" : {
-                  "classType" : "{urn:hl7-org:elm-types:r1}Quantity",
-                  "type" : "Instance",
-                  "element" : [ {
-                     "name" : "value",
-                     "value" : {
-                        "path" : "value",
+                  "type" : "Case",
+                  "comparand" : {
+                     "path" : "value",
+                     "type" : "Property",
+                     "source" : {
+                        "path" : "comparator",
                         "type" : "Property",
                         "source" : {
-                           "path" : "value",
-                           "type" : "Property",
-                           "source" : {
+                           "name" : "quantity",
+                           "type" : "OperandRef"
+                        }
+                     }
+                  },
+                  "caseItem" : [ {
+                     "when" : {
+                        "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                        "value" : "<",
+                        "type" : "Literal"
+                     },
+                     "then" : {
+                        "lowClosed" : true,
+                        "highClosed" : false,
+                        "type" : "Interval",
+                        "low" : {
+                           "asType" : "{urn:hl7-org:elm-types:r1}Quantity",
+                           "type" : "As",
+                           "operand" : {
+                              "type" : "Null"
+                           }
+                        },
+                        "high" : {
+                           "name" : "ToQuantityIgnoringComparator",
+                           "type" : "FunctionRef",
+                           "operand" : [ {
                               "name" : "quantity",
                               "type" : "OperandRef"
+                           } ]
+                        }
+                     }
+                  }, {
+                     "when" : {
+                        "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                        "value" : "<=",
+                        "type" : "Literal"
+                     },
+                     "then" : {
+                        "lowClosed" : true,
+                        "highClosed" : true,
+                        "type" : "Interval",
+                        "low" : {
+                           "asType" : "{urn:hl7-org:elm-types:r1}Quantity",
+                           "type" : "As",
+                           "operand" : {
+                              "type" : "Null"
+                           }
+                        },
+                        "high" : {
+                           "name" : "ToQuantityIgnoringComparator",
+                           "type" : "FunctionRef",
+                           "operand" : [ {
+                              "name" : "quantity",
+                              "type" : "OperandRef"
+                           } ]
+                        }
+                     }
+                  }, {
+                     "when" : {
+                        "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                        "value" : ">=",
+                        "type" : "Literal"
+                     },
+                     "then" : {
+                        "lowClosed" : true,
+                        "highClosed" : true,
+                        "type" : "Interval",
+                        "low" : {
+                           "name" : "ToQuantityIgnoringComparator",
+                           "type" : "FunctionRef",
+                           "operand" : [ {
+                              "name" : "quantity",
+                              "type" : "OperandRef"
+                           } ]
+                        },
+                        "high" : {
+                           "asType" : "{urn:hl7-org:elm-types:r1}Quantity",
+                           "type" : "As",
+                           "operand" : {
+                              "type" : "Null"
                            }
                         }
                      }
                   }, {
-                     "name" : "unit",
-                     "value" : {
-                        "path" : "value",
-                        "type" : "Property",
-                        "source" : {
-                           "path" : "unit",
-                           "type" : "Property",
-                           "source" : {
+                     "when" : {
+                        "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                        "value" : ">",
+                        "type" : "Literal"
+                     },
+                     "then" : {
+                        "lowClosed" : false,
+                        "highClosed" : true,
+                        "type" : "Interval",
+                        "low" : {
+                           "name" : "ToQuantityIgnoringComparator",
+                           "type" : "FunctionRef",
+                           "operand" : [ {
                               "name" : "quantity",
                               "type" : "OperandRef"
+                           } ]
+                        },
+                        "high" : {
+                           "asType" : "{urn:hl7-org:elm-types:r1}Quantity",
+                           "type" : "As",
+                           "operand" : {
+                              "type" : "Null"
                            }
                         }
                      }
-                  } ]
+                  } ],
+                  "else" : {
+                     "lowClosed" : true,
+                     "highClosed" : true,
+                     "type" : "Interval",
+                     "low" : {
+                        "name" : "ToQuantity",
+                        "type" : "FunctionRef",
+                        "operand" : [ {
+                           "name" : "quantity",
+                           "type" : "OperandRef"
+                        } ]
+                     },
+                     "high" : {
+                        "name" : "ToQuantity",
+                        "type" : "FunctionRef",
+                        "operand" : [ {
+                           "name" : "quantity",
+                           "type" : "OperandRef"
+                        } ]
+                     }
+                  }
                }
             },
             "operand" : [ {
                "name" : "quantity",
                "operandTypeSpecifier" : {
                   "name" : "{http://hl7.org/fhir}Quantity",
+                  "type" : "NamedTypeSpecifier"
+               }
+            } ]
+         }, {
+            "name" : "ToRatio",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "type" : "FunctionDef",
+            "expression" : {
+               "type" : "If",
+               "condition" : {
+                  "asType" : "{urn:hl7-org:elm-types:r1}Boolean",
+                  "type" : "As",
+                  "operand" : {
+                     "type" : "IsNull",
+                     "operand" : {
+                        "name" : "ratio",
+                        "type" : "OperandRef"
+                     }
+                  }
+               },
+               "then" : {
+                  "asType" : "{urn:hl7-org:elm-types:r1}Ratio",
+                  "type" : "As",
+                  "operand" : {
+                     "type" : "Null"
+                  }
+               },
+               "else" : {
+                  "classType" : "{urn:hl7-org:elm-types:r1}Ratio",
+                  "type" : "Instance",
+                  "element" : [ {
+                     "name" : "numerator",
+                     "value" : {
+                        "name" : "ToQuantity",
+                        "type" : "FunctionRef",
+                        "operand" : [ {
+                           "path" : "numerator",
+                           "type" : "Property",
+                           "source" : {
+                              "name" : "ratio",
+                              "type" : "OperandRef"
+                           }
+                        } ]
+                     }
+                  }, {
+                     "name" : "denominator",
+                     "value" : {
+                        "name" : "ToQuantity",
+                        "type" : "FunctionRef",
+                        "operand" : [ {
+                           "path" : "denominator",
+                           "type" : "Property",
+                           "source" : {
+                              "name" : "ratio",
+                              "type" : "OperandRef"
+                           }
+                        } ]
+                     }
+                  } ]
+               }
+            },
+            "operand" : [ {
+               "name" : "ratio",
+               "operandTypeSpecifier" : {
+                  "name" : "{http://hl7.org/fhir}Ratio",
                   "type" : "NamedTypeSpecifier"
                }
             } ]

@@ -1,0 +1,483 @@
+---
+name: Brenda Jackson
+
+data:
+-
+  resourceType: Patient
+  name: Brenda Jackson
+  gender: female
+  birthDate: 1956-10-14
+-
+  # Conditions Associated w/ Chronic Pain
+  resourceType: Condition
+  code: SNOMED#203082005 Fibromyalgia (disorder)
+  onsetDateTime: 2013-04-05T16:00:00.000+00:00
+  recordedDate: 2013-04-05
+-
+  resourceType: Condition
+  code: ICD10CM#M54.5 Low back pain
+  onsetDateTime: 2008-11-12T16:00:00.000+00:00
+  recordedDate: 2008-11-12
+-
+  resourceType: Condition
+  code: SNOMEDCT#202725007 Lumbar post-laminectomy syndrome (disorder)
+  onsetDateTime: 2012-02-01T16:00:00.000+00:00
+  recordedDate: 2012-02-16
+-
+  # Risk Factors for Opioid-related Harms
+  resourceType: Condition
+  code: SNOMED#832007 Moderate major depression (disorder)
+  onsetDateTime: 2016-12-02T16:00:00.000+00:00
+-
+  # FACES
+  resourceType: Observation
+  code: LOINC#38221-8 Pain severity Wong-Baker FACES Scale
+  category: [OBS-CAT#survey]
+  valueQuantity: 10
+  interpretation: [Hurts Worst]
+  issued: 2018-10-09T16:00:00.000+00:00
+-
+  resourceType: Observation
+  code: LOINC#38221-8 Pain severity Wong-Baker FACES Scale
+  category: [OBS-CAT#survey]
+  valueQuantity: 6
+  interpretation: [Hurts Even More]
+  issued: 2017-11-15T16:00:00.000+00:00
+-
+  resourceType: Observation
+  code: LOINC#38221-8 Pain severity Wong-Baker FACES Scale
+  category: [OBS-CAT#survey]
+  valueQuantity: 6
+  interpretation: [Hurts Even More]
+  issued: 2016-12-02T16:00:00.000+00:00
+-
+  # PEG
+  resourceType: Observation
+  code: http://cds.ahrq.gov/cdsconnect/pms#PEGASSESSMENT Pain Enjoyment General Activity (PEG) Assessment
+  category: [OBS-CAT#survey]
+  valueQuantity: 5
+  issued: 2017-11-15T16:00:00.000+00:00
+  component:
+  -
+    code: http://cds.ahrq.gov/cdsconnect/pms#PEGPAIN Pain
+    valueQuantity: 7
+  -
+    code: http://cds.ahrq.gov/cdsconnect/pms#PEGENJOYMENT Enjoyment of life
+    valueQuantity: 5
+  -
+    code: http://cds.ahrq.gov/cdsconnect/pms#PEGGENERALACTIVITY General activity
+    valueQuantity: 4
+-
+  resourceType: Observation
+  code: http://cds.ahrq.gov/cdsconnect/pms#PEGASSESSMENT Pain Enjoyment General Activity (PEG) Assessment
+  category: [OBS-CAT#survey]
+  valueQuantity: 7
+  issued: 2017-05-30T16:00:00.000+00:00
+  component:
+  -
+    code: http://cds.ahrq.gov/cdsconnect/pms#PEGPAIN Pain
+    valueQuantity: 8
+  -
+    code: http://cds.ahrq.gov/cdsconnect/pms#PEGENJOYMENT Enjoyment of life
+    valueQuantity: 5
+  -
+    code: http://cds.ahrq.gov/cdsconnect/pms#PEGGENERALACTIVITY General activity
+    valueQuantity: 8
+-
+  resourceType: Observation
+  code: http://cds.ahrq.gov/cdsconnect/pms#PEGASSESSMENT Pain Enjoyment General Activity (PEG) Assessment
+  category: [OBS-CAT#survey]
+  valueQuantity: 8
+  issued: 2016-12-02T16:00:00.000+00:00
+  component:
+  -
+    code: http://cds.ahrq.gov/cdsconnect/pms#PEGPAIN Pain
+    valueQuantity: 8
+  -
+    code: http://cds.ahrq.gov/cdsconnect/pms#PEGENJOYMENT Enjoyment of life
+    valueQuantity: 6
+  -
+    code: http://cds.ahrq.gov/cdsconnect/pms#PEGGENERALACTIVITY General activity
+    valueQuantity: 10
+-
+  # STarT Back
+  resourceType: Observation
+  code: http://cds.ahrq.gov/cdsconnect/pms#STARTBACK STarT Back Screening Tool
+  category: [OBS-CAT#survey]
+  valueQuantity: 4
+  interpretation: [Medium risk]
+  issued: 2018-11-15T16:00:00.000+00:00
+-
+  resourceType: Observation
+  code: http://cds.ahrq.gov/cdsconnect/pms#STARTBACK STarT Back Screening Tool
+  category: [OBS-CAT#survey]
+  valueQuantity: 3
+  interpretation: [Low risk]
+  issued: 2017-11-15T16:00:00.000+00:00
+-
+  resourceType: Observation
+  code: http://cds.ahrq.gov/cdsconnect/pms#STARTBACK STarT Back Screening Tool
+  category: [OBS-CAT#survey]
+  valueQuantity: 5
+  interpretation: [High risk]
+  issued: 2016-12-02T16:00:00.000+00:00
+-
+  # Opioid Medications
+  resourceType: MedicationRequest
+  code: RXNORM#1049593 12 HR Oxycodone Hydrochloride 60 MG Extended Release Oral Tablet
+  authoredOn: 2018-10-15T16:02:00.000+00:00
+-
+  resourceType: MedicationRequest
+  code: RXNORM#1049593 12 HR Oxycodone Hydrochloride 60 MG Extended Release Oral Tablet
+  authoredOn: 2018-07-15T16:02:00.000+00:00
+-
+  resourceType: MedicationRequest
+  code: RXNORM#1049593 12 HR Oxycodone Hydrochloride 60 MG Extended Release Oral Tablet
+  authoredOn: 2018-04-15T16:02:00.000+00:00
+-
+  resourceType: MedicationRequest
+  code: RXNORM#1049593 12 HR Oxycodone Hydrochloride 60 MG Extended Release Oral Tablet
+  authoredOn: 2018-01-15T16:02:00.000+00:00
+-
+  resourceType: MedicationRequest
+  code: RXNORM#1049593 12 HR Oxycodone Hydrochloride 60 MG Extended Release Oral Tablet
+  authoredOn: 2017-10-15T16:02:00.000+00:00
+-
+  resourceType: MedicationRequest
+  code: RXNORM#1049593 12 HR Oxycodone Hydrochloride 60 MG Extended Release Oral Tablet
+  authoredOn: 2017-07-15T16:02:00.000+00:00
+-
+  resourceType: MedicationRequest
+  code: RXNORM#1049593 12 HR Oxycodone Hydrochloride 60 MG Extended Release Oral Tablet
+  authoredOn: 2017-04-15T16:02:00.000+00:00
+-
+  resourceType: MedicationRequest
+  code: RXNORM#1049593 12 HR Oxycodone Hydrochloride 60 MG Extended Release Oral Tablet
+  authoredOn: 2017-01-15T16:02:00.000+00:00
+-
+  resourceType: MedicationRequest
+  code: RXNORM#1049593 12 HR Oxycodone Hydrochloride 60 MG Extended Release Oral Tablet
+  authoredOn: 2016-10-15T16:02:00.000+00:00
+-
+  resourceType: MedicationRequest
+  code: RXNORM#1049717 Oxycodone Hydrochloride 10 MG Oral Capsule
+  authoredOn: 2018-10-15T16:01:00.000+00:00
+-
+  resourceType: MedicationRequest
+  code: RXNORM#1049717 Oxycodone Hydrochloride 10 MG Oral Capsule
+  authoredOn: 2018-07-15T16:01:00.000+00:00
+-
+  resourceType: MedicationRequest
+  code: RXNORM#1049717 Oxycodone Hydrochloride 10 MG Oral Capsule
+  authoredOn: 2018-04-15T16:01:00.000+00:00
+-
+  resourceType: MedicationRequest
+  code: RXNORM#1049717 Oxycodone Hydrochloride 10 MG Oral Capsule
+  authoredOn: 2018-01-15T16:01:00.000+00:00
+-
+  resourceType: MedicationRequest
+  code: RXNORM#1049717 Oxycodone Hydrochloride 10 MG Oral Capsule
+  authoredOn: 2017-10-15T16:01:00.000+00:00
+-
+  resourceType: MedicationRequest
+  code: RXNORM#1049717 Oxycodone Hydrochloride 10 MG Oral Capsule
+  authoredOn: 2017-07-15T16:01:00.000+00:00
+-
+  resourceType: MedicationRequest
+  code: RXNORM#1049717 Oxycodone Hydrochloride 10 MG Oral Capsule
+  authoredOn: 2017-04-15T16:01:00.000+00:00
+-
+  resourceType: MedicationRequest
+  code: RXNORM#1049717 Oxycodone Hydrochloride 10 MG Oral Capsule
+  authoredOn: 2017-01-15T16:01:00.000+00:00
+-
+  resourceType: MedicationRequest
+  code: RXNORM#1049717 Oxycodone Hydrochloride 10 MG Oral Capsule
+  authoredOn: 2016-10-15T16:01:00.000+00:00
+-
+  # Non-Opioid Medications
+  resourceType: MedicationRequest
+  code: RXNORM#197806 Ibuprofen 600 MG Oral Tablet
+  authoredOn: 2016-12-02T16:00:00.000+00:00
+-
+  resourceType: MedicationRequest
+  code: RXNORM#198440 Acetaminophen 500 MG Oral Tablet
+  authoredOn: 2016-12-02T16:00:00.000+00:00
+-
+  resourceType: MedicationRequest
+  code: RXNORM#197806 Ibuprofen 600 MG Oral Tablet
+  authoredOn: 2017-11-15T16:00:00.000+00:00
+-
+  resourceType: MedicationRequest
+  code: RXNORM#198440 Acetaminophen 500 MG Oral Tablet
+  authoredOn: 2017-11-15T16:00:00.000+00:00
+-
+  # Non-Pharmacologic
+  resourceType: Procedure
+  code: SNOMEDCT#308449000 Referral to chiropractor (procedure)
+  performedDateTime: 2016-12-02T16:00:00.000+00:00
+-
+  resourceType: Procedure
+  code: SNOMEDCT#444831000124102 Referral for physical therapy (procedure)
+  performedDateTime: 2016-12-02T16:00:00.000+00:00
+-
+  resourceType: Procedure
+  code: SNOMEDCT#81294000 Patient referral for psychotherapy (procedure)
+  performedDateTime: 2017-11-15T16:00:00.000+00:00
+-
+  # Stool Softeners and Laxatives
+  resourceType: MedicationRequest
+  code: RXNORM#876193 POLYETHYLENE GLYCOL 3350 17000 MG Powder for Oral Solution
+  authoredOn: 2017-05-15T16:00:00.000+00:00
+-
+  resourceType: MedicationRequest
+  code: RXNORM#876193 POLYETHYLENE GLYCOL 3350 17000 MG Powder for Oral Solution
+  authoredOn: 2017-11-15T16:00:00.000+00:00
+-
+  resourceType: MedicationRequest
+  code: RXNORM#876193 POLYETHYLENE GLYCOL 3350 17000 MG Powder for Oral Solution
+  authoredOn: 2018-05-15T16:00:00.000+00:00
+-
+  # Most Recent MME
+  resourceType: Observation
+  code: http://cds.ahrq.gov/cdsconnect/pms#MME Morphine Milligram Equivalent (MME)
+  category: [OBS-CAT#therapy]
+  valueQuantity: 220 {MME}/d
+  issued: 2018-10-09T16:00:00.000+00:00
+-
+  resourceType: Observation
+  code: http://cds.ahrq.gov/cdsconnect/pms#MME Morphine Milligram Equivalent (MME)
+  category: [OBS-CAT#therapy]
+  valueQuantity: 190 {MME}/d
+  issued: 2017-11-15T16:00:00.000+00:00
+-
+  resourceType: Observation
+  code: http://cds.ahrq.gov/cdsconnect/pms#MME Morphine Milligram Equivalent (MME)
+  category: [OBS-CAT#therapy]
+  valueQuantity: 160 {MME}/d
+  issued: 2016-12-02T16:00:00.000+00:00
+-
+  # Urine Drug Screens
+  resourceType: Observation
+  code: LOINC#19295-5 Opiates [Presence] in Urine by Screen method
+  valueQuantity: 2500 ng/mL
+  interpretation: [http://hl7.org/fhir/v2/0078#POS Positive]
+  issued: 2017-11-16T16:00:00.000+00:00
+-
+  resourceType: Observation
+  code: LOINC#19295-5 Opiates [Presence] in Urine by Screen method
+  valueQuantity: 2200 ng/mL
+  interpretation: [http://hl7.org/fhir/v2/0078#POS Positive]
+  issued: 2016-12-03T16:00:00.000+00:00
+-
+  # Benzo Medications
+  resourceType: MedicationRequest
+  code: RXNORM#905505 Chlordiazepoxide Hydrochloride 25 MG Oral Tablet
+  authoredOn: 2013-04-05T16:00:00.000+00:00
+-
+  # Naloxone Medications
+  # Risk Screenings
+  resourceType: Observation
+  code: LOINC#44261-6 Patient Health Questionnaire 9 item (PHQ-9) total score [Reported]
+  category: [OBS-CAT#survey]
+  valueQuantity: 8
+  interpretation: [Mild depression]
+  issued: 2018-09-15T16:00:00.000+00:00
+-
+  resourceType: Observation
+  code: LOINC#44261-6 Patient Health Questionnaire 9 item (PHQ-9) total score [Reported]
+  category: [OBS-CAT#survey]
+  valueQuantity: 15
+  interpretation: [Moderately severe depression]
+  issued: 2017-11-15T16:00:00.000+00:00
+-
+  resourceType: Observation
+  code: LOINC#44261-6 Patient Health Questionnaire 9 item (PHQ-9) total score [Reported]
+  category: [OBS-CAT#survey]
+  valueQuantity: 18
+  interpretation: [Moderately severe depression]
+  issued: 2016-12-02T16:00:00.000+00:00
+
+results:
+  Summary:
+    Patient:
+      Name: Brenda Jackson
+      Gender: female
+      Age: 62
+      MeetsInclusionCriteria: true
+    PertinentMedicalHistory:
+      ConditionsAssociatedWithChronicPain:
+        - Name: Fibromyalgia (disorder)
+          Status: active
+          Onset: '2013-04-05T16:00:00.000+00:00'
+          DateRecorded: '2013-04-05T00:00:00.000+00:00'
+        - Name: Lumbar post-laminectomy syndrome (disorder)
+          Status: active
+          Onset: '2012-02-01T16:00:00.000+00:00'
+          DateRecorded: '2012-02-16T00:00:00.000+00:00'
+        - Name: Low back pain
+          Status: active
+          Onset: '2008-11-12T16:00:00.000+00:00'
+          DateRecorded: '2008-11-12T00:00:00.000+00:00'
+      RiskFactorsForOpioidRelatedHarms:
+        - Name: Moderate major depression (disorder)
+          Status: active
+          Onset: '2016-12-02T16:00:00.000+00:00'
+          DateRecorded: null
+          Abatement: null
+          Visit: null
+    PainAssessments:
+      NumericPainIntensityAssessments:
+        - Name: 'Pain severity Wong-Baker FACES Scale [Range: 0-10]'
+          Score: '10'
+          Interpretation: Hurts Worst
+          Date: '2018-10-09T16:00:00.000+00:00'
+        - Name: 'Pain severity Wong-Baker FACES Scale [Range: 0-10]'
+          Score: '6'
+          Interpretation: Hurts Even More
+          Date: '2017-11-15T16:00:00.000+00:00'
+      PainEnjoymentGeneralActivityAssessments:
+        - Name: 'Mean score [PEG] [Range: 0-10]'
+          Score: '5'
+          Interpretation: null
+          Questions:
+            - Name: Pain
+              Score: '7'
+            - Name: Enjoyment of life
+              Score: '5'
+            - Name: General activity
+              Score: '4'
+          Date: '2017-11-15T16:00:00.000+00:00'
+        - Name: 'Mean score [PEG] [Range: 0-10]'
+          Score: '7'
+          Interpretation: null
+          Questions:
+            - Name: Pain
+              Score: '8'
+            - Name: Enjoyment of life
+              Score: '5'
+            - Name: General activity
+              Score: '8'
+          Date: '2017-05-30T16:00:00.000+00:00'
+      STarTBackAssessments:
+        - Name: 'STarT Back Screening Tool [Range: 0-9]'
+          Score: '4'
+          Interpretation: Medium risk
+          Date: '2018-11-15T16:00:00.000+00:00'
+        - Name: 'STarT Back Screening Tool [Range: 0-9]'
+          Score: '3'
+          Interpretation: Low risk
+          Date: '2017-11-15T16:00:00.000+00:00'
+    HistoricalTreatments:
+      OpioidMedications:
+        - Type: Request
+          Name: 12 HR Oxycodone Hydrochloride 60 MG Extended Release Oral Tablet
+          Start: '2018-10-15T16:02:00.000+00:00'
+          End: null
+          Status: active
+        - Type: Request
+          Name: Oxycodone Hydrochloride 10 MG Oral Capsule
+          Start: '2018-10-15T16:01:00.000+00:00'
+          End: null
+          Status: active
+        - Type: Request
+          Name: 12 HR Oxycodone Hydrochloride 60 MG Extended Release Oral Tablet
+          Start: '2018-07-15T16:02:00.000+00:00'
+          End: null
+          Status: active
+        - Type: Request
+          Name: Oxycodone Hydrochloride 10 MG Oral Capsule
+          Start: '2018-07-15T16:01:00.000+00:00'
+          End: null
+          Status: active
+        - Type: Request
+          Name: 12 HR Oxycodone Hydrochloride 60 MG Extended Release Oral Tablet
+          Start: '2018-04-15T16:02:00.000+00:00'
+          End: null
+          Status: active
+        - Type: Request
+          Name: Oxycodone Hydrochloride 10 MG Oral Capsule
+          Start: '2018-04-15T16:01:00.000+00:00'
+          End: null
+          Status: active
+        - Type: Request
+          Name: 12 HR Oxycodone Hydrochloride 60 MG Extended Release Oral Tablet
+          Start: '2018-01-15T16:02:00.000+00:00'
+          End: null
+          Status: active
+        - Type: Request
+          Name: Oxycodone Hydrochloride 10 MG Oral Capsule
+          Start: '2018-01-15T16:01:00.000+00:00'
+          End: null
+          Status: active
+        - Type: Request
+          Name: 12 HR Oxycodone Hydrochloride 60 MG Extended Release Oral Tablet
+          Start: '2017-10-15T16:02:00.000+00:00'
+          End: null
+          Status: active
+        - Type: Request
+          Name: Oxycodone Hydrochloride 10 MG Oral Capsule
+          Start: '2017-10-15T16:01:00.000+00:00'
+          End: null
+          Status: active
+        - Type: Request
+          Name: 12 HR Oxycodone Hydrochloride 60 MG Extended Release Oral Tablet
+          Start: '2017-07-15T16:02:00.000+00:00'
+          End: null
+          Status: active
+        - Type: Request
+          Name: Oxycodone Hydrochloride 10 MG Oral Capsule
+          Start: '2017-07-15T16:01:00.000+00:00'
+          End: null
+          Status: active
+        - Type: Request
+          Name: 12 HR Oxycodone Hydrochloride 60 MG Extended Release Oral Tablet
+          Start: '2017-04-15T16:02:00.000+00:00'
+          End: null
+          Status: active
+        - Type: Request
+          Name: Oxycodone Hydrochloride 10 MG Oral Capsule
+          Start: '2017-04-15T16:01:00.000+00:00'
+          End: null
+          Status: active
+        - Type: Request
+          Name: 12 HR Oxycodone Hydrochloride 60 MG Extended Release Oral Tablet
+          Start: '2017-01-15T16:02:00.000+00:00'
+          End: null
+          Status: active
+        - Type: Request
+          Name: Oxycodone Hydrochloride 10 MG Oral Capsule
+          Start: '2017-01-15T16:01:00.000+00:00'
+          End: null
+          Status: active
+      NonOpioidMedications:
+        - Type: Request
+          Name: Ibuprofen 600 MG Oral Tablet
+          Start: '2017-11-15T16:00:00.000+00:00'
+          End: null
+          Status: active
+        - Type: Request
+          Name: Acetaminophen 500 MG Oral Tablet
+          Start: '2017-11-15T16:00:00.000+00:00'
+          End: null
+          Status: active
+      NonPharmacologicTreatments:
+        - Type: Procedure
+          Name: Patient referral for psychotherapy (procedure)
+          Date: '2017-11-15T16:00:00.000+00:00'
+      StoolSoftenersAndLaxatives: []
+    RiskConsiderations:
+      MostRecentMME:
+        Name: Morphine Milligram Equivalent (MME)
+        Result: '220 {MME}/d'
+        Date: '2018-10-09T16:00:00.000+00:00'
+      UrineDrugScreens: []
+      BenzodiazepineMedications: []
+      NaloxoneMedications: []
+      RiskScreeningsRelevantToPainManagement:
+        - Name: >-
+            Patient Health Questionnaire 9 item (PHQ-9) total score [Reported]
+            [Range: 0-27]
+          Score: '8'
+          Interpretation: Mild depression
+          Date: '2018-09-15T16:00:00.000+00:00'

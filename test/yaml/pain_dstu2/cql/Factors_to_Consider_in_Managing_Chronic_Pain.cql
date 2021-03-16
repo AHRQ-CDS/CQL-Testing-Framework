@@ -1,5 +1,9 @@
 // # Introduction
 
+// NOTE: This version of the Pain Management Summary artifact is for testing and example purposes only. For the
+// latest official version of the artifact, please see visit it in the CDS Connect repository:
+// https://cds.ahrq.gov/cdsconnect/artifact/factors-consider-managing-chronic-pain-pain-management-summary
+//
 // The Pain Management Summary artifact provides relevant information to consider when managing a patient’s pain.
 // This CDS logic was informed by the Centers for Disease Control and Prevention (CDC) Guideline for Opioid Prescribing
 // for Chronic Pain. The CDS is not a direct representation of any one recommendation statement within the guideline.
@@ -12,7 +16,7 @@
 //
 // ##Source guideline: [CDC Guideline for Opioid Prescribing for Chronic Pain](https://www.cdc.gov/drugoverdose/prescribing/guideline.html)
 
-library Factors_to_Consider_in_Managing_Chronic_Pain version '1.0.0'
+library Factors_to_Consider_in_Managing_Chronic_Pain_DSTU2_Test version '1.0.0'
 
 // # Data model #
 

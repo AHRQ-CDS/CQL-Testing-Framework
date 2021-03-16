@@ -1,0 +1,8 @@
+reusable_resources:
+- &painRelatedConditions
+  - resourceType: Condition
+    code: SNOMED#203082005 Fibromyalgia (disorder)
+    onsetDateTime: 2012-04-05
+  - resourceType: Condition
+    code: SNOMED#191722009 Agoraphobia with panic attacks (disorder)
+    onsetDateTime: 2014-09-05
