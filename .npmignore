@@ -2,7 +2,11 @@
 /yarn-error.log
 /dist
 /test
+/gradle
+/gradlew*
+/build.gradle
 src/doc-gen.js
 **/.vscode
-**/.vscache/
-**/dump_files/
+**/.vscache
+**/.gradle
+**/dump_files
