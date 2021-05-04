@@ -1,6 +1,6 @@
 {
   "name": "cql-testing",
-  "version": "2.3.0",
+  "version": "2.3.1",
   "description": "Provides utilities for testing CQL logic",
   "license": "Apache-2.0",
   "main": "src/index.js",
