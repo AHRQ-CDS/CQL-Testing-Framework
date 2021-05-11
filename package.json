@@ -15,14 +15,14 @@
   },
   "dependencies": {
     "chai": "^4.2.0",
-    "convict": "^4.4.0",
+    "convict": "^6.1.0",
     "cql-exec-fhir": "^2.0.0",
     "cql-exec-vsac": "^1.2.1",
-    "eslint": "^6.0.1",
+    "eslint": "^7.26.0",
     "fs-extra": "^7.0.1",
     "js-yaml": "^3.13.1",
-    "lodash": "^4.17.15",
-    "mocha": "^5.2.0",
+    "lodash": "^4.17.21",
+    "mocha": "^8.4.0",
     "semver": "^5.6.0",
     "uuid": "^3.3.2"
   },
@@ -33,6 +33,6 @@
     "cql-execution": "^2.2.0"
   },
   "resolutions": {
-    "lodash": "^4.17.15"
+    "lodash": "^4.17.21"
   }
 }
