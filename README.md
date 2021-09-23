@@ -64,7 +64,7 @@ Your CQL _and ELM JSON_ files should reside somewhere in your project. The easie
 
 If your CQL logic uses any other CQL libraries, those must be provided as well. Again, it is easiest to put them in the same `cql` folder along side your own CQL, but this is not strictly necessary.
 
-Each CQL file must have its corresponding ELM JSON file. The CQL Testing Framework currently does not support any method for translating CQL to ELM JSON. If you use the [CDS Authoring Tool](https://cds.ahrq.gov/authoring/), the downloaded zip package will already contain ELM JSON.  If you only have the CQL source, you must translate it to ELM JSON using something like the [CQL-to-ELM translator](https://github.com/cqframework/clinical_quality_language/blob/master/Src/java/cql-to-elm/OVERVIEW.md).
+Each CQL file must have its corresponding ELM JSON file before tests can be run. If you use the [CDS Authoring Tool](https://cds.ahrq.gov/authoring/), the downloaded zip package will already contain ELM JSON and so no further steps are needed in this case.  If you only have the CQL source, you must translate it to ELM JSON using something like the [CQL-to-ELM translator](https://github.com/cqframework/clinical_quality_language/blob/master/Src/java/cql-to-elm/OVERVIEW.md). The CQL Testing Framework includes a copy of this translator which is exposed as an npm executable command; for more information [see below]()
 
 #### ./node_modules
 
@@ -227,6 +227,14 @@ $ npm install
 ```
 
 This only needs to be done once.  After this, your `node_modules` folder will be populated and all test runs will reference it for the necessary dependencies.
+
+#### Translating CQL TO ELM
+
+This step is only necessary if the ELM JSON representation is not already available (e.g., it was produced by the CDS Authoring Tool). The CQL Testing Framework includes scripts for running the [CQL-to-ELM translator](https://github.com/cqframework/clinical_quality_language/blob/master/Src/java/cql-to-elm/OVERVIEW.md), however a requirement for using this functionality is that Java SE Development Kit 11 is installed on the system. [The following page](https://github.com/cqframework/clinical_quality_language/blob/master/Src/java/README.md) contains more information on installing Java. Once Java is installed, CQL can be translated to ELM by running the following command from the root directory of your project:
+
+```
+npx cql-to-elm /path/to/folder/with/cql
+```
 
 #### Downloading Value Sets
 

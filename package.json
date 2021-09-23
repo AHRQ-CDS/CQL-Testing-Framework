@@ -1,6 +1,6 @@
 {
   "name": "cql-testing",
-  "version": "2.3.1",
+  "version": "2.4.0",
   "description": "Provides utilities for testing CQL logic",
   "license": "Apache-2.0",
   "main": "src/index.js",
@@ -34,5 +34,8 @@
   },
   "resolutions": {
     "lodash": "^4.17.21"
+  },
+  "bin": {
+    "cql-to-elm": "bin/cql2elm.js"
   }
 }
