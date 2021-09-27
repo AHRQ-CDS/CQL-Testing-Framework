@@ -13,5 +13,9 @@ dependencies {
 task cql2elm(type: JavaExec) {
   classpath = sourceSets.main.runtimeClasspath
   main = 'org.cqframework.cql.cql2elm.CqlTranslator'
-  args '--input', './test/yaml', '--format', 'JSON'
+  if (project.hasProperty("targetDir")) {
+    args '--input', targetDir, '--format', 'JSON'  
+  } else { // NOTE: For translating CQL for `cql-testing` built-in tests.
+    args '--input', './test/yaml', '--format', 'JSON'
+  }
 }
