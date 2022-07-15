@@ -147,6 +147,7 @@ function checkResult(expr, actual, expected) {
   } else {
     const simpleResult = simplifyResult(actual);
     const message = `${expr}=<${simpleResult}>`;
+    console.log(simpleResult,expected);
     expect(simpleResult, message).to.eql(expected);
   }
 }
@@ -157,6 +158,8 @@ function simplifyResult(result) {
   } else if (Array.isArray(result)) {
     return result.map(r => simplifyResult(r));
   } else if (result instanceof cql.DateTime || result.constructor.name === 'DateTime') {
+    return result.toString();
+  } else if (result instanceof cql.Date || result.constructor.name === 'Date') {
     return result.toString();
   } else if (result instanceof cql.Quantity || result.constructor.name === 'Quantity') {
     let result2 = {};
