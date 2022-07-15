@@ -147,7 +147,6 @@ function checkResult(expr, actual, expected) {
   } else {
     const simpleResult = simplifyResult(actual);
     const message = `${expr}=<${simpleResult}>`;
-    console.log(simpleResult,expected);
     expect(simpleResult, message).to.eql(expected);
   }
 }
