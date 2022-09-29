@@ -100,7 +100,7 @@ function buildTestSuite(testCases, library, codeService, fhirVersion, config) {
 
     for (const testCase of testCases) {
       const testFunc = testCase.skip ? it.skip : testCase.only ? it.only : it;
-      testFunc(testCase.name, () => {
+      testFunc(testCase.name, async () => {
         const dumpFileName = `${testCase.name.replace(/[\s/\\]/g, '_')}.json`;
         if (dumpBundlesPath) {
           const filePath = path.join(dumpBundlesPath, dumpFileName);
@@ -117,7 +117,7 @@ function buildTestSuite(testCases, library, codeService, fhirVersion, config) {
           }
         }
         patientSource.loadBundles([testCase.bundle]);
-        const results = executor.exec(patientSource, executionDateTime);
+        const results = await executor.exec(patientSource, executionDateTime);
         if (dumpResultsPath) {
           const filePath = path.join(dumpResultsPath, dumpFileName);
           fs.writeFileSync(filePath, JSON.stringify(results, null, 2), 'utf8');

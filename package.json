@@ -30,7 +30,7 @@
     "cql-execution": ">=1.3.0"
   },
   "devDependencies": {
-    "cql-execution": "^2.2.0"
+    "cql-execution": "github:projecttacoma/cql-execution#async-implementation"
   },
   "resolutions": {
     "lodash": "^4.17.21",
