@@ -9,7 +9,7 @@ describe('#yaml2fhir-config', () => {
   describe('#dstu2', () => {
     it('should be configured with valid resources, patient fields, and defaults', () => {
       assertValidConfig(
-        yaml.safeLoad(fs.readFileSync(path.join(__dirname, '..', 'src', 'fhir', 'dstu2', 'config.yaml'), 'utf-8')),
+        yaml.load(fs.readFileSync(path.join(__dirname, '..', 'src', 'fhir', 'dstu2', 'config.yaml'), 'utf-8')),
         load('dstu2')
       );
     });
@@ -18,7 +18,7 @@ describe('#yaml2fhir-config', () => {
   describe('#stu3', () => {
     it('should be configured with valid resources, patient fields, and defaults', () => {
       assertValidConfig(
-        yaml.safeLoad(fs.readFileSync(path.join(__dirname, '..', 'src', 'fhir', 'stu3', 'config.yaml'), 'utf-8')),
+        yaml.load(fs.readFileSync(path.join(__dirname, '..', 'src', 'fhir', 'stu3', 'config.yaml'), 'utf-8')),
         load('stu3')
       );
     });
@@ -27,7 +27,7 @@ describe('#yaml2fhir-config', () => {
   describe('#r4', () => {
     it('should be configured with valid resources, patient fields, and defaults', () => {
       assertValidConfig(
-        yaml.safeLoad(fs.readFileSync(path.join(__dirname, '..', 'src', 'fhir', 'r4', 'config.yaml'), 'utf-8')),
+        yaml.load(fs.readFileSync(path.join(__dirname, '..', 'src', 'fhir', 'r4', 'config.yaml'), 'utf-8')),
         load('r4')
       );
     });

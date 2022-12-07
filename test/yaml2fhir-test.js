@@ -5,7 +5,7 @@ const yaml2fhir = require('../src/yaml2fhir');
 describe('#yaml2fhir', () => {
   describe('#dstu2', () => {
     it('should convert a simple blank Patient', () => {
-      const data = yaml.safeLoad(`
+      const data = yaml.load(`
         resourceType: Patient
       `);
       const result = yaml2fhir(data, null, 'dstu2');
@@ -16,7 +16,7 @@ describe('#yaml2fhir', () => {
     });
 
     it('should convert a simple blank Patient with supplied patientId', () => {
-      const data = yaml.safeLoad(`
+      const data = yaml.load(`
         resourceType: Patient
       `);
       const result = yaml2fhir(data, '123', 'dstu2');
@@ -27,7 +27,7 @@ describe('#yaml2fhir', () => {
     });
 
     it('should convert a simple blank Encounter with proper defaults and reference to Patient', () => {
-      const data = yaml.safeLoad(`
+      const data = yaml.load(`
         resourceType: Encounter
       `);
       const result = yaml2fhir(data, '123', 'dstu2');
@@ -39,7 +39,7 @@ describe('#yaml2fhir', () => {
     });
 
     it('should convert a Condition whose config uses $if-present/$then/$else when target property is present', () => {
-      const data = yaml.safeLoad(`
+      const data = yaml.load(`
         resourceType: Condition
         abatementDateTime: 2000-12-15
       `);
@@ -54,7 +54,7 @@ describe('#yaml2fhir', () => {
     });
 
     it('should convert a Condition whose config uses $if-present/$then/$else when target property is not present', () => {
-      const data = yaml.safeLoad(`
+      const data = yaml.load(`
         resourceType: Condition
       `);
       const result = yaml2fhir(data, '123', 'dstu2');
@@ -67,7 +67,7 @@ describe('#yaml2fhir', () => {
     });
 
     it('should convert a Patient with top-level properties', () => {
-      const data = yaml.safeLoad(`
+      const data = yaml.load(`
         resourceType: Patient
         active: true
         name: [Bobby Jones]
@@ -98,7 +98,7 @@ describe('#yaml2fhir', () => {
     });
 
     it('should convert a non-array value to an array when necessary', () => {
-      const data = yaml.safeLoad(`
+      const data = yaml.load(`
         resourceType: Patient
         name: Bobby Jones
       `);
@@ -115,7 +115,7 @@ describe('#yaml2fhir', () => {
 
 
     it('should convert an Observation with top-level properties', () => {
-      const data = yaml.safeLoad(`
+      const data = yaml.load(`
         resourceType: Observation
         id: 456
         status: amended
@@ -143,7 +143,7 @@ describe('#yaml2fhir', () => {
     });
 
     it('should support choice properties like value[x]', () => {
-      const data = yaml.safeLoad(`
+      const data = yaml.load(`
         resourceType: Observation
         id: 456
         status: final
@@ -174,7 +174,7 @@ describe('#yaml2fhir', () => {
     });
 
     it('should support references', () => {
-      const data = yaml.safeLoad(`
+      const data = yaml.load(`
         resourceType: Observation
         id: 456
         status: final
@@ -211,7 +211,7 @@ describe('#yaml2fhir', () => {
     });
 
     it('should support nested properties for Backbone elements', () => {
-      const data = yaml.safeLoad(`
+      const data = yaml.load(`
         resourceType: Patient
         name: Rover Pupford
         animal:
@@ -239,7 +239,7 @@ describe('#yaml2fhir', () => {
     });
 
     it('should support nested properties for complex type elements', () => {
-      const data = yaml.safeLoad(`
+      const data = yaml.load(`
         resourceType: Observation
         id: 456
         status: final
@@ -266,7 +266,7 @@ describe('#yaml2fhir', () => {
     });
 
     it('should support nested properties for repeating Backbone elements', () => {
-      const data = yaml.safeLoad(`
+      const data = yaml.load(`
         resourceType: Observation
         id: 456
         status: final
@@ -339,21 +339,21 @@ describe('#yaml2fhir', () => {
     });
 
     it('should throw an error for an unsupported version of FHIR', () => {
-      const data = yaml.safeLoad(`
+      const data = yaml.load(`
         resourceType: Patient
       `);
       expect(() => yaml2fhir(data, '123', 'r5')).to.throw('Unsupported version of FHIR: r5');
     });
 
     it('should throw an error if the data does not declare its resourceType', () => {
-      const data = yaml.safeLoad(`
+      const data = yaml.load(`
         id: abc
       `);
       expect(() => yaml2fhir(data, '123', 'dstu2')).to.throw('Each data object must specify its "resourceType"');
     });
 
     it('should throw an error for an unsupported FHIR resource type', () => {
-      const data = yaml.safeLoad(`
+      const data = yaml.load(`
         resourceType: MedicationRequest
       `);
       // Note: MedicationRequests is not in DSTU2 (it is called MedicationOrder in DSTU2)
@@ -361,7 +361,7 @@ describe('#yaml2fhir', () => {
     });
 
     it('should throw an error for an invalid property', () => {
-      const data = yaml.safeLoad(`
+      const data = yaml.load(`
         resourceType: Procedure
         notDone: true
       `);
@@ -370,7 +370,7 @@ describe('#yaml2fhir', () => {
     });
 
     it('should throw an error when an array is provided for a non array property', () => {
-      const data = yaml.safeLoad(`
+      const data = yaml.load(`
         resourceType: Encounter
         status: [planned, finished]
       `);
@@ -381,7 +381,7 @@ describe('#yaml2fhir', () => {
 
   describe('#stu3', () => {
     it('should convert a simple blank Patient', () => {
-      const data = yaml.safeLoad(`
+      const data = yaml.load(`
         resourceType: Patient
       `);
       const result = yaml2fhir(data, null, 'stu3');
@@ -392,7 +392,7 @@ describe('#yaml2fhir', () => {
     });
 
     it('should convert a simple blank Patient with supplied patientId', () => {
-      const data = yaml.safeLoad(`
+      const data = yaml.load(`
         resourceType: Patient
       `);
       const result = yaml2fhir(data, '123', 'stu3');
@@ -403,7 +403,7 @@ describe('#yaml2fhir', () => {
     });
 
     it('should convert a simple blank Encounter with proper defaults and reference to Patient', () => {
-      const data = yaml.safeLoad(`
+      const data = yaml.load(`
         resourceType: Encounter
       `);
       const result = yaml2fhir(data, '123', 'stu3');
@@ -415,7 +415,7 @@ describe('#yaml2fhir', () => {
     });
 
     it('should convert a Condition whose config uses $if-present/$then/$else when target property is present', () => {
-      const data = yaml.safeLoad(`
+      const data = yaml.load(`
         resourceType: Condition
         abatementDateTime: 2000-12-15
       `);
@@ -430,7 +430,7 @@ describe('#yaml2fhir', () => {
     });
 
     it('should convert a Condition whose config uses $if-present/$then/$else when target property is not present', () => {
-      const data = yaml.safeLoad(`
+      const data = yaml.load(`
         resourceType: Condition
       `);
       const result = yaml2fhir(data, '123', 'stu3');
@@ -443,7 +443,7 @@ describe('#yaml2fhir', () => {
     });
 
     it('should convert a Patient with top-level properties', () => {
-      const data = yaml.safeLoad(`
+      const data = yaml.load(`
         resourceType: Patient
         active: true
         name: [Bobby Jones]
@@ -474,7 +474,7 @@ describe('#yaml2fhir', () => {
     });
 
     it('should convert a non-array value to an array when necessary', () => {
-      const data = yaml.safeLoad(`
+      const data = yaml.load(`
         resourceType: Patient
         name: Bobby Jones
       `);
@@ -491,7 +491,7 @@ describe('#yaml2fhir', () => {
 
 
     it('should convert an Observation with top-level properties', () => {
-      const data = yaml.safeLoad(`
+      const data = yaml.load(`
         resourceType: Observation
         id: 456
         status: amended
@@ -519,7 +519,7 @@ describe('#yaml2fhir', () => {
     });
 
     it('should support choice properties like value[x]', () => {
-      const data = yaml.safeLoad(`
+      const data = yaml.load(`
         resourceType: Observation
         id: 456
         status: final
@@ -550,7 +550,7 @@ describe('#yaml2fhir', () => {
     });
 
     it('should support nested properties for Backbone elements', () => {
-      const data = yaml.safeLoad(`
+      const data = yaml.load(`
         resourceType: Patient
         name: Rover Pupford
         animal:
@@ -578,7 +578,7 @@ describe('#yaml2fhir', () => {
     });
 
     it('should support nested properties for complex type elements', () => {
-      const data = yaml.safeLoad(`
+      const data = yaml.load(`
         resourceType: Observation
         id: 456
         status: final
@@ -605,7 +605,7 @@ describe('#yaml2fhir', () => {
     });
 
     it('should support nested properties for repeating Backbone elements', () => {
-      const data = yaml.safeLoad(`
+      const data = yaml.load(`
         resourceType: Observation
         id: 456
         status: final
@@ -678,7 +678,7 @@ describe('#yaml2fhir', () => {
     });
 
     it('should throw an error for an unsupported FHIR resource type', () => {
-      const data = yaml.safeLoad(`
+      const data = yaml.load(`
         resourceType: MedicationOrder
       `);
       // Note: MedicationOrder is not in STU3 (it is called MedicationRequest in STU3)
@@ -686,7 +686,7 @@ describe('#yaml2fhir', () => {
     });
 
     it('should throw an error for an invalid property', () => {
-      const data = yaml.safeLoad(`
+      const data = yaml.load(`
         resourceType: Procedure
         notPerformed: true
       `);
@@ -697,7 +697,7 @@ describe('#yaml2fhir', () => {
 
   describe('#4r', () => {
     it('should convert a simple blank Patient', () => {
-      const data = yaml.safeLoad(`
+      const data = yaml.load(`
         resourceType: Patient
       `);
       const result = yaml2fhir(data, null, 'r4');
@@ -708,7 +708,7 @@ describe('#yaml2fhir', () => {
     });
 
     it('should convert a simple blank Patient with supplied patientId', () => {
-      const data = yaml.safeLoad(`
+      const data = yaml.load(`
         resourceType: Patient
       `);
       const result = yaml2fhir(data, '123', 'r4');
@@ -719,7 +719,7 @@ describe('#yaml2fhir', () => {
     });
 
     it('should convert a simple blank Encounter with proper defaults and reference to Patient', () => {
-      const data = yaml.safeLoad(`
+      const data = yaml.load(`
         resourceType: Encounter
       `);
       const result = yaml2fhir(data, '123', 'r4');
@@ -731,7 +731,7 @@ describe('#yaml2fhir', () => {
     });
 
     it('should convert a Condition whose config uses $if-present/$then/$else when target property is present', () => {
-      const data = yaml.safeLoad(`
+      const data = yaml.load(`
         resourceType: Condition
         abatementDateTime: 2000-12-15
       `);
@@ -760,7 +760,7 @@ describe('#yaml2fhir', () => {
     });
 
     it('should convert a Condition whose config uses $if-present/$then/$else when target property is not present', () => {
-      const data = yaml.safeLoad(`
+      const data = yaml.load(`
         resourceType: Condition
       `);
       const result = yaml2fhir(data, '123', 'r4');
@@ -787,7 +787,7 @@ describe('#yaml2fhir', () => {
     });
 
     it('should convert a Patient with top-level properties', () => {
-      const data = yaml.safeLoad(`
+      const data = yaml.load(`
         resourceType: Patient
         active: true
         name: [Bobby Jones]
@@ -818,7 +818,7 @@ describe('#yaml2fhir', () => {
     });
 
     it('should convert a non-array value to an array when necessary', () => {
-      const data = yaml.safeLoad(`
+      const data = yaml.load(`
         resourceType: Patient
         name: Bobby Jones
       `);
@@ -835,7 +835,7 @@ describe('#yaml2fhir', () => {
 
 
     it('should convert an Observation with top-level properties', () => {
-      const data = yaml.safeLoad(`
+      const data = yaml.load(`
         resourceType: Observation
         id: 456
         status: amended
@@ -861,7 +861,7 @@ describe('#yaml2fhir', () => {
     });
 
     it('should support choice properties like value[x]', () => {
-      const data = yaml.safeLoad(`
+      const data = yaml.load(`
         resourceType: Observation
         id: 456
         status: final
@@ -892,7 +892,7 @@ describe('#yaml2fhir', () => {
     });
 
     it('should support nested properties for Backbone elements', () => {
-      const data = yaml.safeLoad(`
+      const data = yaml.load(`
         resourceType: Patient
         name: Bob Personford
         communication:
@@ -922,7 +922,7 @@ describe('#yaml2fhir', () => {
     });
 
     it('should support nested properties for complex type elements', () => {
-      const data = yaml.safeLoad(`
+      const data = yaml.load(`
         resourceType: Observation
         id: 456
         status: final
@@ -949,7 +949,7 @@ describe('#yaml2fhir', () => {
     });
 
     it('should support nested properties for repeating Backbone elements', () => {
-      const data = yaml.safeLoad(`
+      const data = yaml.load(`
         resourceType: Observation
         id: 456
         status: final
@@ -1022,7 +1022,7 @@ describe('#yaml2fhir', () => {
     });
 
     it('should resolve ICD-9-D to standard ICD-9 URL', () => {
-      const condition = yaml.safeLoad(`
+      const condition = yaml.load(`
         resourceType: Condition
         id: 123
         code: ICD-9-D#12345.6 Fake ICD-9 Code
@@ -1060,7 +1060,7 @@ describe('#yaml2fhir', () => {
     });
 
     it('should resolve ICD-9-P to standard ICD-9 URL', () => {
-      const condition = yaml.safeLoad(`
+      const condition = yaml.load(`
         resourceType: Procedure
         id: 123
         code: ICD-9-P#12345.6 Fake ICD-9 Code
@@ -1083,7 +1083,7 @@ describe('#yaml2fhir', () => {
     });
 
     it('should throw an error for an unsupported FHIR resource type', () => {
-      const data = yaml.safeLoad(`
+      const data = yaml.load(`
         resourceType: DeviceComponent
       `);
       // Note: DeviceComponent is not in R4 (it is in STU3)
@@ -1091,7 +1091,7 @@ describe('#yaml2fhir', () => {
     });
 
     it('should throw an error for an invalid property', () => {
-      const data = yaml.safeLoad(`
+      const data = yaml.load(`
         resourceType: Procedure
         notDone: true
       `);

@@ -24,7 +24,7 @@ function load(version) {
     }
 
     // Load the config
-    const configYaml = yaml.safeLoad(fs.readFileSync(`${__dirname}/${version}/config.yaml`, 'utf-8'));
+    const configYaml = yaml.load(fs.readFileSync(`${__dirname}/${version}/config.yaml`, 'utf-8'));
     if (configYaml && configYaml.resources) {
       Object.keys(configYaml.resources).forEach(name => {
         result.config.addResource(name, configYaml.resources[name]);

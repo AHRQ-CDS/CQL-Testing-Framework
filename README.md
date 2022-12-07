@@ -131,8 +131,7 @@ The following configuration parameters are currently supported:
 * **options**:
     * **date**: The execution date to use as "Now()" when CQL executes tests _(optional, ISO 8601 formatted date string enclosed in double-quotes (`"`), default: now)_
     * **vsac**:
-        * **user**: The UMLS user name to use when connecting to the VSAC _(optional, string)_
-        * **password**: The UMLS password to use when connecting to the VSAC _(optional, string)_
+        * **apikey**: The UMLS API Key to use when connecting to the VSAC _(optional, string)_
         * **cache**: The file path for the value set cache _(optional, string, default: .vscache)_
     * **dumpFiles**:
         * **enabled**: Indicates if test data and actual results should be dumped to files for debugging or testing; supports bundles, CQL Hooks requests, and Postman collections of CQL Hooks requests _(optional, boolean, default: false)_
@@ -240,10 +239,6 @@ npx cql-to-elm /path/to/folder/with/cql
 
 If your CQL uses value sets from the Value Set Authority Center (VSAC), then the first time you run the tests, they will need to download the value set definitions from VSAC.  Downloading value sets from VSAC requires a VSAC account and an API key.  You can find your API key in your [UMLS profile](https://uts.nlm.nih.gov//uts.html#profile) and can configure your VSAC account by setting the `options->vsac->apikey` property in your `cqlt.yaml` file.  If you prefer not to modify the config file, you may set the `UMLS_API_KEY` environment variable instead.
 
-Alternatively, existing username/password authentication is supported until January 1, 2021.  You may set the `options->vsac->user` and `options->vsac->password` properties in your `cqlt.yaml` file.  If you prefer not to modify the config file, you may set the`UMLS_USER_NAME` and `UMLS_PASSWORD` environment variables.
-
-**NOTE**: Username and password based authentication is deprecated by VSAC, and only supported until January 1, 2021.  API key based authentication is highly encouraged.
-
 Once you've run the tests the first time and downloaded the value sets, they'll be stored in a VSAC cache folder (defaulted to `/.vscache` in the same folder as the `cqlt.yaml` file).  After that, you do not need your VSAC credentials anymore since the CQL Testing Framework will just use the cache.
 
 ### Running the Tests
@@ -299,7 +294,7 @@ CQLT Config: /path/to/my/cql/project/test/cqlt.yaml
 The _FHIR_DSTU2.md_ and _FHIR_STU3.md_ documentation files are generated using the FHIR specification definitions and the corresponding _config.yaml_ files (in _src/fhir/${version}/_). Developers working on the CQL Testing Framework (i.e., developing the framework itself) can regenerate the documentation using the following command:
 
 ```sh
-$ yarn doc
+$ npm run doc
 ```
 
 ## LICENSE

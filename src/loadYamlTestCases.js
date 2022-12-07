@@ -70,7 +70,7 @@ function yamlToTestCases(yamlFilePath, fhirVersion) {
   }
 
   // Try to load the document
-  const doc = yaml.safeLoad(docString);
+  const doc = yaml.load(docString);
   if (!doc.name) {
     if (!doc.data && !doc.results) {
       // eslint-disable-next-line no-console

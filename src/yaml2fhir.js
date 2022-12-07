@@ -1,5 +1,5 @@
 const _ = require('lodash');
-const uuidv4 = require('uuid/v4');
+const { v4: uuidv4 } = require('uuid');
 const load = require('./fhir/load');
 
 /**

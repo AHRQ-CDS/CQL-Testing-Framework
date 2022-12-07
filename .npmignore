@@ -1,5 +1,4 @@
 /jsconfig.json
-/yarn-error.log
 /dist
 /test
 src/doc-gen.js

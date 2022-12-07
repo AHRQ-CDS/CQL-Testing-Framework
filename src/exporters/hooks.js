@@ -1,4 +1,4 @@
-const uuidv4 = require('uuid/v4');
+const { v4: uuidv4 } = require('uuid');
 
 function createHooksRequest(bundle, resourceTypes) {
   // Clone it so we don't unintentionall mess it up
