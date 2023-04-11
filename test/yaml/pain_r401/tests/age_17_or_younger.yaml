@@ -11,6 +11,10 @@ data:
   resourceType: MedicationRequest
   code: RXNORM#197591 Diazepam 5 MG Oral Tablet
   authoredOn: 2018-12-05
+-
+  resourceType: MedicationRequest
+  code: RXNORM#1001437 caffeine 50 MG / magnesium salicylate 162.5 MG Oral Tablet
+  authoredOn: 2018-12-05
 
 results:
   Summary:
@@ -31,7 +35,7 @@ results:
       NonOpioidMedications:
       -
         Type: Request
-        Name: Diazepam 5 MG Oral Tablet
+        Name: caffeine 50 MG / magnesium salicylate 162.5 MG Oral Tablet
         Start: '2018-12-05T00:00:00.000+00:00'
         End: null
         Status: active

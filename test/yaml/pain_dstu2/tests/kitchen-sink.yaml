@@ -34,6 +34,10 @@ data:
   dateWritten: 2018-11-05
 -
   resourceType: MedicationOrder
+  code: RXNORM#1001437 caffeine 50 MG / magnesium salicylate 162.5 MG Oral Tablet
+  dateWritten: 2018-11-05
+-
+  resourceType: MedicationOrder
   code: RXNORM#876193 POLYETHYLENE GLYCOL 3350 17000 MG Powder for Oral Solution
   dateWritten: 2018-11-05
 -
@@ -55,6 +59,10 @@ data:
 -
   resourceType: MedicationStatement
   code: RXNORM#197591 Diazepam 5 MG Oral Tablet
+  effectiveDateTime: 2018-12-01
+-
+  resourceType: MedicationStatement
+  code: RXNORM#1001437 caffeine 50 MG / magnesium salicylate 162.5 MG Oral Tablet
   effectiveDateTime: 2018-12-01
 -
   resourceType: MedicationStatement
@@ -191,13 +199,13 @@ results:
       NonOpioidMedications:
       -
         Type: Statement
-        Name: Diazepam 5 MG Oral Tablet
+        Name: caffeine 50 MG / magnesium salicylate 162.5 MG Oral Tablet
         Start: '2018-12-01T00:00:00.000+00:00'
         End: null
         Status: active
       -
         Type: Order
-        Name: Diazepam 5 MG Oral Tablet
+        Name: caffeine 50 MG / magnesium salicylate 162.5 MG Oral Tablet
         Start: '2018-11-05T00:00:00.000+00:00'
         End: null
         Status: active
