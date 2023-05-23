@@ -47,7 +47,7 @@ function buildTestSuite(testCases, library, codeService, fhirVersion, config) {
 
     before('Download value set definitions from VSAC if necessary', function(done) {
       this.timeout(30000);
-      
+
       codeService.ensureValueSetsInLibraryWithAPIKey(library,true,options.vsac.apikey).then(() => done())
         .catch((err) => {
           if (err instanceof Error) {
@@ -98,16 +98,19 @@ function buildTestSuite(testCases, library, codeService, fhirVersion, config) {
           }
         }
         patientSource.loadBundles([testCase.bundle]);
-        const results = executor.exec(patientSource, executionDateTime);
-        if (dumpResultsPath) {
-          const filePath = path.join(dumpResultsPath, dumpFileName);
-          fs.writeFileSync(filePath, JSON.stringify(results, null, 2), 'utf8');
-        }
-        const patientId = testCase.bundle.entry[0].resource.id;
-        expect(results.patientResults[patientId]).to.exist;
-        for (const expr of Object.keys(testCase.expected)) {
-          checkResult(expr, results.patientResults[patientId][expr], testCase.expected[expr]);
-        }
+        return Promise.resolve(executor.exec(patientSource, executionDateTime)).then((results) => {
+          if (dumpResultsPath) {
+            const filePath = path.join(dumpResultsPath, dumpFileName);
+            fs.writeFileSync(filePath, JSON.stringify(results, null, 2), 'utf8');
+          }
+          const patientId = testCase.bundle.entry[0].resource.id;
+          expect(results.patientResults[patientId]).to.exist;
+          for (const expr of Object.keys(testCase.expected)) {
+            checkResult(expr, results.patientResults[patientId][expr], testCase.expected[expr]);
+          }
+        }, (err) => {
+          throw err;
+        });
       });
     }
   });
