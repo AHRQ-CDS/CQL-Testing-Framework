@@ -1,7 +1,7 @@
 {
    "library" : {
       "annotation" : [ {
-         "translatorVersion" : "2.8.0",
+         "translatorVersion" : "3.2.0",
          "translatorOptions" : "",
          "type" : "CqlToElmInfo"
       } ],
@@ -2005,16 +2005,75 @@
                                  "type" : "ValueSetRef"
                               }
                            }, {
-                              "dataType" : "{http://hl7.org/fhir}MedicationRequest",
-                              "templateId" : "http://hl7.org/fhir/StructureDefinition/MedicationRequest",
-                              "codeProperty" : "medication",
-                              "codeComparator" : "in",
-                              "type" : "Retrieve",
-                              "codes" : {
-                                 "name" : "Opioid Pain Medications",
-                                 "preserve" : true,
-                                 "type" : "ValueSetRef"
-                              }
+                              "type" : "Query",
+                              "source" : [ {
+                                 "alias" : "MR",
+                                 "expression" : {
+                                    "dataType" : "{http://hl7.org/fhir}MedicationRequest",
+                                    "templateId" : "http://hl7.org/fhir/StructureDefinition/MedicationRequest",
+                                    "type" : "Retrieve"
+                                 }
+                              } ],
+                              "relationship" : [ {
+                                 "alias" : "M",
+                                 "type" : "With",
+                                 "expression" : {
+                                    "dataType" : "{http://hl7.org/fhir}Medication",
+                                    "templateId" : "http://hl7.org/fhir/StructureDefinition/Medication",
+                                    "type" : "Retrieve"
+                                 },
+                                 "suchThat" : {
+                                    "type" : "And",
+                                    "operand" : [ {
+                                       "type" : "Equal",
+                                       "operand" : [ {
+                                          "name" : "ToString",
+                                          "libraryName" : "FHIRHelpers",
+                                          "type" : "FunctionRef",
+                                          "operand" : [ {
+                                             "path" : "id",
+                                             "scope" : "M",
+                                             "type" : "Property"
+                                          } ]
+                                       }, {
+                                          "type" : "Last",
+                                          "source" : {
+                                             "type" : "Split",
+                                             "stringToSplit" : {
+                                                "name" : "ToString",
+                                                "libraryName" : "FHIRHelpers",
+                                                "type" : "FunctionRef",
+                                                "operand" : [ {
+                                                   "path" : "medication.reference",
+                                                   "scope" : "MR",
+                                                   "type" : "Property"
+                                                } ]
+                                             },
+                                             "separator" : {
+                                                "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                                                "value" : "/",
+                                                "type" : "Literal"
+                                             }
+                                          }
+                                       } ]
+                                    }, {
+                                       "type" : "InValueSet",
+                                       "code" : {
+                                          "name" : "ToConcept",
+                                          "libraryName" : "FHIRHelpers",
+                                          "type" : "FunctionRef",
+                                          "operand" : [ {
+                                             "path" : "code",
+                                             "type" : "Property"
+                                          } ]
+                                       },
+                                       "valueset" : {
+                                          "name" : "Opioid Pain Medications",
+                                          "preserve" : true
+                                       }
+                                    } ]
+                                 }
+                              } ]
                            } ]
                         }, {
                            "name" : "InclusionMedicationsLookbackPeriod",
@@ -2095,16 +2154,75 @@
                                  "type" : "ValueSetRef"
                               }
                            }, {
-                              "dataType" : "{http://hl7.org/fhir}MedicationRequest",
-                              "templateId" : "http://hl7.org/fhir/StructureDefinition/MedicationRequest",
-                              "codeProperty" : "medication",
-                              "codeComparator" : "in",
-                              "type" : "Retrieve",
-                              "codes" : {
-                                 "name" : "Adjuvant Analgesic Medications",
-                                 "preserve" : true,
-                                 "type" : "ValueSetRef"
-                              }
+                              "type" : "Query",
+                              "source" : [ {
+                                 "alias" : "MR",
+                                 "expression" : {
+                                    "dataType" : "{http://hl7.org/fhir}MedicationRequest",
+                                    "templateId" : "http://hl7.org/fhir/StructureDefinition/MedicationRequest",
+                                    "type" : "Retrieve"
+                                 }
+                              } ],
+                              "relationship" : [ {
+                                 "alias" : "M",
+                                 "type" : "With",
+                                 "expression" : {
+                                    "dataType" : "{http://hl7.org/fhir}Medication",
+                                    "templateId" : "http://hl7.org/fhir/StructureDefinition/Medication",
+                                    "type" : "Retrieve"
+                                 },
+                                 "suchThat" : {
+                                    "type" : "And",
+                                    "operand" : [ {
+                                       "type" : "Equal",
+                                       "operand" : [ {
+                                          "name" : "ToString",
+                                          "libraryName" : "FHIRHelpers",
+                                          "type" : "FunctionRef",
+                                          "operand" : [ {
+                                             "path" : "id",
+                                             "scope" : "M",
+                                             "type" : "Property"
+                                          } ]
+                                       }, {
+                                          "type" : "Last",
+                                          "source" : {
+                                             "type" : "Split",
+                                             "stringToSplit" : {
+                                                "name" : "ToString",
+                                                "libraryName" : "FHIRHelpers",
+                                                "type" : "FunctionRef",
+                                                "operand" : [ {
+                                                   "path" : "medication.reference",
+                                                   "scope" : "MR",
+                                                   "type" : "Property"
+                                                } ]
+                                             },
+                                             "separator" : {
+                                                "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                                                "value" : "/",
+                                                "type" : "Literal"
+                                             }
+                                          }
+                                       } ]
+                                    }, {
+                                       "type" : "InValueSet",
+                                       "code" : {
+                                          "name" : "ToConcept",
+                                          "libraryName" : "FHIRHelpers",
+                                          "type" : "FunctionRef",
+                                          "operand" : [ {
+                                             "path" : "code",
+                                             "type" : "Property"
+                                          } ]
+                                       },
+                                       "valueset" : {
+                                          "name" : "Adjuvant Analgesic Medications",
+                                          "preserve" : true
+                                       }
+                                    } ]
+                                 }
+                              } ]
                            } ]
                         }, {
                            "name" : "InclusionMedicationsLookbackPeriod",
@@ -4681,16 +4799,75 @@
                            "type" : "ValueSetRef"
                         }
                      }, {
-                        "dataType" : "{http://hl7.org/fhir}MedicationRequest",
-                        "templateId" : "http://hl7.org/fhir/StructureDefinition/MedicationRequest",
-                        "codeProperty" : "medication",
-                        "codeComparator" : "in",
-                        "type" : "Retrieve",
-                        "codes" : {
-                           "name" : "Opioid Pain Medications",
-                           "preserve" : true,
-                           "type" : "ValueSetRef"
-                        }
+                        "type" : "Query",
+                        "source" : [ {
+                           "alias" : "MR",
+                           "expression" : {
+                              "dataType" : "{http://hl7.org/fhir}MedicationRequest",
+                              "templateId" : "http://hl7.org/fhir/StructureDefinition/MedicationRequest",
+                              "type" : "Retrieve"
+                           }
+                        } ],
+                        "relationship" : [ {
+                           "alias" : "M",
+                           "type" : "With",
+                           "expression" : {
+                              "dataType" : "{http://hl7.org/fhir}Medication",
+                              "templateId" : "http://hl7.org/fhir/StructureDefinition/Medication",
+                              "type" : "Retrieve"
+                           },
+                           "suchThat" : {
+                              "type" : "And",
+                              "operand" : [ {
+                                 "type" : "Equal",
+                                 "operand" : [ {
+                                    "name" : "ToString",
+                                    "libraryName" : "FHIRHelpers",
+                                    "type" : "FunctionRef",
+                                    "operand" : [ {
+                                       "path" : "id",
+                                       "scope" : "M",
+                                       "type" : "Property"
+                                    } ]
+                                 }, {
+                                    "type" : "Last",
+                                    "source" : {
+                                       "type" : "Split",
+                                       "stringToSplit" : {
+                                          "name" : "ToString",
+                                          "libraryName" : "FHIRHelpers",
+                                          "type" : "FunctionRef",
+                                          "operand" : [ {
+                                             "path" : "medication.reference",
+                                             "scope" : "MR",
+                                             "type" : "Property"
+                                          } ]
+                                       },
+                                       "separator" : {
+                                          "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                                          "value" : "/",
+                                          "type" : "Literal"
+                                       }
+                                    }
+                                 } ]
+                              }, {
+                                 "type" : "InValueSet",
+                                 "code" : {
+                                    "name" : "ToConcept",
+                                    "libraryName" : "FHIRHelpers",
+                                    "type" : "FunctionRef",
+                                    "operand" : [ {
+                                       "path" : "code",
+                                       "type" : "Property"
+                                    } ]
+                                 },
+                                 "valueset" : {
+                                    "name" : "Opioid Pain Medications",
+                                    "preserve" : true
+                                 }
+                              } ]
+                           }
+                        } ]
                      } ]
                   }, {
                      "value" : 2,
@@ -4996,16 +5173,75 @@
                            "type" : "ValueSetRef"
                         }
                      }, {
-                        "dataType" : "{http://hl7.org/fhir}MedicationRequest",
-                        "templateId" : "http://hl7.org/fhir/StructureDefinition/MedicationRequest",
-                        "codeProperty" : "medication",
-                        "codeComparator" : "in",
-                        "type" : "Retrieve",
-                        "codes" : {
-                           "name" : "Non opiod pain medications",
-                           "preserve" : true,
-                           "type" : "ValueSetRef"
-                        }
+                        "type" : "Query",
+                        "source" : [ {
+                           "alias" : "MR",
+                           "expression" : {
+                              "dataType" : "{http://hl7.org/fhir}MedicationRequest",
+                              "templateId" : "http://hl7.org/fhir/StructureDefinition/MedicationRequest",
+                              "type" : "Retrieve"
+                           }
+                        } ],
+                        "relationship" : [ {
+                           "alias" : "M",
+                           "type" : "With",
+                           "expression" : {
+                              "dataType" : "{http://hl7.org/fhir}Medication",
+                              "templateId" : "http://hl7.org/fhir/StructureDefinition/Medication",
+                              "type" : "Retrieve"
+                           },
+                           "suchThat" : {
+                              "type" : "And",
+                              "operand" : [ {
+                                 "type" : "Equal",
+                                 "operand" : [ {
+                                    "name" : "ToString",
+                                    "libraryName" : "FHIRHelpers",
+                                    "type" : "FunctionRef",
+                                    "operand" : [ {
+                                       "path" : "id",
+                                       "scope" : "M",
+                                       "type" : "Property"
+                                    } ]
+                                 }, {
+                                    "type" : "Last",
+                                    "source" : {
+                                       "type" : "Split",
+                                       "stringToSplit" : {
+                                          "name" : "ToString",
+                                          "libraryName" : "FHIRHelpers",
+                                          "type" : "FunctionRef",
+                                          "operand" : [ {
+                                             "path" : "medication.reference",
+                                             "scope" : "MR",
+                                             "type" : "Property"
+                                          } ]
+                                       },
+                                       "separator" : {
+                                          "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                                          "value" : "/",
+                                          "type" : "Literal"
+                                       }
+                                    }
+                                 } ]
+                              }, {
+                                 "type" : "InValueSet",
+                                 "code" : {
+                                    "name" : "ToConcept",
+                                    "libraryName" : "FHIRHelpers",
+                                    "type" : "FunctionRef",
+                                    "operand" : [ {
+                                       "path" : "code",
+                                       "type" : "Property"
+                                    } ]
+                                 },
+                                 "valueset" : {
+                                    "name" : "Non opiod pain medications",
+                                    "preserve" : true
+                                 }
+                              } ]
+                           }
+                        } ]
                      } ]
                   }, {
                      "value" : 2,
@@ -5544,16 +5780,75 @@
                            "type" : "ValueSetRef"
                         }
                      }, {
-                        "dataType" : "{http://hl7.org/fhir}MedicationRequest",
-                        "templateId" : "http://hl7.org/fhir/StructureDefinition/MedicationRequest",
-                        "codeProperty" : "medication",
-                        "codeComparator" : "in",
-                        "type" : "Retrieve",
-                        "codes" : {
-                           "name" : "Stool softeners and laxatives",
-                           "preserve" : true,
-                           "type" : "ValueSetRef"
-                        }
+                        "type" : "Query",
+                        "source" : [ {
+                           "alias" : "MR",
+                           "expression" : {
+                              "dataType" : "{http://hl7.org/fhir}MedicationRequest",
+                              "templateId" : "http://hl7.org/fhir/StructureDefinition/MedicationRequest",
+                              "type" : "Retrieve"
+                           }
+                        } ],
+                        "relationship" : [ {
+                           "alias" : "M",
+                           "type" : "With",
+                           "expression" : {
+                              "dataType" : "{http://hl7.org/fhir}Medication",
+                              "templateId" : "http://hl7.org/fhir/StructureDefinition/Medication",
+                              "type" : "Retrieve"
+                           },
+                           "suchThat" : {
+                              "type" : "And",
+                              "operand" : [ {
+                                 "type" : "Equal",
+                                 "operand" : [ {
+                                    "name" : "ToString",
+                                    "libraryName" : "FHIRHelpers",
+                                    "type" : "FunctionRef",
+                                    "operand" : [ {
+                                       "path" : "id",
+                                       "scope" : "M",
+                                       "type" : "Property"
+                                    } ]
+                                 }, {
+                                    "type" : "Last",
+                                    "source" : {
+                                       "type" : "Split",
+                                       "stringToSplit" : {
+                                          "name" : "ToString",
+                                          "libraryName" : "FHIRHelpers",
+                                          "type" : "FunctionRef",
+                                          "operand" : [ {
+                                             "path" : "medication.reference",
+                                             "scope" : "MR",
+                                             "type" : "Property"
+                                          } ]
+                                       },
+                                       "separator" : {
+                                          "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                                          "value" : "/",
+                                          "type" : "Literal"
+                                       }
+                                    }
+                                 } ]
+                              }, {
+                                 "type" : "InValueSet",
+                                 "code" : {
+                                    "name" : "ToConcept",
+                                    "libraryName" : "FHIRHelpers",
+                                    "type" : "FunctionRef",
+                                    "operand" : [ {
+                                       "path" : "code",
+                                       "type" : "Property"
+                                    } ]
+                                 },
+                                 "valueset" : {
+                                    "name" : "Stool softeners and laxatives",
+                                    "preserve" : true
+                                 }
+                              } ]
+                           }
+                        } ]
                      } ]
                   }, {
                      "value" : 6,
@@ -6143,16 +6438,75 @@
                            "type" : "ValueSetRef"
                         }
                      }, {
-                        "dataType" : "{http://hl7.org/fhir}MedicationRequest",
-                        "templateId" : "http://hl7.org/fhir/StructureDefinition/MedicationRequest",
-                        "codeProperty" : "medication",
-                        "codeComparator" : "in",
-                        "type" : "Retrieve",
-                        "codes" : {
-                           "name" : "Benzodiazepine medications",
-                           "preserve" : true,
-                           "type" : "ValueSetRef"
-                        }
+                        "type" : "Query",
+                        "source" : [ {
+                           "alias" : "MR",
+                           "expression" : {
+                              "dataType" : "{http://hl7.org/fhir}MedicationRequest",
+                              "templateId" : "http://hl7.org/fhir/StructureDefinition/MedicationRequest",
+                              "type" : "Retrieve"
+                           }
+                        } ],
+                        "relationship" : [ {
+                           "alias" : "M",
+                           "type" : "With",
+                           "expression" : {
+                              "dataType" : "{http://hl7.org/fhir}Medication",
+                              "templateId" : "http://hl7.org/fhir/StructureDefinition/Medication",
+                              "type" : "Retrieve"
+                           },
+                           "suchThat" : {
+                              "type" : "And",
+                              "operand" : [ {
+                                 "type" : "Equal",
+                                 "operand" : [ {
+                                    "name" : "ToString",
+                                    "libraryName" : "FHIRHelpers",
+                                    "type" : "FunctionRef",
+                                    "operand" : [ {
+                                       "path" : "id",
+                                       "scope" : "M",
+                                       "type" : "Property"
+                                    } ]
+                                 }, {
+                                    "type" : "Last",
+                                    "source" : {
+                                       "type" : "Split",
+                                       "stringToSplit" : {
+                                          "name" : "ToString",
+                                          "libraryName" : "FHIRHelpers",
+                                          "type" : "FunctionRef",
+                                          "operand" : [ {
+                                             "path" : "medication.reference",
+                                             "scope" : "MR",
+                                             "type" : "Property"
+                                          } ]
+                                       },
+                                       "separator" : {
+                                          "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                                          "value" : "/",
+                                          "type" : "Literal"
+                                       }
+                                    }
+                                 } ]
+                              }, {
+                                 "type" : "InValueSet",
+                                 "code" : {
+                                    "name" : "ToConcept",
+                                    "libraryName" : "FHIRHelpers",
+                                    "type" : "FunctionRef",
+                                    "operand" : [ {
+                                       "path" : "code",
+                                       "type" : "Property"
+                                    } ]
+                                 },
+                                 "valueset" : {
+                                    "name" : "Benzodiazepine medications",
+                                    "preserve" : true
+                                 }
+                              } ]
+                           }
+                        } ]
                      } ]
                   }, {
                      "value" : 2,
@@ -6454,16 +6808,75 @@
                         "type" : "ValueSetRef"
                      }
                   }, {
-                     "dataType" : "{http://hl7.org/fhir}MedicationRequest",
-                     "templateId" : "http://hl7.org/fhir/StructureDefinition/MedicationRequest",
-                     "codeProperty" : "medication",
-                     "codeComparator" : "in",
-                     "type" : "Retrieve",
-                     "codes" : {
-                        "name" : "Naloxone medications",
-                        "preserve" : true,
-                        "type" : "ValueSetRef"
-                     }
+                     "type" : "Query",
+                     "source" : [ {
+                        "alias" : "MR",
+                        "expression" : {
+                           "dataType" : "{http://hl7.org/fhir}MedicationRequest",
+                           "templateId" : "http://hl7.org/fhir/StructureDefinition/MedicationRequest",
+                           "type" : "Retrieve"
+                        }
+                     } ],
+                     "relationship" : [ {
+                        "alias" : "M",
+                        "type" : "With",
+                        "expression" : {
+                           "dataType" : "{http://hl7.org/fhir}Medication",
+                           "templateId" : "http://hl7.org/fhir/StructureDefinition/Medication",
+                           "type" : "Retrieve"
+                        },
+                        "suchThat" : {
+                           "type" : "And",
+                           "operand" : [ {
+                              "type" : "Equal",
+                              "operand" : [ {
+                                 "name" : "ToString",
+                                 "libraryName" : "FHIRHelpers",
+                                 "type" : "FunctionRef",
+                                 "operand" : [ {
+                                    "path" : "id",
+                                    "scope" : "M",
+                                    "type" : "Property"
+                                 } ]
+                              }, {
+                                 "type" : "Last",
+                                 "source" : {
+                                    "type" : "Split",
+                                    "stringToSplit" : {
+                                       "name" : "ToString",
+                                       "libraryName" : "FHIRHelpers",
+                                       "type" : "FunctionRef",
+                                       "operand" : [ {
+                                          "path" : "medication.reference",
+                                          "scope" : "MR",
+                                          "type" : "Property"
+                                       } ]
+                                    },
+                                    "separator" : {
+                                       "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                                       "value" : "/",
+                                       "type" : "Literal"
+                                    }
+                                 }
+                              } ]
+                           }, {
+                              "type" : "InValueSet",
+                              "code" : {
+                                 "name" : "ToConcept",
+                                 "libraryName" : "FHIRHelpers",
+                                 "type" : "FunctionRef",
+                                 "operand" : [ {
+                                    "path" : "code",
+                                    "type" : "Property"
+                                 } ]
+                              },
+                              "valueset" : {
+                                 "name" : "Naloxone medications",
+                                 "preserve" : true
+                              }
+                           } ]
+                        }
+                     } ]
                   } ]
                } ]
             }
