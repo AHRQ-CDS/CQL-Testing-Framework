@@ -81,7 +81,7 @@ function yamlToTestCases(yamlFilePath, fhirVersion) {
   }
   const testName = doc.name;
   if (doc.skip) {
-    return new TestCase(testName, null, null, true);
+    return [new TestCase(testName, null, null, true)];
   }
 
   // Handle the data

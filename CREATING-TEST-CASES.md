@@ -8,6 +8,7 @@ Each YAML file in the `tests` folder is a separate test case.  Each file has the
 * **externalData**: A YAML [array](https://yaml.org/spec/1.2/spec.html#id2802662) of the names of other YAML files which may contain [anchored](https://yaml.org/spec/1.2/spec.html#id2785586) resource definitions which can be referenced below under the `data` section. See "Reusing Resources" below for more information.
 * **data**: A sequence (i.e., array) of the resource instances making up the test case (with the `Patient` resource as the first one). Can include YAML references to anchored resources defined in any YAML files listed under the `externalData` section.
 * **results**: A hash (i.e. object) for which each key corresponds to a CQL expression name and the value is the _expected_ result for that CQL expression.
+* **skip**: Skip test case if true (optional, default false).
 
 The following is a very simple example of a test case for a fictional CQL library with inclusion criteria that the patient must be male, over 18, and have an Opiod prescription on record.  It sets up test data for a 40 year-old male with an Oxycodone prescription and specifies that the `MeetsInclusionCriteria` CQL expression should evaluate to `true`.
 
