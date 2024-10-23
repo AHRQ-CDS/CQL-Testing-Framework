@@ -152,7 +152,12 @@ function simplifyResult(result) {
     return result2;
   } else if (result != null && typeof result === 'object') {
     for (const key of Object.keys(result)) {
-      result[key] = simplifyResult(result[key]);
+      if(result[key] === undefined){
+        // execution library is serializing uninitialized fields, remove these
+        delete result[key];
+      } else {
+        result[key] = simplifyResult(result[key]);
+      } 
     }
   }
   return result;
