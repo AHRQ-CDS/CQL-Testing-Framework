@@ -136,6 +136,8 @@ The following configuration parameters are currently supported:
     * **dumpFiles**:
         * **enabled**: Indicates if test data and actual results should be dumped to files for debugging or testing; supports bundles, CQL Hooks requests, and Postman collections of CQL Hooks requests _(optional, boolean, default: false)_
         * **path**: The file path to dump files to, if enabled _(optional, string, default: dump\_files)_
+* **skip**: Skip test folder if true _(optional, boolean, default: false)_.
+* **only**: Only run this test folder if true _(optional, boolean, default: false)_.        
 
 All file paths are relative to the location of the `cqlt.yaml` configuraton file unless the file path is absolute.
 

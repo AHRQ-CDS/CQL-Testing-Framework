@@ -107,6 +107,20 @@ function newConfig() {
         }
       }
     },
+    skip: {
+      doc: 'Skip test folder if true',
+      format: 'Boolean',
+      default: false,
+      env: 'CQLT_SKIP',
+      arg: 'skip'
+    },
+    only: {
+      doc: 'Only run this test folder if true',
+      format: 'Boolean',
+      default: false,
+      env: 'CQLT_ONLY',
+      arg: 'only'
+    }      
   });
 }
 

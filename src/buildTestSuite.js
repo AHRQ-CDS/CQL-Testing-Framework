@@ -31,7 +31,10 @@ function buildTestSuite(testCases, library, codeService, fhirVersion, config) {
     prefetchKeys = hooksExporter.extractPrefetchKeys(library);
   }
   const executor = new cql.Executor(library, codeService);
-  describe(libraryHandle, () => {
+  // Use describe.skip if the suite has skip: true, use describe.only if the suite has only: true, 
+  // otherwise use describe
+  const describeFn = config.get('skip') ? describe.skip : config.get('only') ? describe.only : describe;
+  describeFn(libraryHandle, () => {
     let patientSource;
     before('Initialize FHIR patient source', () => {
       switch (fhirVersion) {
@@ -98,6 +101,7 @@ function buildTestSuite(testCases, library, codeService, fhirVersion, config) {
           }
         }
         patientSource.loadBundles([testCase.bundle]);
+        executor.withParameters(testCase.parameters);
         return Promise.resolve(executor.exec(patientSource, executionDateTime)).then((results) => {
           if (dumpResultsPath) {
             const filePath = path.join(dumpResultsPath, dumpFileName);

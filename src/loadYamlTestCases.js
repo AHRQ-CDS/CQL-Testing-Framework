@@ -171,7 +171,7 @@ function yamlToTestCases(yamlFilePath, fhirVersion) {
     for (let i = 0; i < bundles.length; i++) {
       let iterateTestName = testName + (i > 0 ? ` (${i})` : '');
       returnedTestCases.push(
-        new TestCase(iterateTestName, bundles[i], doc.results, false, doc.only)
+        new TestCase(iterateTestName, bundles[i], doc.results, false, doc.only, doc.parameters)
       );
     }
     return returnedTestCases;

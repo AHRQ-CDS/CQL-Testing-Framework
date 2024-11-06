@@ -10,6 +10,7 @@ Each YAML file in the `tests` folder is a separate test case.  Each file has the
 * **results**: A hash (i.e. object) for which each key corresponds to a CQL expression name and the value is the _expected_ result for that CQL expression.
 * **skip**: Skip test case if true (optional, default false).
 * **only**: Only run this test case if true (optional, default false).
+* **parameters**: A hash (i.e. object) for which each key corresponds to a CQL library parameter name and the value is the input for execution. (optional, default none).
 
 The following is a very simple example of a test case for a fictional CQL library with inclusion criteria that the patient must be male, over 18, and have an Opiod prescription on record.  It sets up test data for a 40 year-old male with an Oxycodone prescription and specifies that the `MeetsInclusionCriteria` CQL expression should evaluate to `true`.
 
