@@ -1,0 +1,15 @@
+---
+name: Test reusable resources with relative path, reusable patient, and should include
+
+externalData:
+  - ../reusable_resources
+
+data:
+  - *reusablePatient
+
+parameters:
+  LookbackPeriod: 90
+
+results:
+  # To check for subset rather than deep equals, needs to be properly quoted and valid JSON
+  TestParamAndIncludeSubset: "$should include {\"LookbackPeriod\": 90}"

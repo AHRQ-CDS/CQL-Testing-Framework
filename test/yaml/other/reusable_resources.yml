@@ -1,0 +1,6 @@
+reusable_resources: 
+  - &reusablePatient
+    resourceType: Patient
+    name: Fuller Jackson
+    gender: male
+    birthDate: 1954-02-16

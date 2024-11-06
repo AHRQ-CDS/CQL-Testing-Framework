@@ -16,9 +16,9 @@ const mockLibrary = {
   }
 };
 
-describe.only('buildTestSuite', () => {
+describe('buildTestSuite', () => {
   it('should use describe.skip when config.skip is true', () => {
-    const configPath = path.join(__dirname, 'yaml', 'other', 'config-skip.yaml');
+    const configPath = path.join(__dirname, 'config-skip.yaml');
     const config = loadConfig(configPath);
 
     const describeSpy = sinon.spy(global, 'describe');
@@ -35,7 +35,7 @@ describe.only('buildTestSuite', () => {
   });
 
   it('should use describe.only when config.only is true', () => {
-    const configPath = path.join(__dirname, 'yaml', 'other', 'config-only.yaml');
+    const configPath = path.join(__dirname, 'config-only.yaml');
     const config = loadConfig(configPath);
 
     const describeSpy = sinon.spy(global, 'describe');
