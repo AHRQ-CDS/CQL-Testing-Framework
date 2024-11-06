@@ -214,6 +214,8 @@ results:
   # The following indicates that these outputs should be arrays of length 1
   ThirdCqlExpression: $should have length 1
   FourthCqlExpression: $should have length 1
+  # The following indicates that the output should contain a JSON subset, needs to be properly quoted and valid JSON
+  FifthCqlExpression: "$should include {\"LookbackPeriod\": 90}"
 ```
 
 Currently only the `exist` and `have length` methods are supported.
