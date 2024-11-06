@@ -129,6 +129,10 @@ function checkResult(expr, actual, expected) {
     } else if (/^\$should have length (\d+)/.test(expectedString)) {
       let expectedLength = Number(expectedString.match(/^\$should have length (\d+)/)[1]);
       expect(actual, message).to.have.lengthOf(expectedLength);
+    } else if (/^\$should include (.+)/.test(expectedString)) {
+      let expectedJson = String(expectedString.match(/^\$should include (.+)/)[1]);
+      const simpleResult = simplifyResult(actual);
+      expect(simpleResult, message).to.deep.include(JSON.parse(expectedJson));  
     } else { // Anything else is not supported
       throw new Error(`Unsupported $should method: ${message}`);
     }
