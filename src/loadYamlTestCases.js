@@ -70,6 +70,11 @@ function yamlToTestCases(yamlFilePath, fhirVersion) {
   }
 
   // Try to load the document
+  if(!docString.startsWith('---')){
+    // eslint-disable-next-line no-console
+    console.log(`Ignoring potential external data file: ${yamlFilePath}`);
+    return [];
+  }  
   const doc = yaml.load(docString);
   if (!doc.name) {
     if (!doc.data && !doc.results) {
