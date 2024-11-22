@@ -291,6 +291,30 @@ CQLT Config: /path/to/my/cql/project/test/cqlt.yaml
 
 ```
 
+## Generating CQL library coverage reports
+
+Test coverage reports describing total number of expressions in the library, number of covered expressions, and list of uncovered expressions can be generated using the custom Mocha coverage reporter. Setup the additional script `test:coverage` in `package.json` as below. The reporter exports lcov formatted files and HTML to the `coverage` folder.
+
+```json
+{
+  "name": "my-cql-project",
+  "version": "1.0.0",
+  "scripts": {
+    "test": "./node_modules/.bin/mocha --reporter spec --recursive",
+    "test:coverage": "./node_modules/.bin/mocha --reporter ./src/exporters/coverage.js --recursive"
+  },
+  "devDependencies": {
+    "mocha": "^5.2.0",
+    "cql-testing": "^1.0.0",
+    "cql-execution": "^1.3.7"
+  }
+}
+```
+
+```sh
+$ npm run test:coverage
+```
+
 ## Generating FHIR Documentation
 
 The _FHIR_DSTU2.md_ and _FHIR_STU3.md_ documentation files are generated using the FHIR specification definitions and the corresponding _config.yaml_ files (in _src/fhir/${version}/_). Developers working on the CQL Testing Framework (i.e., developing the framework itself) can regenerate the documentation using the following command:

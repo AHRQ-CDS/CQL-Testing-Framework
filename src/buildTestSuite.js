@@ -34,7 +34,7 @@ function buildTestSuite(testCases, library, codeService, fhirVersion, config) {
   // Use describe.skip if the suite has skip: true, use describe.only if the suite has only: true, 
   // otherwise use describe
   const describeFn = config.get('skip') ? describe.skip : config.get('only') ? describe.only : describe;
-  describeFn(libraryHandle, () => {
+  describeFn(libraryHandle, function() {
     let patientSource;
     before('Initialize FHIR patient source', () => {
       switch (fhirVersion) {
@@ -80,11 +80,16 @@ function buildTestSuite(testCases, library, codeService, fhirVersion, config) {
       });
     }
 
+    before('Initialize coverage report', () => {
+      this.emit('initCoverageReport', 
+        { source: library.source.library, paths: config.get('library.paths')});
+    });      
+
     afterEach('Reset the patient source', () => patientSource.reset());
 
     for (const testCase of testCases) {
       const testFunc = testCase.skip ? it.skip : testCase.only ? it.only : it;
-      testFunc(testCase.name, () => {
+      testFunc(testCase.name, function() {
         const dumpFileName = `${testCase.name.replace(/[\s/\\]/g, '_')}.json`;
         if (dumpBundlesPath) {
           const filePath = path.join(dumpBundlesPath, dumpFileName);
@@ -108,6 +113,7 @@ function buildTestSuite(testCases, library, codeService, fhirVersion, config) {
             fs.writeFileSync(filePath, JSON.stringify(results, null, 2), 'utf8');
           }
           const patientId = testCase.bundle.entry[0].resource.id;
+          this.test.emit('addLocalIdResultMap', results.localIdPatientResultsMap[patientId]);    
           expect(results.patientResults[patientId]).to.exist;
           for (const expr of Object.keys(testCase.expected)) {
             checkResult(expr, results.patientResults[patientId][expr], testCase.expected[expr]);
