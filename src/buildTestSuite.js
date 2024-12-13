@@ -164,15 +164,17 @@ function simplifyResult(result) {
       result2[key] = simplifyResult(result[key]);
     }
     return result2;
-  } else if (result != null && typeof result === 'object') {
+  } else if (result.constructor.name === 'FHIRObject') {
+    return result._json;
+  } else if (typeof result === 'object') {
+    let result2 = {};
     for (const key of Object.keys(result)) {
-      if(result[key] === undefined){
-        // execution library is serializing uninitialized fields, remove these
-        delete result[key];
-      } else {
-        result[key] = simplifyResult(result[key]);
+      if(result[key] !== undefined){
+        // execution library is serializing uninitialized fields, skip these
+        result2[key] = simplifyResult(result[key]);
       } 
     }
+    return result2;
   }
   return result;
 }

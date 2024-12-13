@@ -9,7 +9,7 @@
       }, {
          "type" : "Annotation",
          "s" : {
-            "r" : "215",
+            "r" : "230",
             "s" : [ {
                "value" : [ "","library OtherFHIRv401Test version '0.0.1'" ]
             } ]
@@ -239,6 +239,179 @@
                      "type" : "Literal"
                   }
                } ]
+            }
+         }, {
+            "localId" : "230",
+            "locator" : "17:1-18:39",
+            "resultTypeName" : "{http://hl7.org/fhir}Age",
+            "name" : "AbatementAge",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "230",
+                  "s" : [ {
+                     "value" : [ "","define ","AbatementAge",":\n  " ]
+                  }, {
+                     "r" : "231",
+                     "s" : [ {
+                        "r" : "250",
+                        "s" : [ {
+                           "r" : "247",
+                           "s" : [ {
+                              "value" : [ "First","(" ]
+                           }, {
+                              "r" : "240",
+                              "s" : [ {
+                                 "s" : [ {
+                                    "r" : "232",
+                                    "s" : [ {
+                                       "r" : "233",
+                                       "s" : [ {
+                                          "r" : "233",
+                                          "s" : [ {
+                                             "value" : [ "[","Condition","]" ]
+                                          } ]
+                                       } ]
+                                    }, {
+                                       "value" : [ " ","C" ]
+                                    } ]
+                                 } ]
+                              } ]
+                           }, {
+                              "value" : [ ")" ]
+                           } ]
+                        }, {
+                           "value" : [ "." ]
+                        }, {
+                           "r" : "250",
+                           "s" : [ {
+                              "value" : [ "abatement" ]
+                           } ]
+                        } ]
+                     }, {
+                        "value" : [ " as " ]
+                     }, {
+                        "r" : "263",
+                        "s" : [ {
+                           "value" : [ "Age" ]
+                        } ]
+                     } ]
+                  } ]
+               }
+            } ],
+            "expression" : {
+               "localId" : "231",
+               "locator" : "18:3-18:39",
+               "resultTypeName" : "{http://hl7.org/fhir}Age",
+               "strict" : false,
+               "type" : "As",
+               "signature" : [ ],
+               "operand" : {
+                  "localId" : "250",
+                  "locator" : "18:3-18:32",
+                  "path" : "abatement",
+                  "type" : "Property",
+                  "resultTypeSpecifier" : {
+                     "localId" : "257",
+                     "type" : "ChoiceTypeSpecifier",
+                     "type" : [ ],
+                     "choice" : [ {
+                        "localId" : "258",
+                        "name" : "{http://hl7.org/fhir}dateTime",
+                        "type" : "NamedTypeSpecifier"
+                     }, {
+                        "localId" : "259",
+                        "name" : "{http://hl7.org/fhir}Age",
+                        "type" : "NamedTypeSpecifier"
+                     }, {
+                        "localId" : "260",
+                        "name" : "{http://hl7.org/fhir}Period",
+                        "type" : "NamedTypeSpecifier"
+                     }, {
+                        "localId" : "261",
+                        "name" : "{http://hl7.org/fhir}Range",
+                        "type" : "NamedTypeSpecifier"
+                     }, {
+                        "localId" : "262",
+                        "name" : "{http://hl7.org/fhir}string",
+                        "type" : "NamedTypeSpecifier"
+                     } ]
+                  },
+                  "source" : {
+                     "localId" : "247",
+                     "locator" : "18:3-18:22",
+                     "resultTypeName" : "{http://hl7.org/fhir}Condition",
+                     "type" : "First",
+                     "signature" : [ {
+                        "localId" : "248",
+                        "type" : "ListTypeSpecifier",
+                        "elementType" : {
+                           "localId" : "249",
+                           "name" : "{http://hl7.org/fhir}Condition",
+                           "type" : "NamedTypeSpecifier"
+                        }
+                     } ],
+                     "source" : {
+                        "localId" : "240",
+                        "locator" : "18:9-18:21",
+                        "type" : "Query",
+                        "resultTypeSpecifier" : {
+                           "localId" : "241",
+                           "type" : "ListTypeSpecifier",
+                           "elementType" : {
+                              "localId" : "242",
+                              "name" : "{http://hl7.org/fhir}Condition",
+                              "type" : "NamedTypeSpecifier"
+                           }
+                        },
+                        "source" : [ {
+                           "localId" : "232",
+                           "locator" : "18:9-18:21",
+                           "alias" : "C",
+                           "resultTypeSpecifier" : {
+                              "localId" : "238",
+                              "type" : "ListTypeSpecifier",
+                              "elementType" : {
+                                 "localId" : "239",
+                                 "name" : "{http://hl7.org/fhir}Condition",
+                                 "type" : "NamedTypeSpecifier"
+                              }
+                           },
+                           "expression" : {
+                              "localId" : "233",
+                              "locator" : "18:9-18:19",
+                              "dataType" : "{http://hl7.org/fhir}Condition",
+                              "templateId" : "http://hl7.org/fhir/StructureDefinition/Condition",
+                              "type" : "Retrieve",
+                              "resultTypeSpecifier" : {
+                                 "localId" : "236",
+                                 "type" : "ListTypeSpecifier",
+                                 "elementType" : {
+                                    "localId" : "237",
+                                    "name" : "{http://hl7.org/fhir}Condition",
+                                    "type" : "NamedTypeSpecifier"
+                                 }
+                              },
+                              "include" : [ ],
+                              "codeFilter" : [ ],
+                              "dateFilter" : [ ],
+                              "otherFilter" : [ ]
+                           }
+                        } ],
+                        "let" : [ ],
+                        "relationship" : [ ]
+                     }
+                  }
+               },
+               "asTypeSpecifier" : {
+                  "localId" : "263",
+                  "locator" : "18:37-18:39",
+                  "resultTypeName" : "{http://hl7.org/fhir}Age",
+                  "name" : "{http://hl7.org/fhir}Age",
+                  "type" : "NamedTypeSpecifier"
+               }
             }
          } ]
       }

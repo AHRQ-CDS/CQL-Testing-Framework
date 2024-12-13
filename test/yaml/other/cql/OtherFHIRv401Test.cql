@@ -13,3 +13,6 @@ define "TestParamAndIncludeSubset":
       LookbackPeriod: "LookbackPeriod",
       Ignore: 'some other output'
     }
+
+define AbatementAge:
+  First([Condition] C).abatement as Age
