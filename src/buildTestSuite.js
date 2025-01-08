@@ -31,7 +31,10 @@ function buildTestSuite(testCases, library, codeService, fhirVersion, config) {
     prefetchKeys = hooksExporter.extractPrefetchKeys(library);
   }
   const executor = new cql.Executor(library, codeService);
-  describe(libraryHandle, () => {
+  // Use describe.skip if the suite has skip: true, use describe.only if the suite has only: true, 
+  // otherwise use describe
+  const describeFn = config.get('skip') ? describe.skip : config.get('only') ? describe.only : describe;
+  describeFn(libraryHandle, function() {
     let patientSource;
     before('Initialize FHIR patient source', () => {
       switch (fhirVersion) {
@@ -77,11 +80,16 @@ function buildTestSuite(testCases, library, codeService, fhirVersion, config) {
       });
     }
 
+    before('Initialize coverage report', () => {
+      this.emit('initCoverageReport', 
+        { source: library.source.library, paths: config.get('library.paths')});
+    });      
+
     afterEach('Reset the patient source', () => patientSource.reset());
 
     for (const testCase of testCases) {
       const testFunc = testCase.skip ? it.skip : testCase.only ? it.only : it;
-      testFunc(testCase.name, () => {
+      testFunc(testCase.name, function() {
         const dumpFileName = `${testCase.name.replace(/[\s/\\]/g, '_')}.json`;
         if (dumpBundlesPath) {
           const filePath = path.join(dumpBundlesPath, dumpFileName);
@@ -98,12 +106,14 @@ function buildTestSuite(testCases, library, codeService, fhirVersion, config) {
           }
         }
         patientSource.loadBundles([testCase.bundle]);
+        executor.withParameters(testCase.parameters);
         return Promise.resolve(executor.exec(patientSource, executionDateTime)).then((results) => {
           if (dumpResultsPath) {
             const filePath = path.join(dumpResultsPath, dumpFileName);
             fs.writeFileSync(filePath, JSON.stringify(results, null, 2), 'utf8');
           }
           const patientId = testCase.bundle.entry[0].resource.id;
+          this.test.emit('addLocalIdResultMap', results.localIdPatientResultsMap[patientId]);    
           expect(results.patientResults[patientId]).to.exist;
           for (const expr of Object.keys(testCase.expected)) {
             checkResult(expr, results.patientResults[patientId][expr], testCase.expected[expr]);
@@ -125,6 +135,10 @@ function checkResult(expr, actual, expected) {
     } else if (/^\$should have length (\d+)/.test(expectedString)) {
       let expectedLength = Number(expectedString.match(/^\$should have length (\d+)/)[1]);
       expect(actual, message).to.have.lengthOf(expectedLength);
+    } else if (/^\$should include (.+)/.test(expectedString)) {
+      let expectedJson = String(expectedString.match(/^\$should include (.+)/)[1]);
+      const simpleResult = simplifyResult(actual);
+      expect(simpleResult, message).to.deep.include(JSON.parse(expectedJson));  
     } else { // Anything else is not supported
       throw new Error(`Unsupported $should method: ${message}`);
     }
@@ -150,10 +164,17 @@ function simplifyResult(result) {
       result2[key] = simplifyResult(result[key]);
     }
     return result2;
-  } else if (result != null && typeof result === 'object') {
+  } else if (result.constructor.name === 'FHIRObject') {
+    return result._json;
+  } else if (typeof result === 'object') {
+    let result2 = {};
     for (const key of Object.keys(result)) {
-      result[key] = simplifyResult(result[key]);
+      if(result[key] !== undefined){
+        // execution library is serializing uninitialized fields, skip these
+        result2[key] = simplifyResult(result[key]);
+      } 
     }
+    return result2;
   }
   return result;
 }

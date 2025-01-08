@@ -8,6 +8,9 @@ Each YAML file in the `tests` folder is a separate test case.  Each file has the
 * **externalData**: A YAML [array](https://yaml.org/spec/1.2/spec.html#id2802662) of the names of other YAML files which may contain [anchored](https://yaml.org/spec/1.2/spec.html#id2785586) resource definitions which can be referenced below under the `data` section. See "Reusing Resources" below for more information.
 * **data**: A sequence (i.e., array) of the resource instances making up the test case (with the `Patient` resource as the first one). Can include YAML references to anchored resources defined in any YAML files listed under the `externalData` section.
 * **results**: A hash (i.e. object) for which each key corresponds to a CQL expression name and the value is the _expected_ result for that CQL expression.
+* **skip**: Skip test case if true (optional, default false).
+* **only**: Only run this test case if true (optional, default false).
+* **parameters**: A hash (i.e. object) for which each key corresponds to a CQL library parameter name and the value is the input for execution. (optional, default none).
 
 The following is a very simple example of a test case for a fictional CQL library with inclusion criteria that the patient must be male, over 18, and have an Opiod prescription on record.  It sets up test data for a 40 year-old male with an Oxycodone prescription and specifies that the `MeetsInclusionCriteria` CQL expression should evaluate to `true`.
 
@@ -211,6 +214,8 @@ results:
   # The following indicates that these outputs should be arrays of length 1
   ThirdCqlExpression: $should have length 1
   FourthCqlExpression: $should have length 1
+  # The following indicates that the output should contain a JSON subset, needs to be properly quoted and valid JSON
+  FifthCqlExpression: "$should include {\"LookbackPeriod\": 90}"
 ```
 
 Currently only the `exist` and `have length` methods are supported.

@@ -136,6 +136,8 @@ The following configuration parameters are currently supported:
     * **dumpFiles**:
         * **enabled**: Indicates if test data and actual results should be dumped to files for debugging or testing; supports bundles, CQL Hooks requests, and Postman collections of CQL Hooks requests _(optional, boolean, default: false)_
         * **path**: The file path to dump files to, if enabled _(optional, string, default: dump\_files)_
+* **skip**: Skip test folder if true _(optional, boolean, default: false)_.
+* **only**: Only run this test folder if true _(optional, boolean, default: false)_.        
 
 All file paths are relative to the location of the `cqlt.yaml` configuraton file unless the file path is absolute.
 
@@ -287,6 +289,30 @@ CQLT Config: /path/to/my/cql/project/test/cqlt.yaml
       -  "MeetsInclusionCriteria": true
       +  "MeetsInclusionCriteria": false
 
+```
+
+## Generating CQL library coverage reports
+
+Test coverage reports describing total number of expressions in the library, number of covered expressions, and list of uncovered expressions can be generated using the custom Mocha coverage reporter. Setup the additional script `test:coverage` in `package.json` as below. The reporter exports lcov formatted files and HTML to the `coverage` folder.
+
+```json
+{
+  "name": "my-cql-project",
+  "version": "1.0.0",
+  "scripts": {
+    "test": "./node_modules/.bin/mocha --reporter spec --recursive",
+    "test:coverage": "./node_modules/.bin/mocha --reporter ./src/exporters/coverage.js --recursive"
+  },
+  "devDependencies": {
+    "mocha": "^5.2.0",
+    "cql-testing": "^1.0.0",
+    "cql-execution": "^1.3.7"
+  }
+}
+```
+
+```sh
+$ npm run test:coverage
 ```
 
 ## Generating FHIR Documentation

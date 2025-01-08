@@ -9,6 +9,7 @@
     "test": "./node_modules/.bin/mocha --reporter spec --recursive",
     "test:watch": "npm test -- --watch",
     "test:debug": "./node_modules/.bin/mocha --inspect --inspect-brk --reporter spec --recursive",
+    "test:coverage": "./node_modules/.bin/mocha --reporter ./src/exporters/coverage.js --recursive",
     "lint": "./node_modules/.bin/eslint .",
     "lint:fix": "./node_modules/.bin/eslint . --fix",
     "doc": "node ./src/doc-gen.js"
@@ -19,6 +20,8 @@
     "cql-exec-fhir": "^2.1.5",
     "cql-exec-vsac": "^2.2.0",
     "fs-extra": "^11.2.0",
+    "istanbul-lib-report": "^3.0.1",
+    "istanbul-reports": "^3.1.7",
     "js-yaml": "^4.1.0",
     "lodash": "^4.17.21",
     "mocha": "^10.6.0",
@@ -33,7 +36,8 @@
     "@eslint/js": "^9.6.0",
     "cql-execution": "^3.0.1",
     "eslint": "^9.6.0",
-    "globals": "^15.8.0"
+    "globals": "^15.8.0",
+    "sinon": "^19.0.2"
   },
   "bin": {
     "cql-to-elm": "bin/cql2elm.js"
